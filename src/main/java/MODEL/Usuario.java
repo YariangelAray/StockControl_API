@@ -15,12 +15,12 @@ public class Usuario {
     private String telefono;
     private String correo;
     private Integer ficha_id;
-    private String contraseña;
+    private String contrasena;
     private int rol_id;
 
     public Usuario(){}
     
-    public Usuario(int id, String nombres, String apellidos, int tipo_documento_id, String documento, int genero_id, String telefono, String correo, Integer ficha_id, String contraseña, int rol_id) {
+    public Usuario(int id, String nombres, String apellidos, int tipo_documento_id, String documento, int genero_id, String telefono, String correo, Integer ficha_id, String contrasena, int rol_id) {
         this.id = id;
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -30,7 +30,7 @@ public class Usuario {
         this.telefono = telefono;
         this.correo = correo;
         this.ficha_id = ficha_id;
-        this.contraseña = contraseña;
+        this.contrasena = contrasena;
         this.rol_id = rol_id;
     }
 
@@ -106,12 +106,12 @@ public class Usuario {
         this.ficha_id = ficha_id;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public int getRol_id() {

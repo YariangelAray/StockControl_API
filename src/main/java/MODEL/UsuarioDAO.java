@@ -53,7 +53,7 @@ public class UsuarioDAO {
                     rs.getString("telefono"),
                     rs.getString("correo"),
                     rs.getObject("ficha_id") != null ? rs.getInt("ficha_id") : null,
-                    rs.getString("contraseña"),
+                    rs.getString("contrasena"),
                     rs.getInt("rol_id")
                 );
                 usuarios.add(usuario);
@@ -92,7 +92,7 @@ public class UsuarioDAO {
                     rs.getString("telefono"),
                     rs.getString("correo"),
                     rs.getObject("ficha_id") != null ? rs.getInt("ficha_id") : null,
-                    rs.getString("contraseña"),
+                    rs.getString("contrasena"),
                     rs.getInt("rol_id")
                 );
             }
@@ -131,7 +131,7 @@ public class UsuarioDAO {
                     rs.getString("telefono"),
                     rs.getString("correo"),
                     rs.getObject("ficha_id") != null ? rs.getInt("ficha_id") : null,
-                    rs.getString("contraseña"),
+                    rs.getString("contrasena"),
                     rs.getInt("rol_id")
                 );
             }
@@ -170,7 +170,7 @@ public class UsuarioDAO {
                     rs.getString("telefono"),
                     rs.getString("correo"),
                     rs.getObject("ficha_id") != null ? rs.getInt("ficha_id") : null,
-                    rs.getString("contraseña"),
+                    rs.getString("contrasena"),
                     rs.getInt("rol_id")
                 );
             }
@@ -189,7 +189,7 @@ public class UsuarioDAO {
     * @return true si la operación fue exitosa, false en caso contrario.
     */
     public boolean create(Usuario usuario) {
-        String SQL = "INSERT INTO usuarios (nombres, apellidos, tipo_documento_id, documento, genero_id, telefono, correo, ficha_id, contraseña, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String SQL = "INSERT INTO usuarios (nombres, apellidos, tipo_documento_id, documento, genero_id, telefono, correo, ficha_id, contrasena, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conexion = DBConnection.conectar();
              PreparedStatement stmt = conexion.prepareStatement(SQL)) {
@@ -202,7 +202,7 @@ public class UsuarioDAO {
             stmt.setString(6, usuario.getTelefono());
             stmt.setString(7, usuario.getCorreo());
             stmt.setInt(8, usuario.getFicha_id());
-            stmt.setString(9, usuario.getContraseña());
+            stmt.setString(9, usuario.getContrasena());
             stmt.setInt(10, usuario.getRol_id());
 
             int filasAfectadas = stmt.executeUpdate();
@@ -222,7 +222,7 @@ public class UsuarioDAO {
     * @return true si se actualizó correctamente, false en caso contrario.
     */
     public boolean update(int id, Usuario usuario) {
-        String SQL = "UPDATE usuarios SET nombres = ?, apellidos = ?, tipo_documento_id = ?, documento = ?, genero_id = ?, telefono = ?, correo = ?, ficha_id = ?, contraseña = ?, rol_id = ? WHERE id = ?";
+        String SQL = "UPDATE usuarios SET nombres = ?, apellidos = ?, tipo_documento_id = ?, documento = ?, genero_id = ?, telefono = ?, correo = ?, ficha_id = ?, contrasena = ?, rol_id = ? WHERE id = ?";
 
         try (Connection conexion = DBConnection.conectar();
              PreparedStatement stmt = conexion.prepareStatement(SQL)) {
@@ -235,7 +235,7 @@ public class UsuarioDAO {
             stmt.setString(6, usuario.getTelefono());
             stmt.setString(7, usuario.getCorreo());
             stmt.setInt(8, usuario.getFicha_id());
-            stmt.setString(9, usuario.getContraseña());
+            stmt.setString(9, usuario.getContrasena());
             stmt.setInt(10, usuario.getRol_id());
             stmt.setInt(11, id);
 
