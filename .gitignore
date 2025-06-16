@@ -1,0 +1,21 @@
+# Ignora la carpeta de compilación de Maven
+/target/
+
+# Archivos de configuración de NetBeans
+nbproject/private/
+/nbbuild/
+/dist/
+/.nb-gradle/
+
+# Archivos generados por el IDE
+*.class
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración de IDEs comunes
+*.iml
+.idea/
+.vscode/
