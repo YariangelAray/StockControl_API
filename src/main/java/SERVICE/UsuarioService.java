@@ -2,7 +2,9 @@ package SERVICE;
 
 import MODEL.Usuario;
 import MODEL.UsuarioDAO;
+import PROVIDERS.ResponseProvider;
 import java.util.List;
+import javax.ws.rs.core.*;
 
 /**
  * Servicio para gestionar operaciones relacionadas con usuarios.
@@ -32,18 +34,40 @@ public class UsuarioService {
      *
      * @return Lista de objetos Usuario.
      */
-    public List<Usuario> obtenerTodos() {
-        return dao.getAll();
+    public Response obtenerTodos() {
+        List<Usuario> usuarios = dao.getAll();
+        if (usuarios.isEmpty()) {
+            return ResponseProvider.error("No se encontraron usuarios", 404);
+        }
+        return ResponseProvider.success(usuarios, "Usuarios obtenidos correctamente", 200);
     }
-
+    
+    /**
+     * Retorna la lista completa de usuarios que sean de un Rol determinado.
+     * 
+     * @param id ID del Rol.
+     * @return Lista de objetos Usuario.
+     */
+    public Response obtenerTodosPorIdRol(int idRol) {
+        List<Usuario> usuarios = dao.getAll();
+        if (usuarios.isEmpty()) {
+            return ResponseProvider.error("No se encontraron usuarios", 404);
+        }
+        return ResponseProvider.success(usuarios, "Usuarios obtenidos correctamente", 200);
+    }
+    
     /**
      * Busca un usuario por su ID.
      *
      * @param id ID del usuario.
      * @return Usuario encontrado o null.
      */
-    public Usuario obtenerUsuario(int id) {
-        return dao.getById(id);
+    public Response obtenerUsuario(int id) {
+        Usuario usuario = dao.getById(id);
+        if (usuario == null) {
+            return ResponseProvider.error("Usuario no encontrado", 404);
+        }
+        return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
     }
 
     /**
@@ -52,8 +76,12 @@ public class UsuarioService {
      * @param correo Correo a buscar.
      * @return Usuario encontrado o null.
      */
-    public Usuario obtenerPorCorreo(String correo) {
-        return dao.getByCorreo(correo);
+    public Response obtenerPorCorreo(String correo) {
+        Usuario usuario = dao.getByCorreo(correo);
+        if (usuario == null) {
+            return ResponseProvider.error("Usuario no encontrado", 404);
+        }
+        return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
     }
 
     /**
@@ -62,8 +90,12 @@ public class UsuarioService {
      * @param documento Documento a buscar.
      * @return Usuario encontrado o null.
      */
-    public Usuario obtenerPorDocumento(String documento) {
-        return dao.getByDocumento(documento);
+    public Response obtenerPorDocumento(String documento) {
+        Usuario usuario = dao.getByDocumento(documento);
+        if (usuario == null) {
+            return ResponseProvider.error("Usuario no encontrado", 404);
+        }
+        return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);        
     }
     
     /**
@@ -72,8 +104,23 @@ public class UsuarioService {
      * @param usuario Objeto Usuario a crear.
      * @return true si se creó exitosamente, false si falló.
      */
-    public boolean crearUsuario(Usuario usuario) {
-        return dao.create(usuario);
+    public Response crearUsuario(Usuario usuario) {        
+        Usuario usuarioExistenteCorreo = dao.getByCorreo(usuario.getCorreo());
+        if (usuarioExistenteCorreo != null){
+            return ResponseProvider.error("Este correo ya fue registrado", 400);
+        }
+        
+        Usuario usuarioExistenteDoc = dao.getByDocumento(usuario.getDocumento());
+        if (usuarioExistenteDoc != null){
+            return ResponseProvider.error("Este número de documento ya fue registrado", 400);
+        }
+        
+        Usuario nuevoUsuario = dao.create(usuario);      
+        if (nuevoUsuario != null) {
+            return ResponseProvider.success(nuevoUsuario, "Usuario creado correctamente", 201);
+        } else {
+            return ResponseProvider.error("Error al crear el usuario", 400);
+        }
     }
 
     /**
@@ -83,8 +130,17 @@ public class UsuarioService {
      * @param usuario Nuevos datos del usuario.
      * @return true si se actualizó correctamente, false si falló.
      */
-    public boolean actualizarUsuario(int id, Usuario usuario) {
-        return dao.update(id, usuario);
+    public Response actualizarUsuario(int id, Usuario usuario) {
+        Usuario usuarioExistente = dao.getById(id);
+        if (usuarioExistente == null) {
+            return ResponseProvider.error("Usuario no encontrado", 404);
+        }
+        Usuario usuarioActualizado = dao.update(id, usuario);
+        if (usuarioActualizado != null) {
+            return ResponseProvider.success(usuarioActualizado, "Usuario actualizado correctamente", 200);
+        } else {
+            return ResponseProvider.error("Error al actualizar el usuario", 404);
+        }
     }
 
     /**
@@ -93,7 +149,16 @@ public class UsuarioService {
      * @param id ID del usuario a eliminar.
      * @return true si se eliminó, false si falló.
      */
-    public boolean eliminarUsuario(int id) {
-        return dao.delete(id);
+    public Response eliminarUsuario(int id) {
+        Usuario usuarioExistente = dao.getById(id);
+        if (usuarioExistente == null) {
+            return ResponseProvider.error("Usuario no encontrado", 404);
+        }
+        boolean eliminado = dao.delete(id);
+        if (eliminado) {
+            return ResponseProvider.success(null, "Usuario eliminado correctamente", 200);
+        } else {
+            return ResponseProvider.error("Error al eliminar el usuario", 500);
+        }
     }
 }

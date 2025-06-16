@@ -2,7 +2,7 @@ package CONTROLLER;
 
 import SERVICE.UsuarioService;
 import MODEL.Usuario;
-import java.util.List;
+import PROVIDERS.ResponseProvider;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -40,19 +40,11 @@ public class UsuarioController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerTodos() {
-        try {          
-            List<Usuario> usuarios = service.obtenerTodos();
-            if (usuarios == null || usuarios.isEmpty()) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"No se encontraron usuarios\"}")
-                        .build();
-            }
-            return Response.ok(usuarios).build();
+        try {
+            return service.obtenerTodos();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al obtener los usuarios.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
@@ -67,18 +59,10 @@ public class UsuarioController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerUsuario(@PathParam("id") int id) {
         try {
-            Usuario usuario = service.obtenerUsuario(id);
-            if (usuario == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Usuario no encontrado\"}")
-                        .build();
-            }
-            return Response.ok(usuario).build();
+            return service.obtenerUsuario(id);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al obtener el usuario.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
@@ -93,18 +77,10 @@ public class UsuarioController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerPorDocumento(@PathParam("documento") String documento) {
         try {
-            Usuario usuario = service.obtenerPorDocumento(documento);
-            if (usuario == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Usuario no encontrado con ese documento\"}")
-                        .build();
-            }
-            return Response.ok(usuario).build();
+            return service.obtenerPorDocumento(documento);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al buscar el usuario por documento.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
     
@@ -119,18 +95,10 @@ public class UsuarioController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerPorCorreo(@PathParam("correo") String correo) {
         try {
-            Usuario usuario = service.obtenerPorCorreo(correo);
-            if (usuario == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Usuario no encontrado con ese correo\"}")
-                        .build();
-            }
-            return Response.ok(usuario).build();
+            return service.obtenerPorCorreo(correo);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al buscar el usuario por correo.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
@@ -144,15 +112,11 @@ public class UsuarioController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response crearUsuario(Usuario usuario) {
-        boolean creado = service.crearUsuario(usuario);
-        if (creado) {
-            return Response.status(Response.Status.CREATED)
-                    .entity("{\"mensaje\":\"Usuario creado exitosamente\"}")
-                    .build();
-        } else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"mensaje\":\"Error al crear el usuario\"}")
-                    .build();
+        try {
+            return service.crearUsuario(usuario);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
@@ -169,19 +133,10 @@ public class UsuarioController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarUsuario(@PathParam("id") int id, Usuario usuario) {
         try {
-            boolean actualizado = service.actualizarUsuario(id, usuario);
-            if (actualizado) {
-                return Response.ok("{\"mensaje\": \"Usuario actualizado exitosamente\"}").build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Usuario no encontrado\"}")
-                        .build();
-            }
+            return service.actualizarUsuario(id, usuario);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al actualizar el usuario.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
@@ -196,19 +151,10 @@ public class UsuarioController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarUsuario(@PathParam("id") int id) {
         try {
-            boolean eliminado = service.eliminarUsuario(id);
-            if (eliminado) {
-                return Response.ok("{\"mensaje\": \"Usuario eliminado exitosamente\"}").build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Usuario no encontrado\"}")
-                        .build();
-            }
+            return service.eliminarUsuario(id);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al eliminar el usuario.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 }

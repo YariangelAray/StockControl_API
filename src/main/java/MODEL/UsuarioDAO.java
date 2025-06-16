@@ -66,6 +66,45 @@ public class UsuarioDAO {
     }
 
     /**
+    * Obtiene todos los registros de usuarios desde la base de datos que coincidan con el ID del Rol indicado.
+    *
+    * @param id El ID del rol indicado.
+    * @return Lista de objetos Usuario con todos los usuarios de ese Rol.
+    */
+    public List<Usuario> getAllByIdRol(int idRol) {
+        List<Usuario> usuarios = new ArrayList<>();
+        String SQL = "SELECT * FROM usuarios WHERE rol_id = ?";
+
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+            
+            stmt.setInt(1, idRol);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Usuario usuario = new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nombres"),
+                    rs.getString("apellidos"),
+                    rs.getInt("tipo_documento_id"),
+                    rs.getString("documento"),
+                    rs.getInt("genero_id"),
+                    rs.getString("telefono"),
+                    rs.getString("correo"),
+                    rs.getObject("ficha_id") != null ? rs.getInt("ficha_id") : null,
+                    rs.getString("contrasena"),
+                    rs.getInt("rol_id")
+                );
+                usuarios.add(usuario);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return usuarios;
+    }
+    
+    /**
     * Busca un usuario por su ID.
     *
     * @param id El ID del usuario a buscar.
@@ -103,6 +142,7 @@ public class UsuarioDAO {
 
         return usuario;
     }
+    
     
     /**
     * Busca un usuario por su número de documento.
@@ -188,7 +228,7 @@ public class UsuarioDAO {
     * @param usuario Objeto Usuario con la información a registrar.
     * @return true si la operación fue exitosa, false en caso contrario.
     */
-    public boolean create(Usuario usuario) {
+    public Usuario create(Usuario usuario) {
         String SQL = "INSERT INTO usuarios (nombres, apellidos, tipo_documento_id, documento, genero_id, telefono, correo, ficha_id, contrasena, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conexion = DBConnection.conectar();
@@ -206,12 +246,19 @@ public class UsuarioDAO {
             stmt.setInt(10, usuario.getRol_id());
 
             int filasAfectadas = stmt.executeUpdate();
-            return filasAfectadas > 0;
+            if (filasAfectadas > 0) {
+                
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    usuario.setId(generatedKeys.getInt(1)); // Asignar el ID generado al usuario
+                    return usuario; // Retornar el usuario creado
+                }
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            e.printStackTrace();            
         }
+        return null;
     }
 
     /**
@@ -221,7 +268,7 @@ public class UsuarioDAO {
     * @param usuario Objeto Usuario con los nuevos datos.
     * @return true si se actualizó correctamente, false en caso contrario.
     */
-    public boolean update(int id, Usuario usuario) {
+    public Usuario update(int id, Usuario usuario) {
         String SQL = "UPDATE usuarios SET nombres = ?, apellidos = ?, tipo_documento_id = ?, documento = ?, genero_id = ?, telefono = ?, correo = ?, ficha_id = ?, contrasena = ?, rol_id = ? WHERE id = ?";
 
         try (Connection conexion = DBConnection.conectar();
@@ -240,12 +287,15 @@ public class UsuarioDAO {
             stmt.setInt(11, id);
 
             int filasAfectadas = stmt.executeUpdate();
-            return filasAfectadas > 0;
+            if (filasAfectadas > 0) {
+                usuario.setId(id); // Asignar el ID al usuario actualizado
+                return usuario; // Retornar el usuario actualizado
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return null;
     }
 
     /**
@@ -255,6 +305,7 @@ public class UsuarioDAO {
     * @return true si la eliminación fue exitosa, false si falló.
     */
     public boolean delete(int id) {
+        
         String SQL = "DELETE FROM usuarios WHERE id = ?";
 
         try (Connection conexion = DBConnection.conectar();
@@ -268,5 +319,5 @@ public class UsuarioDAO {
             e.printStackTrace();
             return false;
         }
-    }
+    }  
 }
