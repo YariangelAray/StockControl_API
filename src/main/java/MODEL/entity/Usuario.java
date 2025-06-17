@@ -1,8 +1,16 @@
-package MODEL;
+package model.entity;
 
 /**
- *
- * @author YariangelAray
+ * Clase que representa la entidad Usuario del sistema.
+ * 
+ * Este modelo se usa para mapear los datos provenientes de la tabla 'usuarios'
+ * en la base de datos. Se utiliza en operaciones de inserción, consulta,
+ * actualización y eliminación a través del UsuarioDAO.
+ * 
+ * También se considera un POJO (Plain Old Java Object) porque solo contiene
+ * atributos, constructores y métodos getters y setters.
+ * 
+ * @author Yariangel Aray
  */
 public class Usuario {
     

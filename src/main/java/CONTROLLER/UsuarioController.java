@@ -1,26 +1,27 @@
-package CONTROLLER;
+package controller;
 
-import SERVICE.UsuarioService;
-import MODEL.Usuario;
-import PROVIDERS.ResponseProvider;
+import middleware.ValidarCampos;
+import service.UsuarioService;
+import model.entity.Usuario;
+import providers.ResponseProvider;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * Controlador para gestionar las rutas HTTP relacionadas con los usuarios.
- * Expone servicios REST para crear, consultar, actualizar y eliminar usuarios.
- * También permite buscar por correo o documento.
- * 
+ * Controlador REST para gestionar operaciones relacionadas con los usuarios.
+ * Define rutas HTTP que permiten consultar, crear, actualizar y eliminar usuarios.
+ *
  * Rutas disponibles:
- * - GET /usuarios
- * - GET /usuarios/{id}
- * - GET /usuarios/correo/{correo}
- * - GET /usuarios/documento/{documento}
- * - POST /usuarios
- * - PUT /usuarios/{id}
- * - DELETE /usuarios/{id}
- * 
+ * - GET /usuarios: Listar todos los usuarios.
+ * - GET /usuarios/{id}: Buscar usuario por ID.
+ * - GET /usuarios/correo/{correo}: Buscar usuario por correo.
+ * - GET /usuarios/documento/{documento}: Buscar usuario por documento.
+ * - POST /usuarios: Crear nuevo usuario.
+ * - PUT /usuarios/{id}: Actualizar usuario existente.
+ * - DELETE /usuarios/{id}: Eliminar usuario.
+ *
  * @author Yariangel Aray
  */
 @Path("/usuarios")
@@ -29,13 +30,14 @@ public class UsuarioController {
     UsuarioService service;
 
     public UsuarioController() {
+        // Instancia el servicio encargado de la lógica de negocio
         service = new UsuarioService();
     }
 
     /**
-     * Obtiene todos los usuarios registrados.
+     * Obtiene todos los usuarios registrados en el sistema.
      *
-     * @return Lista de usuarios en formato JSON o error.
+     * @return Lista de usuarios o mensaje de error si ocurre una excepción.
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -49,10 +51,10 @@ public class UsuarioController {
     }
 
     /**
-     * Obtiene un usuario por su ID.
+     * Busca un usuario por su ID único.
      *
-     * @param id ID del usuario a consultar.
-     * @return Usuario encontrado o mensaje de error.
+     * @param id Identificador del usuario.
+     * @return Usuario encontrado o mensaje de error si no existe o ocurre una excepción.
      */
     @GET
     @Path("/{id}")
@@ -67,9 +69,9 @@ public class UsuarioController {
     }
 
     /**
-     * Obtiene un usuario por su documento.
+     * Busca un usuario por su número de documento.
      *
-     * @param documento Número de documento.
+     * @param documento Documento del usuario.
      * @return Usuario encontrado o mensaje de error.
      */
     @GET
@@ -83,9 +85,9 @@ public class UsuarioController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
-    
+
     /**
-     * Obtiene un usuario por su correo.
+     * Busca un usuario por su correo electrónico.
      *
      * @param correo Correo del usuario.
      * @return Usuario encontrado o mensaje de error.
@@ -103,12 +105,14 @@ public class UsuarioController {
     }
 
     /**
-     * Crea un nuevo usuario.
+     * Registra un nuevo usuario en el sistema.
+     * Se valida el contenido con una clase Middleware (`@ValidarUsuarioCampos`).
      *
-     * @param usuario Usuario a registrar.
-     * @return Mensaje de éxito o error.
+     * @param usuario Objeto Usuario recibido en el cuerpo de la petición.
+     * @return Respuesta con estado y mensaje.
      */
     @POST
+    @ValidarCampos(entidad = "usuario")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response crearUsuario(Usuario usuario) {
@@ -121,14 +125,16 @@ public class UsuarioController {
     }
 
     /**
-     * Actualiza los datos de un usuario existente.
+     * Actualiza la información de un usuario existente.
+     * Se validan los nuevos campos antes de aplicar los cambios.
      *
      * @param id ID del usuario a actualizar.
-     * @param usuario Nuevos datos del usuario.
-     * @return Mensaje de éxito o error.
+     * @param usuario Datos nuevos del usuario.
+     * @return Respuesta con mensaje de éxito o error.
      */
     @PUT
     @Path("/{id}")
+    @ValidarCampos(entidad = "usuario")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarUsuario(@PathParam("id") int id, Usuario usuario) {
@@ -141,10 +147,10 @@ public class UsuarioController {
     }
 
     /**
-     * Elimina un usuario por ID.
+     * Elimina un usuario del sistema mediante su ID.
      *
      * @param id ID del usuario a eliminar.
-     * @return Mensaje de éxito o error.
+     * @return Respuesta indicando si la eliminación fue exitosa o no.
      */
     @DELETE
     @Path("/{id}")

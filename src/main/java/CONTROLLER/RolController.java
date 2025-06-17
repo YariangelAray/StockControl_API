@@ -1,7 +1,7 @@
-package CONTROLLER;
+package controller;
 
-import MODEL.Rol;
-import SERVICE.RolService;
+import model.entity.Rol;
+import service.RolService;
 import java.util.List;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

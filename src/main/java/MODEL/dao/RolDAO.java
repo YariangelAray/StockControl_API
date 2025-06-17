@@ -1,6 +1,9 @@
-package MODEL;
+package model.dao;
 
-import UTILS.DBConnection;
+import model.entity.Rol;
+import model.dao.UsuarioDAO;
+import model.entity.Usuario;
+import utils.DBConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

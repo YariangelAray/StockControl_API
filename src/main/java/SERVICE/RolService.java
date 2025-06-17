@@ -1,7 +1,7 @@
-package SERVICE;
+package service;
 
-import MODEL.RolDAO;
-import MODEL.Rol;
+import model.dao.RolDAO;
+import model.entity.Rol;
 import java.util.List;
 
 /**

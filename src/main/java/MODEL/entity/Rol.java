@@ -1,7 +1,15 @@
-package MODEL;
+package model.entity;
 
 /**
- *
+ * Clase que representa la entidad Rol del sistema.
+ * 
+ * Este modelo se usa para mapear los datos provenientes de la tabla 'roles'
+ * en la base de datos. Se utiliza en operaciones de inserción, consulta,
+ * actualización y eliminación a través del RolDAO.
+ * 
+ * También se considera un POJO (Plain Old Java Object) porque solo contiene
+ * atributos, constructores y métodos getters y setters.
+ * 
  * @author Yariangel Aray
  */
 public class Rol {
