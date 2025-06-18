@@ -26,6 +26,6 @@ public class AppConfig extends ResourceConfig {
      * configuraciones y middleware de la aplicación.
      */
     public AppConfig() {
-        packages("CONTROLLER", "CONFIG", "MIDDLEWARE");
+        packages("controller", "config", "middleware");
     }
 }

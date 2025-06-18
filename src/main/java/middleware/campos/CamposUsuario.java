@@ -25,15 +25,15 @@ public class CamposUsuario {
     public static List<Campo> obtener() {
         List<Campo> campos = new ArrayList<>();
         campos.add(new Campo("nombres", true, 3, 100, "string"));
-        campos.add(new Campo("apellidos", true, 5, 100, "string"));
+        campos.add(new Campo("apellidos", true, 3, 100, "string"));
         campos.add(new Campo("tipo_documento_id", true, 1, 2, "numero"));
-        campos.add(new Campo("documento", true, 10, 15, "string"));
+        campos.add(new Campo("documento", true, 10, 11, "string"));
         campos.add(new Campo("genero_id", true, 1, 2, "numero"));
         campos.add(new Campo("telefono", true, 8, 15, "string"));
         campos.add(new Campo("correo", true, 6, 100, "string"));
         campos.add(new Campo("ficha_id", false, 1, 2, "numero"));
         campos.add(new Campo("contrasena", true, 8, 50, "string"));
-        campos.add(new Campo("rol_id", true, 1, 2, "numero"));        
+        campos.add(new Campo("rol_id", false, 1, 2, "numero"));        
         
         return campos;
     }
