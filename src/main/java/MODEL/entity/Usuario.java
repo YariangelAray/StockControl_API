@@ -22,13 +22,13 @@ public class Usuario {
     private int genero_id;
     private String telefono;
     private String correo;
-    private Integer ficha_id;
+    private int ficha_id;
     private String contrasena;
     private int rol_id;
 
     public Usuario(){}
     
-    public Usuario(int id, String nombres, String apellidos, int tipo_documento_id, String documento, int genero_id, String telefono, String correo, Integer ficha_id, String contrasena, int rol_id) {
+    public Usuario(int id, String nombres, String apellidos, int tipo_documento_id, String documento, int genero_id, String telefono, String correo, int ficha_id, String contrasena, int rol_id) {
         this.id = id;
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -106,11 +106,11 @@ public class Usuario {
         this.correo = correo;
     }
 
-    public Integer getFicha_id() {
+    public int getFicha_id() {
         return ficha_id;
     }
 
-    public void setFicha_id(Integer ficha_id) {
+    public void setFicha_id(int ficha_id) {
         this.ficha_id = ficha_id;
     }
 

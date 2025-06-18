@@ -25,8 +25,11 @@ public class ResponseProvider {
      * @return Objeto Response con estructura estandarizada.
      */
     public static Response success(Object data, String message, int status) {
+        // Crea una respuesta HTTP con el código de estado proporcionado
         return Response.status(status)
+                // Establece el cuerpo de la respuesta usando ResponseMessage
                 .entity(new ResponseMessage(true, status, message, data, null))
+                // Construye y retorna el objeto Response
                 .build();
     }
 
@@ -38,8 +41,11 @@ public class ResponseProvider {
      * @return Objeto Response con estructura estandarizada de error.
      */
     public static Response error(String message, int status) {
+        // Crea una respuesta HTTP con el código de estado proporcionado
         return Response.status(status)
+                // Establece el cuerpo de la respuesta usando ResponseMessage
                 .entity(new ResponseMessage(false, status, message, null, null))
+                // Construye y retorna el objeto Response
                 .build();
     }
 
@@ -52,8 +58,11 @@ public class ResponseProvider {
      * @return Objeto Response con estructura estandarizada de error.
      */
     public static Response error(String message, int status, List<String> errors) {
+        // Crea una respuesta HTTP con el código de estado proporcionado
         return Response.status(status)
+                // Establece el cuerpo de la respuesta usando ResponseMessage
                 .entity(new ResponseMessage(false, status, message, null, errors))
+                // Construye y retorna el objeto Response
                 .build();
     }
 }

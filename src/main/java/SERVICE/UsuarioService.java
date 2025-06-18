@@ -26,7 +26,7 @@ import javax.ws.rs.core.Response;
  */
 public class UsuarioService {
 
-    private UsuarioDAO dao;
+    private UsuarioDAO dao; // Instancia del DAO para acceder a los datos de usuarios
 
     public UsuarioService() {
         // Instancia el DAO que se encarga del acceso directo a la base de datos
@@ -39,12 +39,16 @@ public class UsuarioService {
      * @return Lista de usuarios o error si no hay resultados.
      */
     public Response obtenerTodos() {
+        // Obtiene la lista de usuarios desde el DAO
         List<Usuario> usuarios = dao.getAll();
 
+        // Verifica si la lista está vacía
         if (usuarios.isEmpty()) {
+            // Retorna un error si no se encontraron usuarios
             return ResponseProvider.error("No se encontraron usuarios", 404);
         }
 
+        // Retorna la lista de usuarios si se encontraron
         return ResponseProvider.success(usuarios, "Usuarios obtenidos correctamente", 200);
     }
 
@@ -55,12 +59,16 @@ public class UsuarioService {
      * @return Lista de usuarios del rol o error si no hay resultados.
      */
     public Response obtenerTodosPorIdRol(int idRol) {
+        // Obtiene la lista de usuarios por rol desde el DAO
         List<Usuario> usuarios = dao.getAllByIdRol(idRol);
 
+        // Verifica si la lista está vacía
         if (usuarios.isEmpty()) {
+            // Retorna un error si no se encontraron usuarios
             return ResponseProvider.error("No se encontraron usuarios", 404);
         }
 
+        // Retorna la lista de usuarios si se encontraron
         return ResponseProvider.success(usuarios, "Usuarios obtenidos correctamente", 200);
     }
 
@@ -71,12 +79,16 @@ public class UsuarioService {
      * @return Usuario encontrado o error si no existe.
      */
     public Response obtenerUsuario(int id) {
+        // Busca el usuario por ID en el DAO
         Usuario usuario = dao.getById(id);
 
+        // Verifica si el usuario fue encontrado
         if (usuario == null) {
+            // Retorna un error si no se encontró el usuario
             return ResponseProvider.error("Usuario no encontrado", 404);
         }
 
+        // Retorna el usuario si fue encontrado
         return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
     }
 
@@ -87,12 +99,16 @@ public class UsuarioService {
      * @return Usuario encontrado o error si no existe.
      */
     public Response obtenerPorCorreo(String correo) {
+        // Busca el usuario por correo en el DAO
         Usuario usuario = dao.getByCorreo(correo);
 
+        // Verifica si el usuario fue encontrado
         if (usuario == null) {
+            // Retorna un error si no se encontró el usuario
             return ResponseProvider.error("Usuario no encontrado", 404);
         }
 
+        // Retorna el usuario si fue encontrado
         return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
     }
 
@@ -103,12 +119,16 @@ public class UsuarioService {
      * @return Usuario encontrado o error si no existe.
      */
     public Response obtenerPorDocumento(String documento) {
+        // Busca el usuario por documento en el DAO
         Usuario usuario = dao.getByDocumento(documento);
 
+        // Verifica si el usuario fue encontrado
         if (usuario == null) {
+            // Retorna un error si no se encontró el usuario
             return ResponseProvider.error("Usuario no encontrado", 404);
         }
 
+        // Retorna el usuario si fue encontrado
         return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
     }
 
@@ -122,20 +142,24 @@ public class UsuarioService {
         // Validar que no exista un usuario con el mismo correo
         Usuario usuarioExistenteCorreo = dao.getByCorreo(usuario.getCorreo());
         if (usuarioExistenteCorreo != null) {
+            // Retorna un error si el correo ya está registrado
             return ResponseProvider.error("Este correo ya fue registrado", 400);
         }
 
         // Validar que no exista un usuario con el mismo documento
         Usuario usuarioExistenteDoc = dao.getByDocumento(usuario.getDocumento());
         if (usuarioExistenteDoc != null) {
+            // Retorna un error si el documento ya está registrado
             return ResponseProvider.error("Este número de documento ya fue registrado", 400);
         }
 
-        // Intentar crear el usuario
+        // Intentar crear el usuario en la base de datos
         Usuario nuevoUsuario = dao.create(usuario);
         if (nuevoUsuario != null) {
+            // Retorna el nuevo usuario si fue creado correctamente
             return ResponseProvider.success(nuevoUsuario, "Usuario creado correctamente", 201);
         } else {
+            // Retorna un error si hubo un problema al crear el usuario
             return ResponseProvider.error("Error al crear el usuario", 400);
         }
     }
@@ -151,14 +175,17 @@ public class UsuarioService {
         // Validar que el usuario exista
         Usuario usuarioExistente = dao.getById(id);
         if (usuarioExistente == null) {
+            // Retorna un error si el usuario no fue encontrado
             return ResponseProvider.error("Usuario no encontrado", 404);
         }
 
-        // Intentar actualizar el usuario
+        // Intentar actualizar el usuario en la base de datos
         Usuario usuarioActualizado = dao.update(id, usuario);
         if (usuarioActualizado != null) {
+            // Retorna el usuario actualizado si fue exitoso
             return ResponseProvider.success(usuarioActualizado, "Usuario actualizado correctamente", 200);
         } else {
+            // Retorna un error si hubo un problema al actualizar el usuario
             return ResponseProvider.error("Error al actualizar el usuario", 404);
         }
     }
@@ -170,17 +197,20 @@ public class UsuarioService {
      * @return Mensaje de éxito o error si no existe o falla la eliminación.
      */
     public Response eliminarUsuario(int id) {
-        // Verificar existencia
+        // Verificar existencia del usuario
         Usuario usuarioExistente = dao.getById(id);
         if (usuarioExistente == null) {
+            // Retorna un error si el usuario no fue encontrado
             return ResponseProvider.error("Usuario no encontrado", 404);
         }
 
-        // Intentar eliminar
+        // Intentar eliminar el usuario de la base de datos
         boolean eliminado = dao.delete(id);
         if (eliminado) {
+            // Retorna un mensaje de éxito si el usuario fue eliminado
             return ResponseProvider.success(null, "Usuario eliminado correctamente", 200);
         } else {
+            // Retorna un error si hubo un problema al eliminar el usuario
             return ResponseProvider.error("Error al eliminar el usuario", 500);
         }
     }

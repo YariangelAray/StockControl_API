@@ -22,7 +22,7 @@ import org.json.JSONObject;
  * 
  * Este filtro se activa automáticamente si un método tiene la anotación @ValidarCampos.
  * 
- * @author YariangelAray
+ * @author Yariangel Aray
  */
 @Provider
 @ValidarCampos(entidad = "") // Requiere esta anotación para que se active
@@ -39,7 +39,7 @@ public class ValidarCamposFilter implements ContainerRequestFilter {
         // Obtenemos la anotación del método (si no la tiene, no hacemos nada)
         ValidarCampos anotacion = metodo.getAnnotation(ValidarCampos.class);
         if (anotacion == null) {
-            return;
+            return; // Si no hay anotación, no se realiza ninguna validación
         }
 
         // Obtenemos el nombre de la entidad a validar (ej. "usuario")
@@ -59,8 +59,9 @@ public class ValidarCamposFilter implements ContainerRequestFilter {
 
         // Verificamos que el cuerpo sea un JSON válido
         try {
-            json = new JSONObject(body);
+            json = new JSONObject(body); // Intenta crear un objeto JSON a partir del cuerpo
         } catch (Exception e) {
+            // Si hay un error al crear el JSON, abortamos la solicitud
             requestContext.abortWith(ResponseProvider.error("JSON mal formado", 400));
             return;
         }

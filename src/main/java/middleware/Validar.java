@@ -26,29 +26,32 @@ public class Validar {
      * @return Lista de errores encontrados (puede estar vacía si todo es válido).
      */
     public static List<String> validar(JSONObject json, List<Campo> campos) {
+        // Inicializa una lista para almacenar los errores encontrados
         List<String> errores = new ArrayList<>();
 
         // Recorremos todos los campos esperados
         for (Campo campo : campos) {
-            String nombre = campo.getNombre();
+            String nombre = campo.getNombre(); // Obtiene el nombre del campo a validar
 
             // Si el campo no existe en el JSON
             if (!json.has(nombre)) {
-                // Si es obligatorio, agregamos un error
+                // Si es obligatorio, agregamos un error a la lista
                 if (campo.isRequerido()) {
                     errores.add("El campo '" + nombre + "' es obligatorio.");
                 }
-                continue; // Si no es obligatorio, se ignora
+                continue; // Si no es obligatorio, se ignora y se pasa al siguiente campo
             }
 
-            Object valor = json.get(nombre);
+            Object valor = json.get(nombre); // Obtiene el valor del campo en el JSON
 
             // Dependiendo del tipo, se hace una validación diferente
             switch (campo.getTipo()) {
                 case "string":
+                    // Verifica si el valor es una cadena
                     if (!(valor instanceof String)) {
                         errores.add("El campo '" + nombre + "' debe ser de tipo texto.");
                     } else {
+                        // Verifica la longitud mínima y máxima
                         int longitud = ((String) valor).length();
                         if (longitud < campo.getMinimo()) {
                             errores.add("El campo '" + nombre + "' debe tener al menos " + campo.getMinimo() + " caracteres.");
@@ -59,23 +62,28 @@ public class Validar {
                     }
                     break;
 
-                case "numero":
-                    if (!(valor instanceof Number)) {
+                case "numero":                                        
+                    
+                    // Verifica si el valor es un número
+                    if (!(valor instanceof Number)) {                        
                         errores.add("El campo '" + nombre + "' debe ser de tipo numérico.");
                     }
                     break;
 
                 case "booleano":
+                    // Verifica si el valor es un booleano
                     if (!(valor instanceof Boolean)) {
                         errores.add("El campo '" + nombre + "' debe ser de tipo booleano.");
                     }
                     break;
 
                 default:
+                    // Si el tipo no es reconocido, se agrega un error
                     errores.add("Tipo no reconocido para el campo '" + nombre + "'.");
             }
         }
 
+        // Retorna la lista de errores encontrados
         return errores;
     }
 }

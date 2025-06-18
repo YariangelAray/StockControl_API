@@ -32,7 +32,7 @@ public class CamposUsuario {
         campos.add(new Campo("telefono", true, 8, 15, "string"));
         campos.add(new Campo("correo", true, 6, 100, "string"));
         campos.add(new Campo("ficha_id", false, 1, 2, "numero"));
-        campos.add(new Campo("contrasena", true, 8, 50, "string"));
+        campos.add(new Campo("contrasena", true, 8, 30, "string"));
         campos.add(new Campo("rol_id", false, 1, 2, "numero"));        
         
         return campos;
