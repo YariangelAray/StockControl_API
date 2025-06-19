@@ -1,5 +1,6 @@
 package service;
 
+import java.util.ArrayList;
 import model.entity.Usuario;
 import model.dao.UsuarioDAO;
 import providers.ResponseProvider;
@@ -158,6 +159,22 @@ public class UsuarioService {
             return ResponseProvider.error("Usuario no encontrado", 404);
         }
 
+        List<Usuario> usuarios = dao.getAll();
+        List<Usuario> usuariosRegistrados = new ArrayList<>();
+        
+        for (Usuario usuarioRegistrado : usuarios)
+            if (usuarioRegistrado.getId() != id) usuariosRegistrados.add(usuarioRegistrado);
+        
+        for (Usuario usuarioRegistrado : usuariosRegistrados)
+            if (usuarioRegistrado.getDocumento()== usuario.getDocumento()){
+                return ResponseProvider.error("Este número de documento ya fue registrado", 400);
+            }
+        
+        for (Usuario usuarioRegistrado : usuariosRegistrados)
+            if (usuarioRegistrado.getCorreo()== usuario.getCorreo()){
+                return ResponseProvider.error("Este correo ya fue registrado", 400);
+            }
+        
         // Intentar actualizar el usuario en la base de datos
         Usuario usuarioActualizado = dao.update(id, usuario);
         if (usuarioActualizado != null) {

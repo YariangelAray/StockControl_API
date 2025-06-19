@@ -16,6 +16,7 @@ import java.util.List;
  * - getAll(): Obtiene todos los usuarios.
  * - getAllByIdRol(int idRol): Obtiene todos los usuarios que pertenecen a un rol específico.
  * - getAllByIdTipoDocumento(int idTipoDocumento): Obtiene todos los usuarios que tienen un tipo de documento específico.
+ * - getAllByIdFicha(int idFicha): Obtiene todos los usuarios que pertenecen a un número de ficha especifico
  * - getById(int id): Busca un usuario por su ID.
  * - getByDocumento(String documento): Busca un usuario por su número de documento.
  * - getByCorreo(String correo): Busca un usuario por su correo electrónico.
@@ -174,7 +175,7 @@ public class UsuarioDAO {
     /**
     * Obtiene una lista de usuarios que tienen asignada una ficha específica.
     *
-    * @param fichaId ID de la ficha a buscar.
+    * @param idFicha ID de la ficha a buscar.
     * @return Lista de usuarios asociados a la ficha, o lista vacía si no hay ninguno.
     */
     public List<Usuario> getAllByIdFicha(int idFicha) {
@@ -223,6 +224,56 @@ public class UsuarioDAO {
         return usuarios;
     }
 
+    /**
+    * Obtiene todos los usuarios que tienen asignado un género específico.
+    *
+    * @param idGenero ID del género a buscar.
+    * @return Lista de usuarios que pertenecen a ese género.
+    */
+    public List<Usuario> getAllByIdGenero(int idGenero) {
+        // Inicializa la lista que contendrá los usuarios encontrados
+        List<Usuario> usuarios = new ArrayList<>();
+        // Consulta SQL para obtener usuarios según el ID del género
+        String SQL = "SELECT * FROM usuarios WHERE genero_id = ?";
+
+        // Intenta establecer una conexión y ejecutar la consulta
+        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+
+            // Se establece el ID de la ficha como parámetro
+            stmt.setInt(1, idGenero);
+
+            // Se ejecuta la consulta y se obtiene el resultado
+            ResultSet rs = stmt.executeQuery();
+
+            // Itera sobre los resultados obtenidos
+            while (rs.next()) {
+                // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
+                Usuario usuario = new Usuario(
+                    rs.getInt("id"), // Obtiene el ID del usuario
+                    rs.getString("nombres"), // Obtiene el nombre del usuario
+                    rs.getString("apellidos"), // Obtiene el apellido del usuario
+                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
+                    rs.getString("documento"), // Obtiene el número de documento
+                    rs.getInt("genero_id"), // Obtiene el ID del género
+                    rs.getString("telefono"), // Obtiene el número de teléfono
+                    rs.getString("correo"), // Obtiene el correo electrónico
+                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
+                    rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getInt("rol_id") // Obtiene el ID del rol
+                );
+                // Agrega el usuario a la lista
+                usuarios.add(usuario);
+            }
+
+        } catch (SQLException e) {
+            // Se imprime el error en caso de falla
+            e.printStackTrace();
+        }
+
+        // Retorna la lista de usuarios encontrados
+        return usuarios;
+    }
 
     /**
      * Busca un usuario por su ID.

@@ -78,9 +78,13 @@ foreign key (centro_id) references centros(id)
 
 create table tipos_elementos(  
 id int auto_increment primary key,  
-nombre varchar (50),  
-descripcion varchar(100),  
-atributos varchar(100));  
+nombre varchar(50),                 -- Ej: Portátil, Silla
+descripcion varchar(100),           -- Opcional
+marca varchar(50),                  -- Ej: HP, Genérica
+modelo varchar(50),                 -- Ej: G5, GWC24ACEXF
+observaciones text                  -- Observaciones comunes del tipo
+);
+
   
 create table estados(
 id int auto_increment primary key,
@@ -88,20 +92,21 @@ nombre varchar (20));
 
 create table elementos(  
 id int auto_increment primary key,  
-placa int,  
-tipo_elemento_id int,  
+placa bigint unique,                 -- Código individual obligatorio
+serial varchar(100),                 -- Puede ser NULL
+tipo_elemento_id int,                -- FK al tipo
 fecha_adquisicion date,  
-valor_monetario int,   
+valor_monetario decimal(12,2),  
 estado_id int,
-observaciones text,
-estado_activo bool,
+estado_activo boolean default true,
 ambiente_id int,
-inventario_id int,  
+inventario_id int,
 foreign key (tipo_elemento_id) references tipos_elementos(id),
 foreign key (estado_id) references estados(id),
 foreign key (ambiente_id) references ambientes(id),
 foreign key (inventario_id) references inventarios(id)
 );
+
  
 -- REPORTES 
 

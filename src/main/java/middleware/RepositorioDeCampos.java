@@ -2,10 +2,7 @@ package middleware;
 
 import middleware.campos.CamposUsuario;
 import java.util.List;
-import middleware.campos.CamposFicha;
-import middleware.campos.CamposProgramaFormacion;
-import middleware.campos.CamposRol;
-import middleware.campos.CamposTipoDocumento;
+import middleware.campos.*;
 
 /**
  * Devuelve la lista de campos que se deben validar para cada entidad (como "usuario").
@@ -30,6 +27,7 @@ public class RepositorioDeCampos {
             case "tipo_documento" -> CamposTipoDocumento.obtener();
             case "programa_formacion" -> CamposProgramaFormacion.obtener();
             case "ficha" -> CamposFicha.obtener();
+            case "genero" -> CamposGenero.obtener();
             default -> null;
         };
     }
