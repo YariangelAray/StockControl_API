@@ -13,8 +13,7 @@ import javax.ws.rs.core.Response;
  * Se encarga de validar reglas antes de enviar los datos a la base de datos o devolver resultados.
  * 
  * Métodos disponibles:
- * - obtenerTodos()
- * - obtenerTodosPorIdRol(int idRol)
+ * - obtenerTodos() 
  * - obtenerUsuario(int id)
  * - obtenerPorDocumento(String documento)
  * - obtenerPorCorreo(String correo)
@@ -41,26 +40,6 @@ public class UsuarioService {
     public Response obtenerTodos() {
         // Obtiene la lista de usuarios desde el DAO
         List<Usuario> usuarios = dao.getAll();
-
-        // Verifica si la lista está vacía
-        if (usuarios.isEmpty()) {
-            // Retorna un error si no se encontraron usuarios
-            return ResponseProvider.error("No se encontraron usuarios", 404);
-        }
-
-        // Retorna la lista de usuarios si se encontraron
-        return ResponseProvider.success(usuarios, "Usuarios obtenidos correctamente", 200);
-    }
-
-    /**
-     * Retorna los usuarios que pertenecen a un rol específico.
-     *
-     * @param idRol ID del rol a filtrar.
-     * @return Lista de usuarios del rol o error si no hay resultados.
-     */
-    public Response obtenerTodosPorIdRol(int idRol) {
-        // Obtiene la lista de usuarios por rol desde el DAO
-        List<Usuario> usuarios = dao.getAllByIdRol(idRol);
 
         // Verifica si la lista está vacía
         if (usuarios.isEmpty()) {

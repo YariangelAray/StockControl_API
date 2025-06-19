@@ -14,11 +14,13 @@ insert into tipos_documento (nombre) values
 ('Permiso Especial de Permanencia'),
 ('Permiso por Protección Temporal');
 
-insert into programas_formacion (nombre) value
+insert into programas_formacion (nombre) values
+('(N/A) - No Aplica'),
 ('(ADSO) - Análisis y Desarrollo de Software');
 
-insert into fichas (ficha, programa_id) value 
-('2894667', 1);
+insert into fichas (ficha, programa_id) values
+('(N/A) - No Aplica', 1),
+('2894667', 2);
 
 insert into generos (nombre) values
 ('Masculino'),

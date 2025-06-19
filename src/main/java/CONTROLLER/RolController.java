@@ -1,159 +1,134 @@
 package controller;
 
-import model.entity.Rol;
+import middleware.ValidarCampos;
 import service.RolService;
-import java.util.List;
+import model.entity.Rol;
+import providers.ResponseProvider;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
- * Controlador para gestionar las rutas HTTP relacionadas con los roles.
- * Expone servicios REST para crear, consultar, actualizar y eliminar roles. 
- * 
+ * Controlador REST para gestionar operaciones relacionadas con los roles.
+ * Define rutas HTTP que permiten consultar, crear, actualizar y eliminar roles.
+ *
  * Rutas disponibles:
- * - GET /roles
- * - GET /roles/{id}
- * - POST /roles
- * - PUT /roles/{id}
- * - DELETE /roles/{id}
- * 
+ * - GET /roles: Listar todos los roles.
+ * - GET /roles/{id}: Buscar rol por ID.
+ * - POST /roles: Crear nuevo rol.
+ * - PUT /roles/{id}: Actualizar rol existente.
+ * - DELETE /roles/{id}: Eliminar rol.
+ *
  * @author Yariangel Aray
  */
-@Path("/roles")
+@Path("/roles") // Define la ruta base para este controlador
 public class RolController {
-    
-    RolService service;
+
+    RolService service; // Instancia del servicio que maneja la lógica de negocio
 
     public RolController() {
+        // Instancia el servicio encargado de la lógica de negocio
         service = new RolService();
     }
 
     /**
-     * Obtiene todos los roles registrados.
+     * Obtiene todos los roles registrados en el sistema.
      *
-     * @return Lista de roles en formato JSON o error.
+     * @return Lista de roles o mensaje de error si ocurre una excepción.
      */
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @GET // Método HTTP GET
+    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
     public Response obtenerTodos() {
-        try {          
-            List<Rol> roles = service.obtenerTodos();
-            if (roles == null || roles.isEmpty()) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"No se encontraron roles\"}")
-                        .build();
-            }
-            return Response.ok(roles).build();
+        try {
+            // Llama al servicio para obtener todos los roles
+            return service.obtenerTodos();
         } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al obtener los roles.\"}")
-                    .build();
+            e.printStackTrace(); // Imprime el error en la consola
+            // Retorna un error 500 si ocurre una excepción
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Obtiene un rol por su ID.
+     * Busca un rol por su ID único.
      *
-     * @param id ID del rol a consultar.
-     * @return Rol encontrado o mensaje de error.
+     * @param id Identificador del rol.
+     * @return Rol encontrado o mensaje de error si no existe o ocurre una excepción.
      */
     @GET
-    @Path("/{id}")
+    @Path("/{id}") // Ruta que incluye el ID del rol
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerRol(@PathParam("id") int id) {
         try {
-            Rol rol = service.obtenerRol(id);
-            if (rol == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Rol no encontrado\"}")
-                        .build();
-            }
-            return Response.ok(rol).build();
+            // Llama al servicio para obtener el rol por ID
+            return service.obtenerRol(id);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al obtener el rol.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Crea un nuevo rol.
+     * Registra un nuevo rol en el sistema.
+     * Se valida el contenido con una clase Middleware (@ValidarCampos).
      *
-     * @param rol Rol a registrar.
-     * @return Mensaje de éxito o error.
+     * @param rol Objeto Rol recibido en el cuerpo de la petición.
+     * @return Respuesta con estado y mensaje.
      */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @POST // Método HTTP POST
+    @ValidarCampos(entidad = "rol") // Anotación que activa la validación de campos
+    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
+    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
     public Response crearRol(Rol rol) {
-        boolean creado = service.crearRol(rol);
-        if (creado) {
-            return Response.status(Response.Status.CREATED)
-                    .entity("{\"mensaje\":\"Rol creado exitosamente\"}")
-                    .build();
-        } else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"mensaje\":\"Error al crear el rol\"}")
-                    .build();
+        try {
+            // Llama al servicio para crear un nuevo rol
+            return service.crearRol(rol);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Actualiza los datos de un rol existente.
+     * Actualiza la información de un rol existente.
+     * Se validan los nuevos campos antes de aplicar los cambios.
      *
      * @param id ID del rol a actualizar.
-     * @param rol Nuevos datos del rol.
-     * @return Mensaje de éxito o error.
+     * @param rol Datos nuevos del rol.
+     * @return Respuesta con mensaje de éxito o error.
      */
-    @PUT
-    @Path("/{id}")
+    @PUT // Método HTTP PUT
+    @Path("/{id}") // Ruta que incluye el ID del rol
+    @ValidarCampos(entidad = "rol") // Anotación que activa la validación de campos
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarRol(@PathParam("id") int id, Rol rol) {
         try {
-            boolean actualizado = service.actualizarRol(id, rol);
-            if (actualizado) {
-                return Response.ok("{\"mensaje\": \"Rol actualizado exitosamente\"}").build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Rol no encontrado\"}")
-                        .build();
-            }
+            // Llama al servicio para actualizar el rol
+            return service.actualizarRol(id, rol);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al actualizar el rol.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Elimina un rol por ID.
+     * Elimina un rol del sistema mediante su ID.
      *
      * @param id ID del rol a eliminar.
-     * @return Mensaje de éxito o error.
+     * @return Respuesta indicando si la eliminación fue exitosa o no.
      */
-    @DELETE
-    @Path("/{id}")
+    @DELETE // Método HTTP DELETE
+    @Path("/{id}") // Ruta que incluye el ID del rol
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarRol(@PathParam("id") int id) {
         try {
-            boolean eliminado = service.eliminarRol(id);
-            if (eliminado) {
-                return Response.ok("{\"mensaje\": \"Rol eliminado exitosamente\"}").build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"mensaje\": \"Rol no encontrado\"}")
-                        .build();
-            }
+            // Llama al servicio para eliminar el rol
+            return service.eliminarRol(id);
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\": \"Ocurrió un error al eliminar el rol.\"}")
-                    .build();
+            return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 }

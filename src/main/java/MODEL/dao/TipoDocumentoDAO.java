@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.Rol;
+import model.entity.TipoDocumento;
 import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
@@ -8,33 +8,33 @@ import java.util.List;
 
 /**
  * Clase DAO (Data Access Object) para realizar operaciones CRUD 
- * sobre la tabla 'roles' en la base de datos.
+ * sobre la tabla 'tipos_documento' en la base de datos.
  * 
  * Esta clase utiliza la clase utilitaria DBConnection para establecer conexión con la base de datos.
  * 
  * Métodos disponibles:
- * - getAll(): Obtiene todos los roles.
- * - getById(int id): Busca un rol por su ID.
- * - create(Rol rol): Crea un nuevo rol y retorna el objeto creado.
- * - update(int id, Rol rol): Actualiza un rol por su ID y retorna el objeto actualizado.
- * - delete(int id): Elimina un rol por su ID.
+ * - getAll(): Obtiene todos los tipos de documento.
+ * - getById(int id): Busca un tipo de documento por su ID.
+ * - create(TipoDocumento tipoDocumento): Crea un nuevo tipo de documento y retorna el objeto creado.
+ * - update(int id, TipoDocumento tipoDocumento): Actualiza un tipo de documento por su ID y retorna el objeto actualizado.
+ * - delete(int id): Elimina un tipo de documento por su ID.
  * 
  * Esta clase no contiene lógica de negocio, solo acceso a datos.
  * 
  * @author Yariangel Aray
  */
-public class RolDAO {
+public class TipoDocumentoDAO {
 
     /**
-     * Obtiene todos los registros de roles desde la base de datos.
+     * Obtiene todos los registros de tipos de documento desde la base de datos.
      *
-     * @return Lista de objetos Rol con todos los roles registrados.
+     * @return Lista de objetos TipoDocumento con todos los tipos registrados.
      */
-    public List<Rol> getAll() {
-        // Inicializa una lista para almacenar los roles
-        List<Rol> roles = new ArrayList<>();
-        // Consulta SQL para seleccionar todos los roles
-        String SQL = "SELECT * FROM roles";
+    public List<TipoDocumento> getAll() {
+        // Inicializa una lista para almacenar los tipos de documento
+        List<TipoDocumento> tipos = new ArrayList<>();
+        // Consulta SQL para seleccionar todos los tipos de documento
+        String SQL = "SELECT * FROM tipos_documento";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -43,34 +43,34 @@ public class RolDAO {
 
             // Itera sobre los resultados obtenidos
             while (rs.next()) {
-                // Crea un nuevo objeto Rol a partir de los datos de la fila actual
-                Rol rol = new Rol(
-                    rs.getInt("id"), // Obtiene el ID del rol
-                    rs.getString("nombre") // Obtiene el nombre del rol
+                // Crea un nuevo objeto TipoDocumento a partir de los datos de la fila actual
+                TipoDocumento tipo = new TipoDocumento(
+                    rs.getInt("id"), // Obtiene el ID del tipo de documento
+                    rs.getString("nombre") // Obtiene el nombre del tipo de documento
                 );
-                // Agrega el rol a la lista
-                roles.add(rol);
+                // Agrega el tipo de documento a la lista
+                tipos.add(tipo);
             }
         } catch (SQLException e) {
             // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
 
-        // Retorna la lista de roles
-        return roles;
+        // Retorna la lista de tipos de documento
+        return tipos;
     }
 
     /**
-     * Busca un rol por su ID.
+     * Busca un tipo de documento por su ID.
      *
-     * @param id El ID del rol a buscar.
-     * @return El objeto Rol si se encuentra, o null si no existe.
+     * @param id El ID del tipo de documento a buscar.
+     * @return El objeto TipoDocumento si se encuentra, o null si no existe.
      */
-    public Rol getById(int id) {
-        // Inicializa el objeto Rol como null
-        Rol rol = null;
-        // Consulta SQL para seleccionar un rol por ID
-        String SQL = "SELECT * FROM roles WHERE id = ?";
+    public TipoDocumento getById(int id) {
+        // Inicializa el objeto TipoDocumento como null
+        TipoDocumento tipo = null;
+        // Consulta SQL para seleccionar un tipo de documento por ID
+        String SQL = "SELECT * FROM tipos_documento WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -83,10 +83,10 @@ public class RolDAO {
 
             // Verifica si hay resultados
             if (rs.next()) {
-                // Crea un nuevo objeto Rol a partir de los datos de la fila actual
-                rol = new Rol(
-                    rs.getInt("id"), // Obtiene el ID del rol
-                    rs.getString("nombre") // Obtiene el nombre del rol
+                // Crea un nuevo objeto TipoDocumento a partir de los datos de la fila actual
+                tipo = new TipoDocumento(
+                    rs.getInt("id"), // Obtiene el ID del tipo de documento
+                    rs.getString("nombre") // Obtiene el nombre del tipo de documento
                 );
             }
 
@@ -95,37 +95,37 @@ public class RolDAO {
             e.printStackTrace();
         }
 
-        // Retorna el rol encontrado o null si no existe
-        return rol;
+        // Retorna el tipo de documento encontrado o null si no existe
+        return tipo;
     }
 
     /**
-     * Inserta un nuevo rol en la base de datos.
+     * Inserta un nuevo tipo de documento en la base de datos.
      *
-     * @param rol Rol con la información a registrar.
-     * @return Rol creado con el ID generado, o null si hubo error.
+     * @param tipo TipoDocumento con la información a registrar.
+     * @return TipoDocumento creado con el ID generado, o null si hubo error.
      */
-    public Rol create(Rol rol) {
-        // Consulta SQL para insertar un nuevo rol
-        String SQL = "INSERT INTO roles (nombre) VALUES (?)";
+    public TipoDocumento create(TipoDocumento tipo) {
+        // Consulta SQL para insertar un nuevo tipo de documento
+        String SQL = "INSERT INTO tipos_documento (nombre) VALUES (?)";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) { // Prepara la consulta y permite obtener el ID generado
 
             // Establece los valores de los parámetros en la consulta
-            stmt.setString(1, rol.getNombre());
+            stmt.setString(1, tipo.getNombre());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
             // Verifica si se insertó al menos un registro
             if (filasAfectadas > 0) {
-                // Obtiene las claves generadas (ID del nuevo rol)
+                // Obtiene las claves generadas (ID del nuevo tipo de documento)
                 ResultSet generatedKeys = stmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    // Establece el ID en el objeto rol y lo retorna
-                    rol.setId(generatedKeys.getInt(1));
-                    return rol;
+                    // Establece el ID en el objeto tipo y lo retorna
+                    tipo.setId(generatedKeys.getInt(1));
+                    return tipo;
                 }
             }
 
@@ -133,55 +133,55 @@ public class RolDAO {
             // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-        // Retorna null si hubo un error al crear el rol
+        // Retorna null si hubo un error al crear el tipo de documento
         return null;
     }
 
     /**
-     * Actualiza un rol existente por su ID.
+     * Actualiza un tipo de documento existente por su ID.
      *
-     * @param id ID del rol a actualizar.
-     * @param rol Objeto Rol con los nuevos datos.
-     * @return Rol actualizado si fue exitoso, o null si falló.
+     * @param id ID del tipo de documento a actualizar.
+     * @param tipo Objeto TipoDocumento con los nuevos datos.
+     * @return TipoDocumento actualizado si fue exitoso, o null si falló.
      */
-    public Rol update(int id, Rol rol) {
-        // Consulta SQL para actualizar un rol existente
-        String SQL = "UPDATE roles SET nombre = ? WHERE id = ?";
+    public TipoDocumento update(int id, TipoDocumento tipo) {
+        // Consulta SQL para actualizar un tipo de documento existente
+        String SQL = "UPDATE tipos_documento SET nombre = ? WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
 
             // Establece los valores de los parámetros en la consulta
-            stmt.setString(1, rol.getNombre());
-            stmt.setInt(2, id); // Establece el ID del rol a actualizar
+            stmt.setString(1, tipo.getNombre());
+            stmt.setInt(2, id); // Establece el ID del tipo de documento a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
             // Verifica si se actualizó al menos un registro
             if (filasAfectadas > 0) {
-                // Establece el ID en el objeto rol y lo retorna
-                rol.setId(id);
-                return rol;
+                // Establece el ID en el objeto tipo y lo retorna
+                tipo.setId(id);
+                return tipo;
             }
 
         } catch (SQLException e) {
             // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-        // Retorna null si hubo un error al actualizar el rol
+        // Retorna null si hubo un error al actualizar el tipo de documento
         return null;
     }
 
     /**
-     * Elimina un rol de la base de datos por su ID.
+     * Elimina un tipo de documento de la base de datos por su ID.
      *
-     * @param id ID del rol a eliminar.
+     * @param id ID del tipo de documento a eliminar.
      * @return true si la eliminación fue exitosa, false si falló.
      */
     public boolean delete(int id) {
-        // Consulta SQL para eliminar un rol por ID
-        String SQL = "DELETE FROM roles WHERE id = ?";
+        // Consulta SQL para eliminar un tipo de documento por ID
+        String SQL = "DELETE FROM tipos_documento WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos

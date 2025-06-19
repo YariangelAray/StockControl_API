@@ -2,10 +2,7 @@ package model.dao;
 
 import model.entity.Usuario;
 import utils.DBConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +15,7 @@ import java.util.List;
  * Métodos disponibles:
  * - getAll(): Obtiene todos los usuarios.
  * - getAllByIdRol(int idRol): Obtiene todos los usuarios que pertenecen a un rol específico.
+ * - getAllByIdTipoDocumento(int idTipoDocumento): Obtiene todos los usuarios que tienen un tipo de documento específico.
  * - getById(int id): Busca un usuario por su ID.
  * - getByDocumento(String documento): Busca un usuario por su número de documento.
  * - getByCorreo(String correo): Busca un usuario por su correo electrónico.
@@ -123,6 +121,108 @@ public class UsuarioDAO {
         // Retorna la lista de usuarios
         return usuarios;
     }
+    
+    /**
+     * Obtiene todos los usuarios que tienen un tipo de documento especifico.
+     *
+     * @param idTipoDocumento ID del tipo de documento.
+     * @return Lista de usuarios o vacío si no hay coincidencias.
+     */
+    public List<Usuario> getAllByIdTipoDocumento(int idTipoDocumento) {
+        // Inicializa una lista para almacenar los usuarios
+        List<Usuario> usuarios = new ArrayList<>();
+        // Consulta SQL para seleccionar usuarios por tipo de documento
+        String SQL = "SELECT * FROM usuarios WHERE tipo_documento_id = ?";
+
+        // Intenta establecer una conexión y ejecutar la consulta
+        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+
+            // Establece el valor del parámetro tipo_documento_id en la consulta
+            stmt.setInt(1, idTipoDocumento);
+            // Ejecuta la consulta y obtiene los resultados
+            ResultSet rs = stmt.executeQuery();
+
+            // Itera sobre los resultados obtenidos
+            while (rs.next()) {
+                // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
+                Usuario usuario = new Usuario(
+                    rs.getInt("id"), // Obtiene el ID del usuario
+                    rs.getString("nombres"), // Obtiene el nombre del usuario
+                    rs.getString("apellidos"), // Obtiene el apellido del usuario
+                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
+                    rs.getString("documento"), // Obtiene el número de documento
+                    rs.getInt("genero_id"), // Obtiene el ID del género
+                    rs.getString("telefono"), // Obtiene el número de teléfono
+                    rs.getString("correo"), // Obtiene el correo electrónico
+                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
+                    rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getInt("rol_id") // Obtiene el ID del rol
+                );
+                // Agrega el usuario a la lista
+                usuarios.add(usuario);
+            }
+        } catch (SQLException e) {
+            // Imprime el error en caso de que ocurra una excepción SQL
+            e.printStackTrace();
+        }
+
+        // Retorna la lista de usuarios
+        return usuarios;
+    }
+    
+    /**
+    * Obtiene una lista de usuarios que tienen asignada una ficha específica.
+    *
+    * @param fichaId ID de la ficha a buscar.
+    * @return Lista de usuarios asociados a la ficha, o lista vacía si no hay ninguno.
+    */
+    public List<Usuario> getAllByIdFicha(int idFicha) {
+        // Se crea una lista para almacenar los usuarios encontrados
+        List<Usuario> usuarios = new ArrayList<>();
+
+        // Consulta SQL que busca todos los usuarios con la ficha dada
+        String SQL = "SELECT * FROM usuarios WHERE ficha_id = ?";
+
+        // Intenta establecer una conexión y ejecutar la consulta
+        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+
+            // Se establece el ID de la ficha como parámetro
+            stmt.setInt(1, idFicha);
+
+            // Se ejecuta la consulta y se obtiene el resultado
+            ResultSet rs = stmt.executeQuery();
+
+            // Itera sobre los resultados obtenidos
+            while (rs.next()) {
+                // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
+                Usuario usuario = new Usuario(
+                    rs.getInt("id"), // Obtiene el ID del usuario
+                    rs.getString("nombres"), // Obtiene el nombre del usuario
+                    rs.getString("apellidos"), // Obtiene el apellido del usuario
+                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
+                    rs.getString("documento"), // Obtiene el número de documento
+                    rs.getInt("genero_id"), // Obtiene el ID del género
+                    rs.getString("telefono"), // Obtiene el número de teléfono
+                    rs.getString("correo"), // Obtiene el correo electrónico
+                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
+                    rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getInt("rol_id") // Obtiene el ID del rol
+                );
+                // Agrega el usuario a la lista
+                usuarios.add(usuario);
+            }
+
+        } catch (SQLException e) {
+            // Se imprime el error en caso de falla
+            e.printStackTrace();
+        }
+
+        // Se retorna la lista de usuarios encontrados (puede estar vacía)
+        return usuarios;
+    }
+
 
     /**
      * Busca un usuario por su ID.
