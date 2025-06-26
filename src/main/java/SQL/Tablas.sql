@@ -65,7 +65,7 @@ nombre varchar(50),
 direccion varchar(50),  
 ciudad_id int,  
 foreign key (ciudad_id) references ciudades(id)
-); 
+);
  
 create table ambientes(  
 id int auto_increment primary key,  
@@ -79,7 +79,7 @@ foreign key (centro_id) references centros(id)
 create table tipos_elementos(  
 id int auto_increment primary key,  
 nombre varchar(50),                 -- Ej: Portátil, Silla
-descripcion varchar(100),           -- Opcional
+descripcion varchar(250),           -- Opcional
 marca varchar(50),                  -- Ej: HP, Genérica
 modelo varchar(50),                 -- Ej: G5, GWC24ACEXF
 observaciones text                  -- Observaciones comunes del tipo
@@ -93,7 +93,7 @@ nombre varchar (20));
 create table elementos(  
 id int auto_increment primary key,  
 placa bigint unique,                 -- Código individual obligatorio
-serial varchar(100),                 -- Puede ser NULL
+serial varchar(50),                 -- Puede ser NULL
 tipo_elemento_id int,                -- FK al tipo
 fecha_adquisicion date,  
 valor_monetario decimal(12,2),  
@@ -112,7 +112,7 @@ foreign key (inventario_id) references inventarios(id)
 
 create table reportes( 
 id int auto_increment primary key, 
-fecha date, 
+fecha timestamp default current_timestamp,, 
 asunto varchar(100), 
 mensaje text, 
 usuario_id int, 

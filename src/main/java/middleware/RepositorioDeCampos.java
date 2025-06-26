@@ -28,6 +28,14 @@ public class RepositorioDeCampos {
             case "programa_formacion" -> CamposProgramaFormacion.obtener();
             case "ficha" -> CamposFicha.obtener();
             case "genero" -> CamposGenero.obtener();
+            case "inventario" -> CamposInventario.obtener();
+            case "ciudad" -> CamposCiudad.obtener();
+            case "centro" -> CamposCentro.obtener();
+            case "ambiente" -> CamposAmbiente.obtener();
+            case "tipo_elemento" -> CamposTipoElemento.obtener();
+            case "estado" -> CamposEstado.obtener();
+            case "elemento" -> CamposElemento.obtener();
+            case "reporte" -> CamposReporte.obtener();
             default -> null;
         };
     }

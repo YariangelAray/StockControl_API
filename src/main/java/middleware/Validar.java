@@ -1,5 +1,7 @@
 package middleware;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +76,27 @@ public class Validar {
                     // Verifica si el valor es un booleano
                     if (!(valor instanceof Boolean)) {
                         errores.add("El campo '" + nombre + "' debe ser de tipo booleano.");
+                    }
+                    break;
+                
+                case "fecha":
+                    // Verifica que el valor sea un string
+                    if (!(valor instanceof String)) {
+                        errores.add("El campo '" + nombre + "' debe ser una cadena en formato fecha.");
+                    } else {
+                        String fechaStr = (String) valor;
+                        if (fechaStr.length() != campo.getMinimo()) {
+                            errores.add("El campo '" + nombre + "' debe tener exactamente " + campo.getMinimo() + " caracteres (formato yyyy-MM-dd).");
+                        } else {
+                            try {
+                                // Intenta convertir el string a una fecha
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                sdf.setLenient(false); // No permite fechas inválidas como 2024-02-30
+                                Date fecha = sdf.parse(fechaStr); // Si lanza error, es porque no es una fecha válida
+                            } catch (Exception e) {
+                                errores.add("El campo '" + nombre + "' no tiene un formato de fecha válido (yyyy-MM-dd).");
+                            }
+                        }
                     }
                     break;
 
