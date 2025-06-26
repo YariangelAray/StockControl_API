@@ -27,7 +27,7 @@ public class CamposCentro {
         List<Campo> campos = new ArrayList<>();
 
         // Agrega el campo 'nombre' como obligatorio, tipo string, con mínimo 3 y máximo 50 caracteres
-        campos.add(new Campo("nombre", true, 3, 50, "string"));
+        campos.add(new Campo("nombre", true, 3, 100, "string"));
 
         // Agrega el campo 'direccion' como obligatorio, tipo string, con mínimo 5 y máximo 50 caracteres
         campos.add(new Campo("direccion", true, 5, 50, "string"));

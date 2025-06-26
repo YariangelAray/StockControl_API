@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
  * 
  * @author Yariangel
  */
-@Path("/programas") // Define la ruta base para este controlador
+@Path("/programas-formacion") // Define la ruta base para este controlador
 public class ProgramaFormacionController {
 
     ProgramaFormacionService service; // Instancia del servicio que maneja la lógica de negocio

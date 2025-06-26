@@ -41,13 +41,13 @@ public class CamposElemento {
         campos.add(new Campo("valorMonetario", true, 1, 20, "numero"));
 
         // Campo estadoId: obligatorio, tipo entero
-        campos.add(new Campo("estadoId", true, 1, 2, "numero"));
+        campos.add(new Campo("estadoId", false, 1, 2, "numero"));
 
         // Campo estadoActivo: obligatorio, tipo booleano
-        campos.add(new Campo("estadoActivo", true, 0, 0, "booleano"));
+        campos.add(new Campo("estadoActivo", false, 0, 0, "booleano"));
 
         // Campo ambienteId: obligatorio, tipo entero
-        campos.add(new Campo("ambienteId", true, 1, 2, "numero"));
+        campos.add(new Campo("ambienteId", false, 1, 2, "numero"));
 
         // Campo inventarioId: obligatorio, tipo entero
         campos.add(new Campo("inventarioId", true, 1, 2, "numero"));

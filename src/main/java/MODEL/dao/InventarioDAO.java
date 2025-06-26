@@ -117,7 +117,7 @@ public class InventarioDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, inventario.getNombre());
-            stmt.setInt(2, inventario.getUsuarioAdminId());
+            stmt.setInt(2, inventario.getUsuario_admin_id());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -157,7 +157,7 @@ public class InventarioDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, inventario.getNombre());
-            stmt.setInt(2, inventario.getUsuarioAdminId());
+            stmt.setInt(2, inventario.getUsuario_admin_id());
             stmt.setInt(3, id); // Establece el ID del inventario a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas

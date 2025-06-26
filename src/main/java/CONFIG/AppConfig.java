@@ -2,6 +2,8 @@ package config;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import javax.ws.rs.ApplicationPath;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import utils.DBConnection;
 
 /**
  * Configuración principal de la API REST usando JAX-RS (Jersey).
@@ -26,6 +28,8 @@ public class AppConfig extends ResourceConfig {
      * configuraciones y middleware de la aplicación.
      */
     public AppConfig() {
+        // DBConnection.conectar();
         packages("controller", "config", "middleware");
+        register(MultiPartFeature.class);
     }
 }

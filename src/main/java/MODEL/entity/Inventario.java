@@ -15,14 +15,14 @@ package model.entity;
 public class Inventario {
     private int id;
     private String nombre;
-    private int usuarioAdminId;
+    private int usuario_admin_id;
 
     public Inventario() {}
 
-    public Inventario(int id, String nombre, int usuarioAdminId) {
+    public Inventario(int id, String nombre, int usuario_admin_id) {
         this.id = id;
         this.nombre = nombre;
-        this.usuarioAdminId = usuarioAdminId;
+        this.usuario_admin_id = usuario_admin_id;
     }
 
     public int getId() {
@@ -41,11 +41,11 @@ public class Inventario {
         this.nombre = nombre;
     }
 
-    public int getUsuarioAdminId() {
-        return usuarioAdminId;
+    public int getUsuario_admin_id() {
+        return usuario_admin_id;
     }
 
-    public void setUsuarioAdminId(int usuarioAdminId) {
-        this.usuarioAdminId = usuarioAdminId;
+    public void setUsuario_admin_id(int usuario_admin_id) {
+        this.usuario_admin_id = usuario_admin_id;
     }
 }

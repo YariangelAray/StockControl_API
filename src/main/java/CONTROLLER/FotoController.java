@@ -7,8 +7,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.*;
 
 /**
  * Controlador REST para gestionar operaciones relacionadas con las fotos de reportes.

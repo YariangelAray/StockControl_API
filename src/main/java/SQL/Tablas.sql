@@ -61,7 +61,7 @@ nombre varchar(50));
  
 create table centros(  
 id int auto_increment primary key,  
-nombre varchar(50),  
+nombre varchar(100),  
 direccion varchar(50),  
 ciudad_id int,  
 foreign key (ciudad_id) references ciudades(id)
@@ -112,7 +112,7 @@ foreign key (inventario_id) references inventarios(id)
 
 create table reportes( 
 id int auto_increment primary key, 
-fecha timestamp default current_timestamp,, 
+fecha timestamp default current_timestamp,
 asunto varchar(100), 
 mensaje text, 
 usuario_id int, 
