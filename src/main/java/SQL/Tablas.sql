@@ -36,7 +36,7 @@ genero_id int,
 telefono varchar(15),
 correo varchar(100) unique,
 ficha_id int default 1, -- No Aplica
-contrasena varchar(30),  
+contrasena varchar(100),  
 rol_id int default 2, -- Aprendices
 foreign key (tipo_documento_id) references tipos_documento(id),
 foreign key (genero_id) references generos(id),

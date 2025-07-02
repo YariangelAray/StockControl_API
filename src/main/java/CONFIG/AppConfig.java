@@ -3,6 +3,7 @@ package config;
 import org.glassfish.jersey.server.ResourceConfig;
 import javax.ws.rs.ApplicationPath;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.mindrot.jbcrypt.BCrypt;
 import utils.DBConnection;
 
 /**
@@ -29,6 +30,7 @@ public class AppConfig extends ResourceConfig {
      */
     public AppConfig() {
         // DBConnection.conectar();
+        System.out.println(BCrypt.hashpw("#Admin12345", BCrypt.gensalt()));
         packages("controller", "config", "middleware");
         register(MultiPartFeature.class);
     }

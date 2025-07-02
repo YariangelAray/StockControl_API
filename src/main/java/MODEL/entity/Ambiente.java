@@ -1,5 +1,7 @@
 package model.entity;
 
+import java.util.List;
+
 /**
  * Clase que representa la entidad Ambiente del sistema.
  * 
@@ -16,6 +18,9 @@ public class Ambiente {
     private int id;
     private String nombre;
     private int centro_id;
+    
+    // Lista de elementos asociadas al ambiente
+    private List<Elemento> elementos;
 
     public Ambiente() {}
 
@@ -47,5 +52,13 @@ public class Ambiente {
 
     public void setCentro_id(int centro_id) {
         this.centro_id = centro_id;
+    }
+    
+    public List<Elemento> getElementos() {
+        return elementos;
+    }
+
+    public void setElementos(List<Elemento> elementos) {
+        this.elementos = elementos;
     }
 }

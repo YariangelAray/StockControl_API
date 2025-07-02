@@ -8,6 +8,7 @@ import providers.ResponseProvider;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import model.dto.LoginDTO;
 
 /**
  * Controlador REST para gestionar operaciones relacionadas con los usuarios.
@@ -16,8 +17,6 @@ import javax.ws.rs.core.Response;
  * Rutas disponibles:
  * - GET /usuarios: Listar todos los usuarios.
  * - GET /usuarios/{id}: Buscar usuario por ID.
- * - GET /usuarios/correo/{correo}: Buscar usuario por correo.
- * - GET /usuarios/documento/{documento}: Buscar usuario por documento.
  * - POST /usuarios: Crear nuevo usuario.
  * - PUT /usuarios/{id}: Actualizar usuario existente.
  * - DELETE /usuarios/{id}: Eliminar usuario.
@@ -69,45 +68,7 @@ public class UsuarioController {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
-    }
-
-    /**
-     * Busca un usuario por su número de documento.
-     *
-     * @param documento Documento del usuario.
-     * @return Usuario encontrado o mensaje de error.
-     */
-    @GET
-    @Path("/documento/{documento}") // Ruta que incluye el documento del usuario
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerPorDocumento(@PathParam("documento") String documento) {
-        try {
-            // Llama al servicio para obtener el usuario por documento
-            return service.obtenerPorDocumento(documento);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseProvider.error("Error interno en el servidor", 500);
-        }
-    }
-
-    /**
-     * Busca un usuario por su correo electrónico.
-     *
-     * @param correo Correo del usuario.
-     * @return Usuario encontrado o mensaje de error.
-     */
-    @GET
-    @Path("/correo/{correo}") // Ruta que incluye el correo del usuario
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerPorCorreo(@PathParam("correo") String correo) {
-        try {
-            // Llama al servicio para obtener el usuario por correo
-            return service.obtenerPorCorreo(correo);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseProvider.error("Error interno en el servidor", 500);
-        }
-    }
+    }    
 
     /**
      * Registra un nuevo usuario en el sistema.
@@ -128,6 +89,31 @@ public class UsuarioController {
             // Llama al servicio para crear un nuevo usuario
             return service.crearUsuario(usuario);
         } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
+    
+    /**
+    * Método que maneja la solicitud de inicio de sesión de un usuario.
+    * 
+    * Este método recibe un objeto LoginDTO que contiene los datos del intento de login,
+    * incluyendo el documento del usuario, la contraseña y el rol. Luego delega la lógica
+    * de autenticación al servicio correspondiente. Si ocurre un error inesperado,
+    * devuelve una respuesta con estado 500.
+    *
+    * @param loginDatos Objeto LoginDTO con los datos de acceso: documento, contraseña y rol_id.
+    * @return Response con código de estado HTTP indicando éxito (200) o el tipo de error (400, 404, 500).
+    */
+    @POST // Método HTTP POST}
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
+    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    public Response login(LoginDTO loginDatos) {
+        try {                                        
+            // Llama al servicio de autenticación con los datos recibidos
+            return service.login(loginDatos);
+        } catch (Exception e) {           
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
         }

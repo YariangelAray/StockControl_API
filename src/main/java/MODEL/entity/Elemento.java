@@ -1,6 +1,5 @@
 package model.entity;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 
 /**
@@ -20,28 +19,27 @@ public class Elemento {
     private int id;
     private long placa;
     private String serial;
-    private int tipoElementoId;
-    private Date fechaAdquisicion;
-    private double valorMonetario;
-    private int estadoId;
-    private boolean estadoActivo;
-    private int ambienteId;
-    private int inventarioId;
+    private int tipo_elemento_id;
+    private Date fecha_adquisicion;
+    private double valor_monetario;
+    private int estado_id;
+    private boolean estado_activo;
+    private int ambiente_id;
+    private int inventario_id;
 
     public Elemento() {}
 
-    public Elemento(int id, long placa, String serial, int tipoElementoId, Date fechaAdquisicion,
-                    double valorMonetario, int estadoId, boolean estadoActivo, int ambienteId, int inventarioId) {
+    public Elemento(int id, long placa, String serial, int tipo_elemento_id, Date fecha_adquisicion, double valor_monetario, int estado_id, boolean estado_activo, int ambiente_id, int inventario_id) {
         this.id = id;
         this.placa = placa;
         this.serial = serial;
-        this.tipoElementoId = tipoElementoId;
-        this.fechaAdquisicion = fechaAdquisicion;
-        this.valorMonetario = valorMonetario;
-        this.estadoId = estadoId;
-        this.estadoActivo = estadoActivo;
-        this.ambienteId = ambienteId;
-        this.inventarioId = inventarioId;
+        this.tipo_elemento_id = tipo_elemento_id;
+        this.fecha_adquisicion = fecha_adquisicion;
+        this.valor_monetario = valor_monetario;
+        this.estado_id = estado_id;
+        this.estado_activo = estado_activo;
+        this.ambiente_id = ambiente_id;
+        this.inventario_id = inventario_id;
     }
 
     public int getId() {
@@ -68,59 +66,59 @@ public class Elemento {
         this.serial = serial;
     }
 
-    public int getTipoElementoId() {
-        return tipoElementoId;
+    public int getTipo_elemento_id() {
+        return tipo_elemento_id;
     }
 
-    public void setTipoElementoId(int tipoElementoId) {
-        this.tipoElementoId = tipoElementoId;
+    public void setTipo_elemento_id(int tipo_elemento_id) {
+        this.tipo_elemento_id = tipo_elemento_id;
     }
 
-    public Date getFechaAdquisicion() {
-        return fechaAdquisicion;
+    public Date getFecha_adquisicion() {
+        return fecha_adquisicion;
     }
 
-    public void setFechaAdquisicion(Date fechaAdquisicion) {
-        this.fechaAdquisicion = fechaAdquisicion;
+    public void setFecha_adquisicion(Date fecha_adquisicion) {
+        this.fecha_adquisicion = fecha_adquisicion;
     }
 
-    public double getValorMonetario() {
-        return valorMonetario;
+    public double getValor_monetario() {
+        return valor_monetario;
     }
 
-    public void setValorMonetario(double valorMonetario) {
-        this.valorMonetario = valorMonetario;
+    public void setValor_monetario(double valor_monetario) {
+        this.valor_monetario = valor_monetario;
     }
 
-    public int getEstadoId() {
-        return estadoId;
+    public int getEstado_id() {
+        return estado_id;
     }
 
-    public void setEstadoId(int estadoId) {
-        this.estadoId = estadoId;
+    public void setEstado_id(int estado_id) {
+        this.estado_id = estado_id;
     }
 
-    public boolean isEstadoActivo() {
-        return estadoActivo;
+    public boolean isEstado_activo() {
+        return estado_activo;
     }
 
-    public void setEstadoActivo(boolean estadoActivo) {
-        this.estadoActivo = estadoActivo;
+    public void setEstado_activo(boolean estado_activo) {
+        this.estado_activo = estado_activo;
     }
 
-    public int getAmbienteId() {
-        return ambienteId;
+    public int getAmbiente_id() {
+        return ambiente_id;
     }
 
-    public void setAmbienteId(int ambienteId) {
-        this.ambienteId = ambienteId;
+    public void setAmbiente_id(int ambiente_id) {
+        this.ambiente_id = ambiente_id;
     }
 
-    public int getInventarioId() {
-        return inventarioId;
+    public int getInventario_id() {
+        return inventario_id;
     }
 
-    public void setInventarioId(int inventarioId) {
-        this.inventarioId = inventarioId;
+    public void setInventario_id(int inventario_id) {
+        this.inventario_id = inventario_id;
     }
 }

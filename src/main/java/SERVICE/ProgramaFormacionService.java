@@ -46,6 +46,18 @@ public class ProgramaFormacionService {
             // Retorna un error si no se encontraron programas
             return ResponseProvider.error("No se encontraron programas de formación", 404);
         }
+        
+        // Instancia el DAO de Ficha para poder consultar las fichas asociadas a cada programa
+        FichaDAO fichaDAO = new FichaDAO();
+
+        // Recorre cada programa de la lista
+        for (ProgramaFormacion programa : programas) {
+            // Obtiene las fichas relacionadas con el programa actual (por su ID)
+            List<Ficha> fichas = fichaDAO.getAllByIdPrograma(programa.getId());
+
+            // Asigna esas fichas al programa (esto llena el atributo 'fichas' de la entidad)
+            programa.setFichas(fichas);
+        }
 
         // Retorna la lista de programas si se encontraron
         return ResponseProvider.success(programas, "Programas obtenidos correctamente", 200);

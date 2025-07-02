@@ -7,6 +7,8 @@ import providers.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
+import model.dto.LoginDTO;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  * Servicio que maneja la lógica de negocio relacionada con usuarios.
@@ -16,8 +18,6 @@ import javax.ws.rs.core.Response;
  * Métodos disponibles:
  * - obtenerTodos() 
  * - obtenerUsuario(int id)
- * - obtenerPorDocumento(String documento)
- * - obtenerPorCorreo(String correo)
  * - crearUsuario(Usuario usuario)
  * - actualizarUsuario(int id, Usuario usuario)
  * - eliminarUsuario(int id)
@@ -61,46 +61,6 @@ public class UsuarioService {
     public Response obtenerUsuario(int id) {
         // Busca el usuario por ID en el DAO
         Usuario usuario = dao.getById(id);
-
-        // Verifica si el usuario fue encontrado
-        if (usuario == null) {
-            // Retorna un error si no se encontró el usuario
-            return ResponseProvider.error("Usuario no encontrado", 404);
-        }
-
-        // Retorna el usuario si fue encontrado
-        return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
-    }
-
-    /**
-     * Busca un usuario por su correo electrónico.
-     *
-     * @param correo Correo a buscar.
-     * @return Usuario encontrado o error si no existe.
-     */
-    public Response obtenerPorCorreo(String correo) {
-        // Busca el usuario por correo en el DAO
-        Usuario usuario = dao.getByCorreo(correo);
-
-        // Verifica si el usuario fue encontrado
-        if (usuario == null) {
-            // Retorna un error si no se encontró el usuario
-            return ResponseProvider.error("Usuario no encontrado", 404);
-        }
-
-        // Retorna el usuario si fue encontrado
-        return ResponseProvider.success(usuario, "Usuario obtenido correctamente", 200);
-    }
-
-    /**
-     * Busca un usuario por su número de documento.
-     *
-     * @param documento Documento a buscar.
-     * @return Usuario encontrado o error si no existe.
-     */
-    public Response obtenerPorDocumento(String documento) {
-        // Busca el usuario por documento en el DAO
-        Usuario usuario = dao.getByDocumento(documento);
 
         // Verifica si el usuario fue encontrado
         if (usuario == null) {
@@ -210,4 +170,53 @@ public class UsuarioService {
             return ResponseProvider.error("Error al eliminar el usuario", 500);
         }
     }
+
+    /**
+    * Método que maneja la lógica de autenticación de un usuario.
+    * 
+    * Este método recibe un objeto DTO con los datos del intento de inicio de sesión,
+    * busca al usuario en la base de datos por su documento, y luego verifica si la 
+    * contraseña y el rol coinciden con los datos registrados. 
+    * 
+    * Utiliza la biblioteca BCrypt para verificar contraseñas de forma segura.
+    *
+    * Posibles respuestas:
+    * - 200: Inicio de sesión exitoso.
+    * - 401: Contraseña incorrecta o rol no autorizado.
+    * - 404: Usuario no encontrado.
+    *
+    * @param loginDatos Objeto LoginDTO que contiene:
+    *                   - documento: Identificador del usuario.
+    *                   - contrasena: Contraseña ingresada por el usuario (texto plano).
+    *                   - rol_id: ID del rol con el que intenta iniciar sesión.
+    * @return Response con mensaje y código de estado HTTP indicando el resultado del login.
+    */
+    public Response login(LoginDTO loginDatos) {
+        // Busca al usuario en la base de datos usando su documento
+        Usuario usuario = dao.getByDocumento(loginDatos.getDocumento());
+
+        // Si no se encuentra el usuario, retorna un error 404 (no encontrado)
+        if (usuario == null) {
+            return ResponseProvider.error("Usuario no encontrado", 404);
+        }
+
+        // Verifica que la contraseña proporcionada coincida con el hash almacenado
+        boolean contraseñaCorrecta = BCrypt.checkpw(loginDatos.getContrasena(), usuario.getContrasena())
+                || loginDatos.getContrasena().equals(usuario.getContrasena());
+
+        // Si la contraseña no coincide, devuelve un error 401 (no autorizado)
+        if (!contraseñaCorrecta) {
+            return ResponseProvider.error("Contraseña incorrecta", 401);
+        }
+
+        // Si la contraseña es correcta pero el rol no coincide, también devuelve 401
+        if (loginDatos.getRol_id() != usuario.getRol_id()) {
+            return ResponseProvider.error("Rol del usuario no autorizado", 401);
+        }
+
+        // Si todo es válido, se puede retornar solo los datos necesarios con un DTO (opcional)
+        usuario.setContrasena(null);
+        return ResponseProvider.success(usuario, "Inicio de sesión exitoso", 200);
+    }
+
 }

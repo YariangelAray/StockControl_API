@@ -4,6 +4,7 @@ import model.dao.FotoDAO;
 import model.entity.Foto;
 import providers.ResponseProvider;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Response;
 import java.io.*;
 import java.nio.file.*;
@@ -11,10 +12,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/** 
+/**
  * Servicio para manejar la lógica relacionada con las fotos de los reportes.
+ * - Guarda físicamente el archivo en una carpeta
+ * - Guarda la URL en la base de datos
+ * - Permite listar y eliminar fotos
  *
- * 
+ * El uso del ServletContext permite guardar archivos en la ruta real del proyecto desplegado,
+ * sin depender de rutas fijas del sistema operativo o IDE.
  *
  * @author Yariangel Aray
  */
@@ -23,8 +28,8 @@ public class FotoService {
     // DAO que maneja las operaciones con la tabla 'fotos'
     private FotoDAO dao = new FotoDAO();
 
-    // Carpeta donde se guardarán las fotos físicamente (relativa al proyecto)
-    private static final String CARPETA_FOTOS = "fotos_reportes";
+    // Carpeta dentro del proyecto donde se guardarán las fotos
+    private static final String CARPETA_FOTOS = "/fotos_reportes";
 
     /**
      * Sube una foto al servidor y guarda la ruta en la base de datos.
@@ -32,33 +37,36 @@ public class FotoService {
      * @param archivoStream InputStream del archivo recibido
      * @param nombreArchivo Nombre original del archivo (no se usará directamente)
      * @param reporteId ID del reporte al que pertenece
+     * @param context ServletContext que permite obtener la ruta real del proyecto desplegado
      * @return Respuesta con el objeto Foto creado o error
      */
-    public Response subirFoto(InputStream archivoStream, String nombreArchivo, int reporteId) {
+    public Response subirFoto(InputStream archivoStream, String nombreArchivo, int reporteId, ServletContext context) {
         try {
-            // Ruta real donde se deben guardar las imágenes (dentro de webapp)
-            // "user.dir" devuelve el directorio donde se ejecuta el proyecto
-            String basePath = System.getProperty("user.dir") + "/src/main/webapp/" + CARPETA_FOTOS;
- 
+            // Usamos ServletContext para obtener la ruta física real dentro del WAR desplegado
+            // Esto garantiza que la imagen se guarde en una carpeta accesible públicamente sin importar el entorno
+            String basePath = context.getRealPath(CARPETA_FOTOS);
+
             // Asegura que la carpeta exista
             Files.createDirectories(Paths.get(basePath));
 
-            // Genera un nombre único con fecha y reporteId
+            // Genera un nombre único para evitar conflictos (ej: foto_5_20250629104523001.jpg)
             String extension = nombreArchivo.contains(".") ? nombreArchivo.substring(nombreArchivo.lastIndexOf(".")) : "";
             String nombreUnico = "foto_" + reporteId + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
 
-            // Ruta completa del archivo
+            // Ruta completa donde se guardará el archivo
             Path rutaDestino = Paths.get(basePath, nombreUnico);
 
-            // Copia la imagen al destino
+            System.out.println("Ruta en donde se guardará la imagen: " + rutaDestino.toString());
+            
+            // Copia el archivo desde el stream a la carpeta
             Files.copy(archivoStream, rutaDestino, StandardCopyOption.REPLACE_EXISTING);
 
-            // Guarda la URL relativa (para accederla desde el navegador)
+            // Crea el objeto Foto con la URL relativa para que pueda ser accedida desde el navegador
             Foto foto = new Foto();
-            foto.setUrl("/" + CARPETA_FOTOS + "/" + nombreUnico);
+            foto.setUrl(CARPETA_FOTOS + "/" + nombreUnico); // URL relativa (accesible vía navegador)
             foto.setReporteId(reporteId);
 
-            // Inserta en base de datos
+            // Guarda la foto en la base de datos
             Foto creada = dao.create(foto);
             return ResponseProvider.success(creada, "Foto subida correctamente", 201);
 
@@ -67,7 +75,6 @@ public class FotoService {
             return ResponseProvider.error("Error al guardar la imagen", 500);
         }
     }
-
 
     /**
      * Retorna todas las fotos
@@ -105,6 +112,7 @@ public class FotoService {
 
         // Intenta eliminar el archivo físico
         try {
+            // Obtenemos la ruta relativa como absoluta con Paths.get
             Path ruta = Paths.get("." + foto.getUrl());
             Files.deleteIfExists(ruta);
         } catch (IOException e) {
@@ -114,7 +122,7 @@ public class FotoService {
 
         // Elimina el registro en la base de datos
         boolean eliminada = dao.delete(id);
-        if (!eliminada) return ResponseProvider.error("Error al eliminar la foto de la base de datos", 500);
+        if (!eliminada) return ResponseProvider.error("Error al eliminar de la base de datos", 500);
 
         return ResponseProvider.success(null, "Foto eliminada correctamente", 200);
     }

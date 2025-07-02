@@ -1,5 +1,7 @@
 package model.entity;
 
+import java.util.List;
+
 /**
  * Clase que representa la entidad Inventario del sistema.
  * 
@@ -16,6 +18,9 @@ public class Inventario {
     private int id;
     private String nombre;
     private int usuario_admin_id;
+    
+    // Lista de elementos asociadas al inventario
+    private List<Elemento> elementos;
 
     public Inventario() {}
 
@@ -47,5 +52,13 @@ public class Inventario {
 
     public void setUsuario_admin_id(int usuario_admin_id) {
         this.usuario_admin_id = usuario_admin_id;
+    }
+    
+    public List<Elemento> getElementos() {
+        return elementos;
+    }
+
+    public void setElementos(List<Elemento> elementos) {
+        this.elementos = elementos;
     }
 }

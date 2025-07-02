@@ -1,0 +1,3 @@
+En esta carpeta se guardaran todas las fotos que esten asociadas a un reporte con la siguiente sintaxis
+
+foto_(id del reporte)_(fecha y hora en la que se guardo).(extensión)

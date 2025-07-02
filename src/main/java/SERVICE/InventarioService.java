@@ -46,6 +46,18 @@ public class InventarioService {
             // Retorna un error si no se encontraron inventarios
             return ResponseProvider.error("No se encontraron inventarios", 404);
         }
+        
+        // Instancia el DAO de elemento para poder consultar los elementos asociadas a cada inventario
+        ElementoDAO elementoDAO = new ElementoDAO();
+
+        // Recorre cada inventario de la lista
+        for (Inventario inventario : inventarios) {
+            // Obtiene los elementos relacionados al inventario actual (por su ID)
+            List<Elemento> elementos = elementoDAO.getAllByIdInventario(inventario.getId());
+
+            // Asigna esos elementos al inventario (esto llena el atributo 'elementos' de la entidad)
+            inventario.setElementos(elementos);
+        }
 
         // Retorna la lista de inventarios si se encontraron
         return ResponseProvider.success(inventarios, "Inventarios obtenidos correctamente", 200);
@@ -66,7 +78,14 @@ public class InventarioService {
             // Retorna un error si no se encontró el inventario
             return ResponseProvider.error("Inventario no encontrado", 404);
         }
-
+        
+        // Instancia el DAO de elemento para poder consultar los elementos asociadas al inventario
+        ElementoDAO elementoDAO = new ElementoDAO();
+        // Obtiene los elementos relacionados al inventario (por su ID)
+        List<Elemento> elementos = elementoDAO.getAllByIdInventario(inventario.getId());
+        // Asigna esos elementos al inventario (esto llena el atributo 'elementos' de la entidad)
+        inventario.setElementos(elementos);                
+        
         // Retorna el inventario si fue encontrado
         return ResponseProvider.success(inventario, "Inventario obtenido correctamente", 200);
     }

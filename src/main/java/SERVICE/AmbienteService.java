@@ -46,6 +46,18 @@ public class AmbienteService {
             // Retorna un error si no se encontraron ambientes
             return ResponseProvider.error("No se encontraron ambientes", 404);
         }
+        
+        // Instancia el DAO de elemento para poder consultar los elementos asociadas a cada ambiente
+        ElementoDAO elementoDAO = new ElementoDAO();
+
+        // Recorre cada ambiente de la lista
+        for (Ambiente ambiente : ambientes) {
+            // Obtiene los elementos relacionados al ambiente actual (por su ID)
+            List<Elemento> elementos = elementoDAO.getAllByIdAmbiente(ambiente.getId());
+
+            // Asigna esos elementos al ambiente (esto llena el atributo 'elementos' de la entidad)
+            ambiente.setElementos(elementos);
+        }
 
         // Retorna la lista de ambientes si se encontraron
         return ResponseProvider.success(ambientes, "Ambientes obtenidos correctamente", 200);
@@ -66,6 +78,13 @@ public class AmbienteService {
             // Retorna un error si no se encontró el ambiente
             return ResponseProvider.error("Ambiente no encontrado", 404);
         }
+        
+        // Instancia el DAO de elemento para poder consultar los elementos asociadas al ambiente
+        ElementoDAO elementoDAO = new ElementoDAO();
+        // Obtiene los elementos relacionados al ambiente (por su ID)
+        List<Elemento> elementos = elementoDAO.getAllByIdAmbiente(ambiente.getId());
+        // Asigna esos elementos al inventario (esto llena el atributo 'elementos' de la entidad)
+        ambiente.setElementos(elementos);     
 
         // Retorna el ambiente si fue encontrado
         return ResponseProvider.success(ambiente, "Ambiente obtenido correctamente", 200);

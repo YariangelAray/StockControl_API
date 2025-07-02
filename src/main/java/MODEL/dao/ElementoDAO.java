@@ -116,13 +116,13 @@ public class ElementoDAO {
 
             stmt.setLong(1, elemento.getPlaca()); // Asigna placa
             stmt.setString(2, elemento.getSerial()); // Asigna serial
-            stmt.setInt(3, elemento.getTipoElementoId()); // Asigna tipo
-            stmt.setDate(4, new java.sql.Date(elemento.getFechaAdquisicion().getTime())); // Asigna fecha
-            stmt.setDouble(5, elemento.getValorMonetario()); // Asigna valor
-            stmt.setInt(6, elemento.getEstadoId()); // Asigna estado
-            stmt.setBoolean(7, elemento.isEstadoActivo()); // Asigna estado activo
-            stmt.setInt(8, elemento.getAmbienteId()); // Asigna ambiente
-            stmt.setInt(9, elemento.getInventarioId()); // Asigna inventario
+            stmt.setInt(3, elemento.getTipo_elemento_id()); // Asigna tipo
+            stmt.setDate(4, new java.sql.Date(elemento.getFecha_adquisicion().getTime())); // Asigna fecha
+            stmt.setDouble(5, elemento.getValor_monetario()); // Asigna valor
+            stmt.setInt(6, elemento.getEstado_id()); // Asigna estado
+            stmt.setBoolean(7, elemento.isEstado_activo()); // Asigna estado activo
+            stmt.setInt(8, elemento.getAmbiente_id()); // Asigna ambiente
+            stmt.setInt(9, elemento.getInventario_id()); // Asigna inventario
 
             int filasAfectadas = stmt.executeUpdate(); // Ejecuta la inserción
             if (filasAfectadas > 0) { // Si se insertó correctamente
@@ -155,13 +155,13 @@ public class ElementoDAO {
 
             stmt.setLong(1, elemento.getPlaca()); // Asigna placa
             stmt.setString(2, elemento.getSerial()); // Asigna serial
-            stmt.setInt(3, elemento.getTipoElementoId()); // Asigna tipo
-            stmt.setDate(4, new java.sql.Date(elemento.getFechaAdquisicion().getTime())); // Asigna fecha
-            stmt.setDouble(5, elemento.getValorMonetario()); // Asigna valor
-            stmt.setInt(6, elemento.getEstadoId()); // Asigna estado
-            stmt.setBoolean(7, elemento.isEstadoActivo()); // Asigna estado activo
-            stmt.setInt(8, elemento.getAmbienteId()); // Asigna ambiente
-            stmt.setInt(9, elemento.getInventarioId()); // Asigna inventario
+            stmt.setInt(3, elemento.getTipo_elemento_id()); // Asigna tipo
+            stmt.setDate(4, new java.sql.Date(elemento.getFecha_adquisicion().getTime())); // Asigna fecha
+            stmt.setDouble(5, elemento.getValor_monetario()); // Asigna valor
+            stmt.setInt(6, elemento.getEstado_id()); // Asigna estado
+            stmt.setBoolean(7, elemento.isEstado_activo()); // Asigna estado activo
+            stmt.setInt(8, elemento.getAmbiente_id()); // Asigna ambiente
+            stmt.setInt(9, elemento.getInventario_id()); // Asigna inventario
             stmt.setInt(10, id); // ID del elemento a actualizar
 
             int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
@@ -202,31 +202,31 @@ public class ElementoDAO {
     // Métodos adicionales para consultar por campos específicos
 
     public List<Elemento> getAllByIdInventario(int inventarioId) {
-        return getAllByField("inventario_id", inventarioId); // Consulta por inventario
+        return getAllByCampo("inventario_id", inventarioId); // Consulta por inventario
     }
 
     public List<Elemento> getAllByIdAmbiente(int ambienteId) {
-        return getAllByField("ambiente_id", ambienteId); // Consulta por ambiente
+        return getAllByCampo("ambiente_id", ambienteId); // Consulta por ambiente
     }
 
     public List<Elemento> getAllByIdTipoElemento(int tipoElementoId) {
-        return getAllByField("tipo_elemento_id", tipoElementoId); // Consulta por tipo
+        return getAllByCampo("tipo_elemento_id", tipoElementoId); // Consulta por tipo
     }
 
     public List<Elemento> getByIdTipoEstado(int estadoId) {
-        return getAllByField("estado_id", estadoId); // Consulta por estado
+        return getAllByCampo("estado_id", estadoId); // Consulta por estado
     }
 
     /**
      * Método auxiliar que realiza una consulta genérica por campo y valor.
      *
-     * @param fieldName Nombre del campo a consultar.
+     * @param campo Nombre del campo a consultar.
      * @param value Valor que debe tener el campo.
      * @return Lista de elementos que cumplen la condición.
      */
-    private List<Elemento> getAllByField(String fieldName, int value) {
+    private List<Elemento> getAllByCampo(String campo, int value) {
         List<Elemento> elementos = new ArrayList<>(); // Lista para resultados
-        String SQL = "SELECT * FROM elementos WHERE " + fieldName + " = ?"; // Consulta dinámica
+        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ?"; // Consulta dinámica
 
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
