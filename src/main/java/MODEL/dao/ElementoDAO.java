@@ -51,6 +51,7 @@ public class ElementoDAO {
                     rs.getDate("fecha_adquisicion"),
                     rs.getDouble("valor_monetario"),
                     rs.getInt("estado_id"),
+                    rs.getString("observaciones"),
                     rs.getBoolean("estado_activo"),
                     rs.getInt("ambiente_id"),
                     rs.getInt("inventario_id")
@@ -89,6 +90,7 @@ public class ElementoDAO {
                     rs.getDate("fecha_adquisicion"),
                     rs.getDouble("valor_monetario"),
                     rs.getInt("estado_id"),
+                    rs.getString("observaciones"),
                     rs.getBoolean("estado_activo"),
                     rs.getInt("ambiente_id"),
                     rs.getInt("inventario_id")
@@ -109,7 +111,7 @@ public class ElementoDAO {
      * @return Elemento creado con el ID generado, o null si hubo error.
      */
     public Elemento create(Elemento elemento) {
-        String SQL = "INSERT INTO elementos (placa, serial, tipo_elemento_id, fecha_adquisicion, valor_monetario, estado_id, estado_activo, ambiente_id, inventario_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"; // Consulta SQL de inserción
+        String SQL = "INSERT INTO elementos (placa, serial, tipo_elemento_id, fecha_adquisicion, valor_monetario, estado_id, observaciones, ambiente_id, inventario_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"; // Consulta SQL de inserción
 
         try (Connection conexion = DBConnection.conectar(); // Establece la conexión
              PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) { // Prepara la consulta con retorno de claves
@@ -120,7 +122,7 @@ public class ElementoDAO {
             stmt.setDate(4, new java.sql.Date(elemento.getFecha_adquisicion().getTime())); // Asigna fecha
             stmt.setDouble(5, elemento.getValor_monetario()); // Asigna valor
             stmt.setInt(6, elemento.getEstado_id()); // Asigna estado
-            stmt.setBoolean(7, elemento.isEstado_activo()); // Asigna estado activo
+            stmt.setString(7, elemento.getObservaciones()); // Asigna observaciones                    
             stmt.setInt(8, elemento.getAmbiente_id()); // Asigna ambiente
             stmt.setInt(9, elemento.getInventario_id()); // Asigna inventario
 
@@ -148,7 +150,7 @@ public class ElementoDAO {
      * @return Elemento actualizado si fue exitoso, o null si falló.
      */
     public Elemento update(int id, Elemento elemento) {
-        String SQL = "UPDATE elementos SET placa = ?, serial = ?, tipo_elemento_id = ?, fecha_adquisicion = ?, valor_monetario = ?, estado_id = ?, estado_activo = ?, ambiente_id = ?, inventario_id = ? WHERE id = ?"; // Consulta SQL de actualización
+        String SQL = "UPDATE elementos SET placa = ?, serial = ?, tipo_elemento_id = ?, fecha_adquisicion = ?, valor_monetario = ?, estado_id = ?, observaciones = ?, ambiente_id = ?, inventario_id = ? WHERE id = ?"; // Consulta SQL de actualización
 
         try (Connection conexion = DBConnection.conectar(); // Establece la conexión
              PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
@@ -159,7 +161,7 @@ public class ElementoDAO {
             stmt.setDate(4, new java.sql.Date(elemento.getFecha_adquisicion().getTime())); // Asigna fecha
             stmt.setDouble(5, elemento.getValor_monetario()); // Asigna valor
             stmt.setInt(6, elemento.getEstado_id()); // Asigna estado
-            stmt.setBoolean(7, elemento.isEstado_activo()); // Asigna estado activo
+            stmt.setString(7, elemento.getObservaciones()); // Asigna observaciones
             stmt.setInt(8, elemento.getAmbiente_id()); // Asigna ambiente
             stmt.setInt(9, elemento.getInventario_id()); // Asigna inventario
             stmt.setInt(10, id); // ID del elemento a actualizar
@@ -243,6 +245,7 @@ public class ElementoDAO {
                     rs.getDate("fecha_adquisicion"),
                     rs.getDouble("valor_monetario"),
                     rs.getInt("estado_id"),
+                    rs.getString("observaciones"),
                     rs.getBoolean("estado_activo"),
                     rs.getInt("ambiente_id"),
                     rs.getInt("inventario_id")

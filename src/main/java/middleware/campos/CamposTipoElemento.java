@@ -37,8 +37,8 @@ public class CamposTipoElemento {
         // Campo obligatorio, modelo del tipo, entre 2 y 50 caracteres
         campos.add(new Campo("modelo", false, 2, 50, "string"));
 
-        // Campo opcional, observaciones generales, sin límite superior razonable (por ser tipo TEXT)
-        campos.add(new Campo("observaciones", false, 0, 1000, "string"));
+        // Campo opcional, observaciones generales
+        campos.add(new Campo("observaciones", false, 0, 250, "string"));
 
         return campos;
     }

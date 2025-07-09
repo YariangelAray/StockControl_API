@@ -23,13 +23,14 @@ public class Elemento {
     private Date fecha_adquisicion;
     private double valor_monetario;
     private int estado_id;
+    private String observaciones;    
     private boolean estado_activo;
     private int ambiente_id;
     private int inventario_id;
 
     public Elemento() {}
 
-    public Elemento(int id, long placa, String serial, int tipo_elemento_id, Date fecha_adquisicion, double valor_monetario, int estado_id, boolean estado_activo, int ambiente_id, int inventario_id) {
+    public Elemento(int id, long placa, String serial, int tipo_elemento_id, Date fecha_adquisicion, double valor_monetario, int estado_id, String observaciones, boolean estado_activo, int ambiente_id, int inventario_id) {
         this.id = id;
         this.placa = placa;
         this.serial = serial;
@@ -37,6 +38,7 @@ public class Elemento {
         this.fecha_adquisicion = fecha_adquisicion;
         this.valor_monetario = valor_monetario;
         this.estado_id = estado_id;
+        this.observaciones = observaciones;
         this.estado_activo = estado_activo;
         this.ambiente_id = ambiente_id;
         this.inventario_id = inventario_id;
@@ -98,6 +100,14 @@ public class Elemento {
         this.estado_id = estado_id;
     }
 
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
+    }
+
     public boolean isEstado_activo() {
         return estado_activo;
     }
@@ -105,7 +115,7 @@ public class Elemento {
     public void setEstado_activo(boolean estado_activo) {
         this.estado_activo = estado_activo;
     }
-
+    
     public int getAmbiente_id() {
         return ambiente_id;
     }

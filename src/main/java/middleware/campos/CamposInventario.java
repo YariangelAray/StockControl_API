@@ -27,6 +27,7 @@ public class CamposInventario {
         List<Campo> campos = new ArrayList<>();        
         
         campos.add(new Campo("nombre", true, 3, 50, "string"));        
+        campos.add(new Campo("fecha_creacion", true, 10, 10, "fecha"));
         campos.add(new Campo("usuario_admin_id", true, 1, 2, "numero"));
 
         // Retorna la lista completa de campos

@@ -6,7 +6,8 @@ drop table if exists fotos, reportes, elementos, estados, tipos_elementos, ambie
 
 create table roles(  
 id int auto_increment primary key,  
-nombre varchar(30));  
+nombre varchar(30),
+descripcion text);  
 
 create table tipos_documento(
 id int auto_increment primary key,
@@ -48,7 +49,8 @@ foreign key (rol_id) references roles(id)
 
 create table inventarios(  
 id int auto_increment primary key,  
-nombre varchar(50),  
+nombre varchar(50),
+fecha_creacion date,
 usuario_admin_id int,  
 foreign key (usuario_admin_id) references usuarios(id)  
 );
@@ -98,6 +100,7 @@ tipo_elemento_id int,                -- FK al tipo
 fecha_adquisicion date,  
 valor_monetario decimal(12,2),  
 estado_id int,
+observaciones text,
 estado_activo boolean default true,
 ambiente_id int,
 inventario_id int,

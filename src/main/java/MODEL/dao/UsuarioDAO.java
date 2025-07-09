@@ -282,11 +282,20 @@ public class UsuarioDAO {
             stmt.setInt(5, usuario.getGenero_id());
             stmt.setString(6, usuario.getTelefono());
             stmt.setString(7, usuario.getCorreo());
+            
+            // Si no vino ficha_id, se le asigna 1 por defecto
+            if (usuario.getFicha_id() == 0) usuario.setFicha_id(1);
+            
             stmt.setInt(8, usuario.getFicha_id());
             
             String contrasenaHasheada = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
             System.out.println(contrasenaHasheada);
+            
             stmt.setString(9, contrasenaHasheada);
+            
+            // Si no vino rol_id, se le asigna 2 por defecto
+            if (usuario.getRol_id()== 0) usuario.setRol_id(1);
+            
             stmt.setInt(10, usuario.getRol_id());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas

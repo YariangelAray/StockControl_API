@@ -47,6 +47,7 @@ public class InventarioDAO {
                 Inventario inventario = new Inventario(
                     rs.getInt("id"), // Obtiene el ID del inventario
                     rs.getString("nombre"), // Obtiene el nombre del inventario
+                    rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
                     rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
                 );
                 // Agrega el inventario a la lista
@@ -88,6 +89,7 @@ public class InventarioDAO {
                 inventario = new Inventario(
                     rs.getInt("id"), // Obtiene el ID del inventario
                     rs.getString("nombre"), // Obtiene el nombre del inventario
+                        rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
                     rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
                 );
             }
@@ -109,7 +111,7 @@ public class InventarioDAO {
      */
     public Inventario create(Inventario inventario) {
         // Consulta SQL para insertar un nuevo inventario
-        String SQL = "INSERT INTO inventarios (nombre, usuario_admin_id) VALUES (?, ?)";
+        String SQL = "INSERT INTO inventarios (nombre, fecha_creacion, usuario_admin_id) VALUES (?, ?, ?)";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -117,7 +119,8 @@ public class InventarioDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, inventario.getNombre());
-            stmt.setInt(2, inventario.getUsuario_admin_id());
+            stmt.setDate(2, new java.sql.Date(inventario.getFecha_creacion().getTime())); // Asigna fecha
+            stmt.setInt(3, inventario.getUsuario_admin_id());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -149,7 +152,7 @@ public class InventarioDAO {
      */
     public Inventario update(int id, Inventario inventario) {
         // Consulta SQL para actualizar un inventario existente
-        String SQL = "UPDATE inventarios SET nombre = ?, usuario_admin_id = ? WHERE id = ?";
+        String SQL = "UPDATE inventarios SET nombre = ?, fecha_creacion = ?, usuario_admin_id = ? WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -158,7 +161,8 @@ public class InventarioDAO {
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, inventario.getNombre());
             stmt.setInt(2, inventario.getUsuario_admin_id());
-            stmt.setInt(3, id); // Establece el ID del inventario a actualizar
+            stmt.setDate(3, new java.sql.Date(inventario.getFecha_creacion().getTime())); // Asigna fecha
+            stmt.setInt(4, id); // Establece el ID del inventario a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();

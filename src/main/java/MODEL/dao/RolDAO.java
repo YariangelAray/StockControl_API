@@ -46,7 +46,8 @@ public class RolDAO {
                 // Crea un nuevo objeto Rol a partir de los datos de la fila actual
                 Rol rol = new Rol(
                     rs.getInt("id"), // Obtiene el ID del rol
-                    rs.getString("nombre") // Obtiene el nombre del rol
+                    rs.getString("nombre"), // Obtiene el nombre del rol
+                    rs.getString("descripcion") // Obtiene la descripcion del rol
                 );
                 // Agrega el rol a la lista
                 roles.add(rol);
@@ -86,7 +87,8 @@ public class RolDAO {
                 // Crea un nuevo objeto Rol a partir de los datos de la fila actual
                 rol = new Rol(
                     rs.getInt("id"), // Obtiene el ID del rol
-                    rs.getString("nombre") // Obtiene el nombre del rol
+                    rs.getString("nombre"), // Obtiene el nombre del rol
+                    rs.getString("descripcion") // Obtiene la descripcion del rol
                 );
             }
 
@@ -107,7 +109,7 @@ public class RolDAO {
      */
     public Rol create(Rol rol) {
         // Consulta SQL para insertar un nuevo rol
-        String SQL = "INSERT INTO roles (nombre) VALUES (?)";
+        String SQL = "INSERT INTO roles (nombre, descripcion) VALUES (?, ?)";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -115,6 +117,7 @@ public class RolDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, rol.getNombre());
+            stmt.setString(2, rol.getDescripcion());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -146,7 +149,7 @@ public class RolDAO {
      */
     public Rol update(int id, Rol rol) {
         // Consulta SQL para actualizar un rol existente
-        String SQL = "UPDATE roles SET nombre = ? WHERE id = ?";
+        String SQL = "UPDATE roles SET nombre = ?, descripcion = ? WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -154,7 +157,8 @@ public class RolDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, rol.getNombre());
-            stmt.setInt(2, id); // Establece el ID del rol a actualizar
+            stmt.setString(2, rol.getDescripcion());
+            stmt.setInt(3, id); // Establece el ID del rol a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();

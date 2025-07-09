@@ -32,25 +32,25 @@ public class CamposElemento {
         campos.add(new Campo("serial", false, 0, 50, "string"));
 
         // Campo tipoElementoId: obligatorio, tipo entero
-        campos.add(new Campo("tipoElementoId", true, 1, 2, "numero"));
+        campos.add(new Campo("tipo_elemento_id", true, 1, 2, "numero"));
 
-        // Campo fechaAdquisicion: obligatorio, tipo string (validación personalizada pendiente)
-        campos.add(new Campo("fechaAdquisicion", true, 10, 10, "fecha")); // Espera formato "yyyy-MM-dd"
+        // Campo fechaAdquisicion: obligatorio, tipo string
+        campos.add(new Campo("fecha_adquisicion", true, 10, 10, "fecha"));
 
         // Campo valorMonetario: obligatorio, tipo double (como string por JSON)
-        campos.add(new Campo("valorMonetario", true, 1, 20, "numero"));
+        campos.add(new Campo("valor_monetario", true, 1, 20, "numero"));
 
         // Campo estadoId: obligatorio, tipo entero
-        campos.add(new Campo("estadoId", false, 1, 2, "numero"));
-
-        // Campo estadoActivo: obligatorio, tipo booleano
-        campos.add(new Campo("estadoActivo", false, 0, 0, "booleano"));
+        campos.add(new Campo("estado_id", false, 1, 2, "numero"));
+        
+        // Campo observaciones: opcional, tipo string
+        campos.add(new Campo("observaciones", false, 0, 250, "string"));
 
         // Campo ambienteId: obligatorio, tipo entero
-        campos.add(new Campo("ambienteId", false, 1, 2, "numero"));
+        campos.add(new Campo("ambiente_id", false, 1, 2, "numero"));
 
         // Campo inventarioId: obligatorio, tipo entero
-        campos.add(new Campo("inventarioId", true, 1, 2, "numero"));
+        campos.add(new Campo("inventario_id", true, 1, 2, "numero"));
 
         return campos; // Retorna la lista de campos
     }

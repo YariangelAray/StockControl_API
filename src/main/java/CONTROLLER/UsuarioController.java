@@ -82,10 +82,7 @@ public class UsuarioController {
     @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
     @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
     public Response crearUsuario(Usuario usuario) {
-        try {
-            // Si no vino ficha_id, se le asigna 1 por defecto
-            if (usuario.getFicha_id() == 0) usuario.setFicha_id(1);
-                
+        try {                          
             // Llama al servicio para crear un nuevo usuario
             return service.crearUsuario(usuario);
         } catch (Exception e) {

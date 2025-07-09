@@ -2,9 +2,9 @@ use stockcontrol_bd;
 
 -- REGISTROS
 
-insert into roles (nombre) values 
-('Administrador'), 
-('Aprendiz');
+insert into roles (nombre, descripcion) values 
+('Administrador', 'Gestiona los inventarios a su cargo.'), 
+('Corriente', 'Apoya en la gestión de los inventarios con acceso. Puede modificar cierta información de los elementos.');
 
 insert into tipos_documento (nombre) values 
 ('Cédula de Ciudadanía'),
