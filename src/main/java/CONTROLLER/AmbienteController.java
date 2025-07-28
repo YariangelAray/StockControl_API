@@ -33,6 +33,7 @@ public class AmbienteController {
     }
 
     /**
+
      * Obtiene todos los ambientes registrados en el sistema.
      *
      * @return Lista de ambientes o mensaje de error si ocurre una excepción.

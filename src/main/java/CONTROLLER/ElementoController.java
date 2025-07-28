@@ -48,6 +48,25 @@ public class ElementoController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    
+    /**
+     * Obtiene todos los elementos que pertenecen a un inventario específico.    
+     *
+     * @param id ID del inventario.
+     * @return Lista de elementos o mensaje de error.
+     */
+    @GET
+    @Path("/inventario/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerPorInventario(@PathParam("id") int idInventario) {
+        try {
+            return service.obtenerTodosPorInventario(idInventario); // Delega al servicio
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
+
 
     /**
      * Busca un elemento por su ID.
@@ -106,6 +125,26 @@ public class ElementoController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    
+    /**
+    * Cambia el estado_activo de un elemento (activar o desactivar).       
+    *
+    * @param id ID del elemento.
+    * @param estado Valor booleano para el estado.
+    * @return Respuesta con mensaje de éxito o error.
+    */
+   @PUT
+   @Path("/{id}/estado/{estado}") // Ruta para cambiar estado
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response actualizarEstado(@PathParam("id") int id, @PathParam("estado") boolean estado) {
+       try {
+           return service.actualizarEstado(id, estado);
+       } catch (Exception e) {
+           e.printStackTrace();
+           return ResponseProvider.error("Error interno en el servidor", 500);
+       }
+   }
+
 
     /**
      * Elimina un elemento del sistema si no tiene reportes asociados.

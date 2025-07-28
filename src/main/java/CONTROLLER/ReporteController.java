@@ -50,6 +50,27 @@ public class ReporteController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    
+    /**
+     * Obtiene todos los reportes asociados a un inventario específico.
+     * Esta ruta está pensada para que un administrador vea los reportes de su inventario.
+     *
+     * @param id ID del inventario a consultar.
+     * @return Lista de reportes relacionados o mensaje de error si no se encuentran.
+     */
+    @GET
+    @Path("/inventario/{id}") // Ruta extendida para filtrar por inventario
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerReportesPorInventario(@PathParam("id") int idInventario) {
+        try {
+            // Llama al servicio para obtener los reportes filtrados por inventario
+            return service.obtenerReportesPorInventario(idInventario);
+        } catch (Exception e) {
+            e.printStackTrace(); // Muestra error en consola
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
+
 
     /**
      * Busca un reporte por su ID único.

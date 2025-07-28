@@ -29,7 +29,7 @@ public class ReporteDAO {
      */
     public List<Reporte> getAll() {
         List<Reporte> reportes = new ArrayList<>(); // Lista que almacenará los reportes encontrados
-        String SQL = "SELECT * FROM reportes"; // Consulta SQL para obtener todos los reportes
+        String SQL = "SELECT * FROM reportes ORDER BY id DESC"; // Consulta SQL para obtener todos los reportes
 
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL); // Prepara la consulta
@@ -53,6 +53,46 @@ public class ReporteDAO {
         }
         return reportes; // Retorna la lista de reportes
     }
+    
+    /**
+     * Obtiene todos los reportes asociados a un inventario específico.
+     * 
+     * @param inventarioId ID del inventario del cual se desean obtener los reportes.
+     * @return Lista de objetos Reporte relacionados a los elementos de ese inventario.
+     */
+    public List<Reporte> getAllByIdInventario(int inventarioId) {
+        List<Reporte> reportes = new ArrayList<>(); // Lista para almacenar los reportes encontrados
+
+        // Consulta SQL que une la tabla reportes con elementos
+        // y filtra los elementos que pertenecen al inventario dado
+        String SQL = "SELECT r.* FROM reportes r JOIN elementos e ON r.elemento_id = e.id WHERE e.inventario_id = ? ORDER BY id DESC";
+
+        try (Connection conexion = DBConnection.conectar(); // Abre conexión a la base de datos
+            PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta SQL        
+            stmt.setInt(1, inventarioId); // Asigna el ID del inventario como parámetro
+
+            ResultSet rs = stmt.executeQuery(); // Ejecuta la consulta y obtiene los resultados
+
+            // Recorre cada fila del resultado
+            while (rs.next()) {
+                // Crea un nuevo objeto Reporte con los datos obtenidos
+                Reporte reporte = new Reporte(
+                    rs.getInt("id"),            // ID del reporte
+                    rs.getDate("fecha"),        // Fecha del reporte
+                    rs.getString("asunto"),     // Asunto del reporte
+                    rs.getString("mensaje"),    // Mensaje detallado
+                    rs.getInt("usuario_id"),    // ID del usuario que lo creó
+                    rs.getInt("elemento_id")    // ID del elemento relacionado
+                );
+                reportes.add(reporte); // Agrega el reporte a la lista
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Imprime el error si ocurre una excepción
+        }
+
+        return reportes; // Devuelve la lista de reportes encontrados
+    }
+
 
     /**
      * Busca un reporte por su ID.
@@ -101,8 +141,8 @@ public class ReporteDAO {
             // Asigna los valores del reporte a los parámetros
             stmt.setString(1, reporte.getAsunto());
             stmt.setString(2, reporte.getMensaje());
-            stmt.setInt(3, reporte.getUsuarioId());
-            stmt.setInt(4, reporte.getElementoId());
+            stmt.setInt(3, reporte.getUsuario_id());
+            stmt.setInt(4, reporte.getElemento_id());
 
             int filasAfectadas = stmt.executeUpdate(); // Ejecuta la inserción
             if (filasAfectadas > 0) {
@@ -133,8 +173,8 @@ public class ReporteDAO {
 
             stmt.setString(1, reporte.getAsunto()); // Asigna el asunto
             stmt.setString(2, reporte.getMensaje()); // Asigna el mensaje
-            stmt.setInt(3, reporte.getUsuarioId()); // Asigna el ID del usuario
-            stmt.setInt(4, reporte.getElementoId()); // Asigna el ID del elemento
+            stmt.setInt(3, reporte.getUsuario_id()); // Asigna el ID del usuario
+            stmt.setInt(4, reporte.getElemento_id()); // Asigna el ID del elemento
             stmt.setInt(5, id); // Asigna el ID del reporte a actualizar
 
             int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
@@ -177,7 +217,7 @@ public class ReporteDAO {
      */
     public List<Reporte> getAllByIdElemento(int idElemento) {
         List<Reporte> reportes = new ArrayList<>(); // Lista para almacenar los reportes encontrados
-        String SQL = "SELECT * FROM reportes WHERE elemento_id = ?"; // Consulta SQL con filtro por elemento_id
+        String SQL = "SELECT * FROM reportes WHERE elemento_id = ? ORDER BY id DESC"; // Consulta SQL con filtro por elemento_id
 
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta

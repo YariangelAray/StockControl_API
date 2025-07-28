@@ -1,5 +1,6 @@
 package service;
 
+import java.util.ArrayList;
 import model.dao.ElementoDAO;
 import model.dao.ReporteDAO;
 import model.entity.Elemento;
@@ -47,6 +48,23 @@ public class ElementoService {
 
         return ResponseProvider.success(elementos, "Elementos obtenidos correctamente", 200);
     }
+    
+    /**
+     * Obtiene todos los elementos asociados a un inventario específico.
+     *
+     * @param idInventario ID del inventario.
+     * @return Lista de elementos que pertenecen al inventario o mensaje de error si no hay resultados.
+     */
+    public Response obtenerTodosPorInventario(int idInventario) {
+        List<Elemento> elementos = dao.getAllByIdInventario(idInventario); // Llama al DAO
+
+        if (elementos.isEmpty()) {
+            return ResponseProvider.error("No se encontraron elementos para este inventario", 404); // Si no hay
+        }
+
+        return ResponseProvider.success(elementos, "Elementos del inventario obtenidos correctamente", 200); // Éxito
+    }
+
 
     /**
      * Busca un elemento por su ID.
@@ -71,6 +89,18 @@ public class ElementoService {
      * @return Elemento creado o error.
      */
     public Response crearElemento(Elemento elemento) {
+        // Verifica si el serial ya está registrado
+        List<Elemento> elementosSerial = dao.getBySerial(elemento.getSerial());
+        if (!elementosSerial.isEmpty()) {
+            return ResponseProvider.error("Ya existe un elemento con este serial registrado", 409);
+        }
+
+        // Verifica si la placa ya está registrada
+        List<Elemento> elementosPlaca = dao.getByPlaca(elemento.getPlaca());
+        if (!elementosPlaca.isEmpty()) {
+            return ResponseProvider.error("Ya existe un elemento con esta placa registrada", 409);
+        }
+    
         Elemento nuevoElemento = dao.create(elemento); // Intenta crear
 
         if (nuevoElemento != null) {
@@ -93,15 +123,64 @@ public class ElementoService {
         if (existente == null) {
             return ResponseProvider.error("Elemento no encontrado", 404); // Si no existe
         }
+        
+        List<Elemento> elementos = dao.getAll();
+        List<Elemento> elementosRegistrados = new ArrayList<>();
 
-        Elemento actualizado = dao.update(id, elemento); // Intenta actualizar
+        for (Elemento elementoRegistrado : elementos)
+            if (elementoRegistrado.getId()!= id) elementosRegistrados.add(elementoRegistrado);
 
-        if (actualizado != null) {
-            return ResponseProvider.success(actualizado, "Elemento actualizado correctamente", 200); // Éxito
+        for (Elemento elementoRegistrado : elementosRegistrados)
+            if (elementoRegistrado.getPlaca()== elemento.getPlaca()){
+                return ResponseProvider.error("Este número de placa ya fue registrado", 409);
+            }
+
+        if (elemento.getSerial() != null && !elemento.getSerial().isEmpty()) {
+            for (Elemento elementoRegistrado : elementosRegistrados) {
+                if (elemento.getSerial().equals(elementoRegistrado.getSerial())) {
+                    return ResponseProvider.error("Este serial ya fue registrado", 409);
+                }
+            }
+        }
+
+        boolean actualizado = dao.update(id, elemento); // Intenta actualizar
+
+        if (actualizado) {
+            Elemento actualizadoElemento = dao.getById(id); // Verifica existencia
+            return ResponseProvider.success(actualizadoElemento, "Elemento actualizado correctamente", 200); // Éxito
         } else {
             return ResponseProvider.error("Error al actualizar el elemento", 400); // Falla
         }
     }
+    
+    /**
+    * Cambia el estado_activo (true/false) de un elemento.
+    *
+    * @param id ID del elemento a modificar.
+    * @param nuevoEstado Valor booleano a establecer.
+    * @return Respuesta con estado de éxito o error.
+    */
+   public Response actualizarEstado(int id, boolean nuevoEstado) {
+       // Verifica que el elemento exista
+       Elemento existente = dao.getById(id);
+       if (existente == null) {
+           return ResponseProvider.error("Elemento no encontrado", 404);
+       }
+
+       // Intenta cambiar el estado
+       boolean actualizado = dao.updateState(id, nuevoEstado);
+
+       if (actualizado) {
+           String mensaje = nuevoEstado
+                   ? "Elemento activado correctamente"
+                   : "Elemento desactivado correctamente";
+
+           return ResponseProvider.success(null, mensaje, 200);
+       } else {
+           return ResponseProvider.error("No se pudo actualizar el estado del elemento", 500);
+       }
+   }
+
 
     /**
      * Elimina un elemento si no tiene reportes asociados.

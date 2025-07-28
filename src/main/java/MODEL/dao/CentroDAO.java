@@ -48,8 +48,7 @@ public class CentroDAO {
                 Centro centro = new Centro(
                     rs.getInt("id"), // Obtiene el ID del centro
                     rs.getString("nombre"), // Obtiene el nombre del centro
-                    rs.getString("direccion"), // Obtiene la dirección del centro
-                    rs.getInt("ciudad_id") // Obtiene el ID de la ciudad asociada
+                    rs.getString("direccion") // Obtiene la dirección del centro                    
                 );
                 // Agrega el centro a la lista
                 centros.add(centro);
@@ -90,8 +89,7 @@ public class CentroDAO {
                 centro = new Centro(
                     rs.getInt("id"), // Obtiene el ID del centro
                     rs.getString("nombre"), // Obtiene el nombre
-                    rs.getString("direccion"), // Obtiene la dirección
-                    rs.getInt("ciudad_id") // Obtiene la ciudad_id
+                    rs.getString("direccion") // Obtiene la dirección                    
                 );
             }
 
@@ -103,49 +101,7 @@ public class CentroDAO {
         // Retorna el centro encontrado o null si no existe
         return centro;
     }
-
-    /**
-     * Obtiene todos los centros que pertenecen a una ciudad específica.
-     *
-     * @param ciudadId ID de la ciudad.
-     * @return Lista de centros que pertenecen a esa ciudad.
-     */
-    public List<Centro> getAllByCiudadId(int ciudadId) {
-        // Inicializa la lista de centros
-        List<Centro> centros = new ArrayList<>();
-        // Consulta SQL para obtener los centros por ciudad
-        String SQL = "SELECT * FROM centros WHERE ciudad_id = ?";
-
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
-
-            // Establece el ID de la ciudad como parámetro
-            stmt.setInt(1, ciudadId);
-            // Ejecuta la consulta y obtiene los resultados
-            ResultSet rs = stmt.executeQuery();
-
-            // Itera sobre los resultados
-            while (rs.next()) {
-                // Crea un nuevo objeto Centro con los datos obtenidos
-                Centro centro = new Centro(
-                    rs.getInt("id"),
-                    rs.getString("nombre"),
-                    rs.getString("direccion"),
-                    rs.getInt("ciudad_id")
-                );
-                // Agrega el centro a la lista
-                centros.add(centro);
-            }
-
-        } catch (SQLException e) {
-            // Imprime cualquier error que ocurra
-            e.printStackTrace();
-        }
-
-        // Retorna la lista de centros encontrados
-        return centros;
-    }
+   
 
     /**
      * Inserta un nuevo centro en la base de datos.
@@ -155,7 +111,7 @@ public class CentroDAO {
      */
     public Centro create(Centro centro) {
         // Consulta SQL para insertar un nuevo centro
-        String SQL = "INSERT INTO centros (nombre, direccion, ciudad_id) VALUES (?, ?, ?)";
+        String SQL = "INSERT INTO centros (nombre, direccion) VALUES (?, ?)";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar();
@@ -163,8 +119,7 @@ public class CentroDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, centro.getNombre());
-            stmt.setString(2, centro.getDireccion());
-            stmt.setInt(3, centro.getCiudad_id());
+            stmt.setString(2, centro.getDireccion());            
 
             // Ejecuta la consulta y verifica las filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -195,7 +150,7 @@ public class CentroDAO {
      */
     public Centro update(int id, Centro centro) {
         // Consulta SQL para actualizar los datos
-        String SQL = "UPDATE centros SET nombre = ?, direccion = ?, ciudad_id = ? WHERE id = ?";
+        String SQL = "UPDATE centros SET nombre = ?, direccion = ?, WHERE id = ?";
 
         // Intenta ejecutar la operación
         try (Connection conexion = DBConnection.conectar();
@@ -203,9 +158,8 @@ public class CentroDAO {
 
             // Asigna los valores a la consulta
             stmt.setString(1, centro.getNombre());
-            stmt.setString(2, centro.getDireccion());
-            stmt.setInt(3, centro.getCiudad_id());
-            stmt.setInt(4, id);
+            stmt.setString(2, centro.getDireccion());            
+            stmt.setInt(3, id);
 
             // Verifica si fue actualizado
             int filasAfectadas = stmt.executeUpdate();

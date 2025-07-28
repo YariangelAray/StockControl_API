@@ -32,9 +32,6 @@ public class CamposCentro {
         // Agrega el campo 'direccion' como obligatorio, tipo string, con mínimo 5 y máximo 50 caracteres
         campos.add(new Campo("direccion", true, 5, 50, "string"));
 
-        // Agrega el campo 'ciudad_id' como obligatorio, sin longitud definida, tipo int
-        campos.add(new Campo("ciudad_id", true, 1, 2, "int"));
-
         // Retorna la lista completa de campos
         return campos;
     }

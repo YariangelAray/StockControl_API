@@ -1,6 +1,6 @@
 use stockcontrol_bd;
 
-drop table if exists fotos, reportes, elementos, estados, tipos_elementos, ambientes, centros, ciudades, inventarios, usuarios, generos, fichas, programas_formacion, tipos_documento, roles;
+drop table if exists fotos, reportes, elementos, estados, tipos_elementos, ambientes, centros, ciudades, inventarios, codigos_acceso, usuarios, accesos_temporales, generos, fichas, programas_formacion, tipos_documento, roles;
 
 -- USUARIOS
 
@@ -39,6 +39,7 @@ correo varchar(100) unique,
 ficha_id int default 1, -- No Aplica
 contrasena varchar(100),  
 rol_id int default 2, -- Aprendices
+activo boolean default true,
 foreign key (tipo_documento_id) references tipos_documento(id),
 foreign key (genero_id) references generos(id),
 foreign key (ficha_id) references fichas(id),
@@ -51,22 +52,29 @@ create table inventarios(
 id int auto_increment primary key,  
 nombre varchar(50),
 fecha_creacion date,
+ultima_actualizacion date,
 usuario_admin_id int,  
 foreign key (usuario_admin_id) references usuarios(id)  
 );
 
--- UBICACIONES
+DELIMITER //
+create trigger establecer_ultima_actualizacion
+before insert on inventarios
+for each row
+begin
+  if new.ultima_actualizacion is null then
+    set new.ultima_actualizacion = new.fecha_creacion;
+  end if;
+end;
+//
+DELIMITER ;
 
-create table ciudades(  
-id int auto_increment primary key,  
-nombre varchar(50));  
- 
+
+-- UBICACIONES
 create table centros(  
 id int auto_increment primary key,  
 nombre varchar(100),  
-direccion varchar(50),  
-ciudad_id int,  
-foreign key (ciudad_id) references ciudades(id)
+direccion varchar(50)
 );
  
 create table ambientes(  
@@ -84,7 +92,7 @@ nombre varchar(50),                 -- Ej: Portátil, Silla
 descripcion varchar(250),           -- Opcional
 marca varchar(50),                  -- Ej: HP, Genérica
 modelo varchar(50),                 -- Ej: G5, GWC24ACEXF
-observaciones text                  -- Observaciones comunes del tipo
+detalles text                  -- Detalles comunes del tipo, 
 );
 
   
@@ -110,6 +118,27 @@ foreign key (ambiente_id) references ambientes(id),
 foreign key (inventario_id) references inventarios(id)
 );
 
+DELIMITER //
+create trigger actualizar_inventario_elemento
+after insert on elementos
+for each row
+begin
+    update inventarios
+    set ultima_actualizacion = now()
+    where id = new.inventario_id;
+end;
+//
+create trigger actualizar_inventario_modificacion
+after update on elementos
+for each row
+begin
+    update inventarios
+    set ultima_actualizacion = now()
+    where id = new.inventario_id;
+end;
+//
+
+DELIMITER ;
  
 -- REPORTES 
 
@@ -129,4 +158,23 @@ id int auto_increment primary key,
 url text,
 reporte_id int,
 foreign key (reporte_id) references reportes(id)
+);
+
+-- GESTIÓN DE ACCESO A UN INVENTARIO
+
+create table codigos_acceso (
+  id int primary key auto_increment,
+  codigo varchar(10) not null unique,
+  inventario_id int not null,
+  fecha_creacion timestamp default current_timestamp,
+  fecha_expiracion datetime not null,
+  foreign key (inventario_id) references inventarios(id)
+);
+
+create table accesos_temporales (
+  id int primary key auto_increment,
+  usuario_id int not null,
+  inventario_id int not null,  
+  foreign key (usuario_id) references usuarios(id),
+  foreign key (inventario_id) references inventarios(id)
 );

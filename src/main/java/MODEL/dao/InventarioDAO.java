@@ -5,6 +5,7 @@ import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.dto.AmbienteDTO;
 
 /**
  * Clase DAO (Data Access Object) para realizar operaciones CRUD 
@@ -48,6 +49,7 @@ public class InventarioDAO {
                     rs.getInt("id"), // Obtiene el ID del inventario
                     rs.getString("nombre"), // Obtiene el nombre del inventario
                     rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
+                    rs.getDate("ultima_actualizacion"), // Obtiene la fecha de actualización del inventario
                     rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
                 );
                 // Agrega el inventario a la lista
@@ -60,6 +62,51 @@ public class InventarioDAO {
 
         // Retorna la lista de inventarios
         return inventarios;
+    }
+    
+    /**
+     * Obtiene todos los inventarios que tiene un administrador
+     *
+     * @param idUsuarioAdmin ID del usuario
+     * @return Lista de inventarios o vacío si no hay coincidencias.
+     */
+    public List<Inventario> getAllByIdUserAdmin(int idUsuarioAdmin) {
+        return getAllByCampo("usuario_admin_id", idUsuarioAdmin); // Consulta por tipo de documento
+    }
+    
+    /**
+     * Obtiene todos los ambientes que esten cubiertos por un inventario
+     *
+     * @param inventarioId ID del inventario
+     * @return Lista de ambientes o vacío si no hay coincidencias.
+     */
+    public List<AmbienteDTO> getAllAmbientesByInventario(int inventarioId) {
+        List<AmbienteDTO> ambientes = new ArrayList<>();
+
+        String SQL = """ 
+            SELECT a.id AS ambiente_id, a.nombre AS ambiente_nombre, COUNT(e.id) AS cantidad_elementos
+            FROM elementos e JOIN ambientes a ON e.ambiente_id = a.id WHERE e.inventario_id = ? GROUP BY a.id, a.nombre ORDER BY a.nombre""";
+
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+
+            stmt.setInt(1, inventarioId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                AmbienteDTO ambiente = new AmbienteDTO(
+                    rs.getInt("ambiente_id"),
+                    rs.getString("ambiente_nombre"),
+                    rs.getInt("cantidad_elementos")
+                );
+                ambientes.add(ambiente);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ambientes;
     }
 
     /**
@@ -89,7 +136,8 @@ public class InventarioDAO {
                 inventario = new Inventario(
                     rs.getInt("id"), // Obtiene el ID del inventario
                     rs.getString("nombre"), // Obtiene el nombre del inventario
-                        rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
+                    rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
+                    rs.getDate("ultima_actualizacion"), // Obtiene la fecha de actualización del inventario
                     rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
                 );
             }
@@ -208,4 +256,55 @@ public class InventarioDAO {
             return false; // Retorna false si hubo un error
         }
     }
+    
+    /**
+    * Método auxiliar que realiza una consulta genérica por campo y valor para la tabla de inventarios.
+    *
+    * Este método es útil para obtener inventarios filtrados por campos específicos como `usuario_admin_id`.
+    *
+    * @param campo Nombre del campo por el cual se desea filtrar (por ejemplo, "usuario_admin_id").
+    * @param value Valor que debe tener el campo especificado.
+    * @return Lista de objetos Inventario que cumplen con el criterio, o una lista vacía si no hay coincidencias.
+    */
+   private List<Inventario> getAllByCampo(String campo, int value) {
+       // Inicializa una lista para almacenar los resultados encontrados
+       List<Inventario> inventarios = new ArrayList<>();
+
+       // Arma dinámicamente la consulta SQL con el campo recibido
+       String SQL = "SELECT * FROM inventarios WHERE " + campo + " = ?";
+
+       // Intenta establecer una conexión y ejecutar la consulta
+       try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+            PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta con parámetros
+
+           // Asigna el valor recibido como parámetro para la condición WHERE
+           stmt.setInt(1, value);
+
+           // Ejecuta la consulta y guarda el resultado en un ResultSet
+           ResultSet rs = stmt.executeQuery();
+
+           // Itera sobre los resultados obtenidos
+           while (rs.next()) {
+               // Crea un nuevo objeto Inventario con los datos de la fila actual
+               Inventario inventario = new Inventario(
+                   rs.getInt("id"),                       // ID del inventario
+                   rs.getString("nombre"),               // Nombre del inventario
+                   rs.getDate("fecha_creacion"),         // Fecha de creación
+                   rs.getDate("ultima_actualizacion"),   // Última actualización
+                   rs.getInt("usuario_admin_id")         // ID del usuario que administra el inventario
+               );
+
+               // Agrega el inventario a la lista de resultados
+               inventarios.add(inventario);
+           }
+
+       } catch (SQLException e) {
+           // Imprime el error en caso de fallo en la consulta
+           e.printStackTrace();
+       }
+
+       // Retorna la lista de inventarios encontrados (puede estar vacía)
+       return inventarios;
+   }
+
 }

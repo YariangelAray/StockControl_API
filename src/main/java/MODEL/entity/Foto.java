@@ -12,14 +12,14 @@ package model.entity;
 public class Foto {
     private int id;             // ID único de la foto
     private String url;         // Ruta o URL donde se almacena la imagen
-    private int reporteId;      // ID del reporte asociado
+    private int reporte_id;      // ID del reporte asociado
 
     public Foto() {}
 
-    public Foto(int id, String url, int reporteId) {
+    public Foto(int id, String url, int reporte_id) {
         this.id = id;
         this.url = url;
-        this.reporteId = reporteId;
+        this.reporte_id = reporte_id;
     }
 
     public int getId() {
@@ -38,11 +38,11 @@ public class Foto {
         this.url = url;
     }
 
-    public int getReporteId() {
-        return reporteId;
+    public int getReporte_id() {
+        return reporte_id;
     }
 
-    public void setReporteId(int reporteId) {
-        this.reporteId = reporteId;
+    public void setReporte_id(int reporte_id) {
+        this.reporte_id = reporte_id;
     }
 }

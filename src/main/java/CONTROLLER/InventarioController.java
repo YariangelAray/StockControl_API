@@ -15,6 +15,8 @@ import javax.ws.rs.core.Response;
  *
  * Rutas disponibles:
  * - GET /inventarios: Listar todos los inventarios.
+ * - GET /inventarios/usuario/{id}: Buscar inventarios por id de usuario admin.
+ * - GET /inventarios/{id}/ambientes: Busca todos los ambientes que tengan elementos de un inventario.
  * - GET /inventarios/{id}: Buscar inventario por ID.
  * - POST /inventarios: Crear nuevo inventario.
  * - PUT /inventarios/{id}: Actualizar inventario existente.
@@ -50,6 +52,44 @@ public class InventarioController {
         }
     }
 
+    /**
+     * Busca los inventarios de un administrador
+     *
+     * @param id Identificador del usuario admin.
+     * @return Inventario encontrado o mensaje de error si no existe o ocurre una excepción.
+     */
+    @GET
+    @Path("/usuario/{id}") // Ruta que incluye el ID del usuario administrador
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerInventariosUserAdmin(@PathParam("id") int id) {
+        try {
+            // Llama al servicio para obtener el inventario por ID
+            return service.obtenerTodosUsuarioAdmin(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
+    
+    /**
+    * Busca los ambientes que esten cubiertos por un inventario
+    *
+    * @param idInventario Objeto con los nuevos datos.
+    * @return Ambientes cubiertos o mensaje de error si no hay o falla la busqueda.
+    */
+    @GET
+    @Path("/{id}/ambientes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerAmbientesPorInventario(@PathParam("id") int id) {
+        try {
+            // Llama al servicio para obtener el inventario por ID
+            return service.obtenerAmbientesPorInventario(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
+    
     /**
      * Busca un inventario por su ID único.
      *

@@ -64,6 +64,24 @@ public class FotoController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    
+    /**
+     * Obtiene todas las fotos asociadas a un reporte dado.
+     *
+     * @param id ID del reporte.
+     * @return Lista de fotos o mensaje de error si no se encuentran.
+     */
+    @GET
+    @Path("/reporte/{id}") // Ruta para obtener fotos por reporte
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerFotosPorReporte(@PathParam("id") int id) {
+        try {
+            return service.obtenerFotosPorReporte(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
 
     /**
      * Sube una foto asociada a un reporte.

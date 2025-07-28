@@ -49,9 +49,9 @@ public class FotoService {
             // Asegura que la carpeta exista
             Files.createDirectories(Paths.get(basePath));
 
-            // Genera un nombre único para evitar conflictos (ej: foto_5_20250629104523001.jpg)
+            // Genera un nombre único para evitar conflictos (ej: foto_reporte_5_20250629104523001.jpg)
             String extension = nombreArchivo.contains(".") ? nombreArchivo.substring(nombreArchivo.lastIndexOf(".")) : "";
-            String nombreUnico = "foto_" + reporteId + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
+            String nombreUnico = "foto_reporte_" + reporteId + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
 
             // Ruta completa donde se guardará el archivo
             Path rutaDestino = Paths.get(basePath, nombreUnico);
@@ -64,7 +64,7 @@ public class FotoService {
             // Crea el objeto Foto con la URL relativa para que pueda ser accedida desde el navegador
             Foto foto = new Foto();
             foto.setUrl(CARPETA_FOTOS + "/" + nombreUnico); // URL relativa (accesible vía navegador)
-            foto.setReporteId(reporteId);
+            foto.setReporte_id(reporteId);
 
             // Guarda la foto en la base de datos
             Foto creada = dao.create(foto);
@@ -92,6 +92,22 @@ public class FotoService {
         Foto foto = dao.getById(id);
         if (foto == null) return ResponseProvider.error("Foto no encontrada", 404);
         return ResponseProvider.success(foto, "Foto encontrada", 200);
+    }
+    
+    /**
+     * Obtiene todas las fotos asociadas a un reporte por su ID.
+     *
+     * @param reporteId ID del reporte al que pertenecen las fotos.
+     * @return Lista de fotos o error si no se encontraron.
+     */
+    public Response obtenerFotosPorReporte(int reporteId) {
+        List<Foto> fotos = dao.getAllByIdReporte(reporteId);
+
+        if (fotos.isEmpty()) {
+            return ResponseProvider.error("No se encontraron fotos para este reporte", 404);
+        }
+
+        return ResponseProvider.success(fotos, "Fotos obtenidas correctamente", 200);
     }
 
     /**

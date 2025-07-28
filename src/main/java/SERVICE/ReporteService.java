@@ -70,6 +70,27 @@ public class ReporteService {
         // Retorna el reporte si fue encontrado
         return ResponseProvider.success(reporte, "Reporte obtenido correctamente", 200);
     }
+    
+    /**
+     * Obtiene todos los reportes asociados a un inventario específico.     
+     *
+     * @param idInventario ID del inventario del cual se desean obtener los reportes.
+     * @return Lista de reportes relacionados o mensaje de error si no se encuentran.
+     */
+    public Response obtenerReportesPorInventario(int idInventario) {
+        // Utiliza el DAO para buscar los reportes filtrados por inventario
+        List<Reporte> reportes = dao.getAllByIdInventario(idInventario);
+
+        // Verifica si la lista está vacía
+        if (reportes == null || reportes.isEmpty()) {
+            // Retorna un error si no se encontraron reportes
+            return ResponseProvider.error("No se encontraron reportes para este inventario", 404);
+        }
+
+        // Retorna la lista de reportes si existen
+        return ResponseProvider.success(reportes, "Reportes obtenidos correctamente", 200);
+    }
+
 
     /**
      * Crea un nuevo reporte.

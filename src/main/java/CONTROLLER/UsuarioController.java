@@ -8,6 +8,7 @@ import providers.ResponseProvider;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import model.dto.ContrasenaDTO;
 import model.dto.LoginDTO;
 
 /**
@@ -18,6 +19,7 @@ import model.dto.LoginDTO;
  * - GET /usuarios: Listar todos los usuarios.
  * - GET /usuarios/{id}: Buscar usuario por ID.
  * - POST /usuarios: Crear nuevo usuario.
+ * - POST /usuarios/login: Loguear un usuario.
  * - PUT /usuarios/{id}: Actualizar usuario existente.
  * - DELETE /usuarios/{id}: Eliminar usuario.
  *
@@ -90,31 +92,6 @@ public class UsuarioController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
-    
-    /**
-    * Método que maneja la solicitud de inicio de sesión de un usuario.
-    * 
-    * Este método recibe un objeto LoginDTO que contiene los datos del intento de login,
-    * incluyendo el documento del usuario, la contraseña y el rol. Luego delega la lógica
-    * de autenticación al servicio correspondiente. Si ocurre un error inesperado,
-    * devuelve una respuesta con estado 500.
-    *
-    * @param loginDatos Objeto LoginDTO con los datos de acceso: documento, contraseña y rol_id.
-    * @return Response con código de estado HTTP indicando éxito (200) o el tipo de error (400, 404, 500).
-    */
-    @POST // Método HTTP POST}
-    @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
-    public Response login(LoginDTO loginDatos) {
-        try {                                        
-            // Llama al servicio de autenticación con los datos recibidos
-            return service.login(loginDatos);
-        } catch (Exception e) {           
-            e.printStackTrace();
-            return ResponseProvider.error("Error interno en el servidor", 500);
-        }
-    }
 
     /**
      * Actualiza la información de un usuario existente.
@@ -157,4 +134,78 @@ public class UsuarioController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    
+    /**
+    * Método que maneja la solicitud de inicio de sesión de un usuario.
+    * 
+    * Este método recibe un objeto LoginDTO que contiene los datos del intento de login,
+    * incluyendo el documento del usuario, la contraseña y el rol. Luego delega la lógica
+    * de autenticación al servicio correspondiente. Si ocurre un error inesperado,
+    * devuelve una respuesta con estado 500.
+    *
+    * @param loginDatos Objeto LoginDTO con los datos de acceso: documento, contraseña y rol_id.
+    * @return Response con código de estado HTTP indicando éxito (200) o el tipo de error (400, 404, 500).
+    */
+    @POST // Método HTTP POST}
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
+    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    public Response login(LoginDTO loginDatos) {
+        try {                                        
+            // Llama al servicio de autenticación con los datos recibidos
+            return service.login(loginDatos);
+        } catch (Exception e) {           
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
+    
+    /**
+    * Endpoint para actualizar la contraseña de un usuario.
+    *
+    * Requiere que se envíe la contraseña actual y la nueva.
+    * Se validará que la contraseña actual coincida con la registrada en la base de datos.
+    * 
+    * @param id ID del usuario a actualizar
+    * @param dto Objeto con la contraseña actual y la nueva
+    * @return Respuesta con mensaje de éxito o error
+    */
+   @PUT
+   @Path("/{id}/contrasena")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response cambiarContrasena(@PathParam("id") int id, ContrasenaDTO dto) {
+       try {                                        
+            // Llama al servicio de cambio de contraseña con los datos recibidos
+            System.out.println("Entro a controlador");
+            return service.cambiarContrasena(id, dto);            
+        } catch (Exception e) {           
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }       
+   }
+
+   /**
+    * Endpoint para desactivar la cuenta de un usuario.
+    *
+    * Se debe enviar únicamente la contraseña actual como verificación.
+    * Si coincide, se procede a marcar al usuario como inactivo en la base de datos.
+    * 
+    * @param id ID del usuario a desactivar
+    * @param dto Objeto con la contraseña actual
+    * @return Respuesta indicando si se desactivó correctamente o no
+    */
+   @PUT
+   @Path("/{id}/desactivar")
+   @Consumes(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response desactivarCuenta(@PathParam("id") int id, ContrasenaDTO dto) {
+       try {                                        
+            // Llama al servicio de cambio de contraseña con los datos recibidos
+            return service.desactivarCuenta(id, dto);            
+        } catch (Exception e) {           
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }  
+   }
 }

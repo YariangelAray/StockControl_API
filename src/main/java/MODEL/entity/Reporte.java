@@ -1,5 +1,6 @@
 package model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
@@ -17,21 +18,22 @@ import java.util.Date;
  */
 public class Reporte {
     private int id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date fecha;
     private String asunto;
     private String mensaje;
-    private int usuarioId;
-    private int elementoId;
+    private int usuario_id;
+    private int elemento_id;
 
     public Reporte() {}
 
-    public Reporte(int id, Date fecha, String asunto, String mensaje, int usuarioId, int elementoId) {
+    public Reporte(int id, Date fecha, String asunto, String mensaje, int usuario_id, int elemento_id) {
         this.id = id;
         this.fecha = fecha;
         this.asunto = asunto;
         this.mensaje = mensaje;
-        this.usuarioId = usuarioId;
-        this.elementoId = elementoId;
+        this.usuario_id = usuario_id;
+        this.elemento_id = elemento_id;
     }
 
     // Getters y Setters
@@ -67,19 +69,19 @@ public class Reporte {
         this.mensaje = mensaje;
     }
 
-    public int getUsuarioId() {
-        return usuarioId;
+    public int getUsuario_id() {
+        return usuario_id;
     }
 
-    public void setUsuarioId(int usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setUsuario_id(int usuario_id) {
+        this.usuario_id = usuario_id;
     }
 
-    public int getElementoId() {
-        return elementoId;
+    public int getElemento_id() {
+        return elemento_id;
     }
 
-    public void setElementoId(int elementoId) {
-        this.elementoId = elementoId;
+    public void setElemento_id(int elemento_id) {
+        this.elemento_id = elemento_id;
     }
 }

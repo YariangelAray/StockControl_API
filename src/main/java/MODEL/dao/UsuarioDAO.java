@@ -62,6 +62,7 @@ public class UsuarioDAO {
                     rs.getString("correo"), // Obtiene el correo electrónico
                     rs.getInt("ficha_id"), // Obtiene el ID de la ficha
                     rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getBoolean("activo"), // Obtiene el estado
                     rs.getInt("rol_id") // Obtiene el ID del rol
                 );
                 // Agrega el usuario a la lista
@@ -151,6 +152,7 @@ public class UsuarioDAO {
                     rs.getString("correo"), // Obtiene el correo electrónico
                     rs.getInt("ficha_id"), // Obtiene el ID de la ficha
                     rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getBoolean("activo"), // Obtiene el estado
                     rs.getInt("rol_id") // Obtiene el ID del rol
                 );
             }
@@ -199,6 +201,7 @@ public class UsuarioDAO {
                     rs.getString("correo"), // Obtiene el correo electrónico
                     rs.getInt("ficha_id"), // Obtiene el ID de la ficha
                     rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getBoolean("activo"), // Obtiene el estado
                     rs.getInt("rol_id") // Obtiene el ID del rol
                 );
             }
@@ -247,6 +250,7 @@ public class UsuarioDAO {
                     rs.getString("correo"), // Obtiene el correo electrónico
                     rs.getInt("ficha_id"), // Obtiene el ID de la ficha
                     rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getBoolean("activo"), // Obtiene el estado
                     rs.getInt("rol_id") // Obtiene el ID del rol
                 );
             }
@@ -281,21 +285,9 @@ public class UsuarioDAO {
             stmt.setString(4, usuario.getDocumento());
             stmt.setInt(5, usuario.getGenero_id());
             stmt.setString(6, usuario.getTelefono());
-            stmt.setString(7, usuario.getCorreo());
-            
-            // Si no vino ficha_id, se le asigna 1 por defecto
-            if (usuario.getFicha_id() == 0) usuario.setFicha_id(1);
-            
-            stmt.setInt(8, usuario.getFicha_id());
-            
-            String contrasenaHasheada = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
-            System.out.println(contrasenaHasheada);
-            
-            stmt.setString(9, contrasenaHasheada);
-            
-            // Si no vino rol_id, se le asigna 2 por defecto
-            if (usuario.getRol_id()== 0) usuario.setRol_id(1);
-            
+            stmt.setString(7, usuario.getCorreo());          
+            stmt.setInt(8, usuario.getFicha_id());                 
+            stmt.setString(9, usuario.getContrasena());          
             stmt.setInt(10, usuario.getRol_id());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
@@ -393,6 +385,33 @@ public class UsuarioDAO {
     }
     
     /**
+    * Realiza una eliminación lógica (soft delete) de un usuario.
+    *
+    * En lugar de borrar el registro de la base de datos, este método actualiza el campo `activo` a `false`,
+    * indicando que el usuario ha sido desactivado. Esta técnica permite conservar la información
+    * del usuario para auditoría o posibles restauraciones futuras.
+    *
+    * @param id ID del usuario a desactivar (eliminar lógicamente).
+    * @return true si se actualizó correctamente, false si hubo un error.
+    */
+   public boolean softDelete(int id) {
+       // Consulta SQL para desactivar el usuario en lugar de eliminarlo
+       String SQL = "UPDATE usuarios SET activo = false WHERE id = ?";
+
+       try (Connection conexion = DBConnection.conectar();              // Conexión a la base de datos
+           PreparedStatement stmt = conexion.prepareStatement(SQL)) {  // Prepara la sentencia SQL
+       
+           stmt.setInt(1, id);                                         // Asigna el ID al parámetro
+           int filasAfectadas = stmt.executeUpdate();                  // Ejecuta la actualización
+           return filasAfectadas > 0;                                  // Devuelve true si se modificó al menos una fila
+       } catch (SQLException e) {
+           e.printStackTrace();                                        // Imprime el error si ocurre
+           return false;                                               // Retorna false en caso de fallo
+       }
+   }
+
+    
+    /**
      * Método auxiliar que realiza una consulta genérica por campo y valor.
      *
      * @param campo Nombre del campo a consultar.
@@ -422,6 +441,7 @@ public class UsuarioDAO {
                     rs.getString("correo"), // Obtiene el correo electrónico
                     rs.getInt("ficha_id"), // Obtiene el ID de la ficha
                     rs.getString("contrasena"), // Obtiene la contraseña
+                    rs.getBoolean("activo"), // Obtiene el estado
                     rs.getInt("rol_id") // Obtiene el ID del rol
                 );
                 // Agrega el usuario a la lista

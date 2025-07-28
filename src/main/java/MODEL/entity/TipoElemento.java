@@ -18,17 +18,17 @@ public class TipoElemento {
     private String descripcion;
     private String marca;
     private String modelo;
-    private String observaciones;
+    private String detalles;
 
     public TipoElemento() {}
 
-    public TipoElemento(int id, String nombre, String descripcion, String marca, String modelo, String observaciones) {
+    public TipoElemento(int id, String nombre, String descripcion, String marca, String modelo, String detalles) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.marca = marca;
         this.modelo = modelo;
-        this.observaciones = observaciones;
+        this.detalles = detalles;
     }
 
     public int getId() {
@@ -71,11 +71,11 @@ public class TipoElemento {
         this.modelo = modelo;
     }
 
-    public String getObservaciones() {
-        return observaciones;
+    public String getDetalles() {
+        return detalles;
     }
 
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+    public void setDetalles(String detalles) {
+        this.detalles = detalles;
     }
 }

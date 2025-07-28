@@ -122,7 +122,7 @@ public class FotoDAO {
              PreparedStatement stmt = conn.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, foto.getUrl());
-            stmt.setInt(2, foto.getReporteId());
+            stmt.setInt(2, foto.getReporte_id());
 
             int filas = stmt.executeUpdate();
             if (filas > 0) {

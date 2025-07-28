@@ -1,5 +1,6 @@
 package model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.sql.Date;
 
 /**
@@ -20,6 +21,7 @@ public class Elemento {
     private long placa;
     private String serial;
     private int tipo_elemento_id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date fecha_adquisicion;
     private double valor_monetario;
     private int estado_id;

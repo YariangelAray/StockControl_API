@@ -36,26 +36,14 @@ public class ElementoDAO {
      */
     public List<Elemento> getAll() {
         List<Elemento> elementos = new ArrayList<>(); // Lista para almacenar los elementos
-        String SQL = "SELECT * FROM elementos"; // Consulta SQL para obtener todos los elementos
+        String SQL = "SELECT * FROM elementos ORDER BY id DESC"; // Consulta SQL para obtener todos los elementos
 
         try (Connection conexion = DBConnection.conectar(); // Establece la conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL); // Prepara la consulta SQL
              ResultSet rs = stmt.executeQuery()) { // Ejecuta la consulta y guarda los resultados
 
             while (rs.next()) { // Itera sobre cada fila del resultado
-                Elemento elemento = new Elemento( // Crea un objeto Elemento con los datos obtenidos
-                    rs.getInt("id"),
-                    rs.getLong("placa"),
-                    rs.getString("serial"),
-                    rs.getInt("tipo_elemento_id"),
-                    rs.getDate("fecha_adquisicion"),
-                    rs.getDouble("valor_monetario"),
-                    rs.getInt("estado_id"),
-                    rs.getString("observaciones"),
-                    rs.getBoolean("estado_activo"),
-                    rs.getInt("ambiente_id"),
-                    rs.getInt("inventario_id")
-                );
+                Elemento elemento = mapearElemento(rs);
                 elementos.add(elemento); // Agrega el elemento a la lista
             }
         } catch (SQLException e) {
@@ -82,19 +70,7 @@ public class ElementoDAO {
             ResultSet rs = stmt.executeQuery(); // Ejecuta la consulta
 
             if (rs.next()) { // Si hay resultado
-                elemento = new Elemento( // Crea el objeto Elemento con los datos obtenidos
-                    rs.getInt("id"),
-                    rs.getLong("placa"),
-                    rs.getString("serial"),
-                    rs.getInt("tipo_elemento_id"),
-                    rs.getDate("fecha_adquisicion"),
-                    rs.getDouble("valor_monetario"),
-                    rs.getInt("estado_id"),
-                    rs.getString("observaciones"),
-                    rs.getBoolean("estado_activo"),
-                    rs.getInt("ambiente_id"),
-                    rs.getInt("inventario_id")
-                );
+                elemento = mapearElemento(rs);
             }
 
         } catch (SQLException e) {
@@ -131,6 +107,7 @@ public class ElementoDAO {
                 ResultSet generatedKeys = stmt.getGeneratedKeys(); // Obtiene el ID generado
                 if (generatedKeys.next()) {
                     elemento.setId(generatedKeys.getInt(1)); // Asigna el ID al objeto
+                    elemento.setEstado_activo(true); // Asigna el objeto como activo al objeto
                     return elemento; // Retorna el objeto creado
                 }
             }
@@ -147,9 +124,9 @@ public class ElementoDAO {
      *
      * @param id ID del elemento a actualizar.
      * @param elemento Objeto Elemento con los nuevos datos.
-     * @return Elemento actualizado si fue exitoso, o null si falló.
+     * @return true si fue exitoso, o false si falló.
      */
-    public Elemento update(int id, Elemento elemento) {
+    public boolean update(int id, Elemento elemento) {
         String SQL = "UPDATE elementos SET placa = ?, serial = ?, tipo_elemento_id = ?, fecha_adquisicion = ?, valor_monetario = ?, estado_id = ?, observaciones = ?, ambiente_id = ?, inventario_id = ? WHERE id = ?"; // Consulta SQL de actualización
 
         try (Connection conexion = DBConnection.conectar(); // Establece la conexión
@@ -167,17 +144,41 @@ public class ElementoDAO {
             stmt.setInt(10, id); // ID del elemento a actualizar
 
             int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
-            if (filasAfectadas > 0) {
-                elemento.setId(id); // Asigna el ID actualizado
-                return elemento; // Retorna el objeto actualizado
-            }
+
+            return filasAfectadas > 0; // Retorna el objeto actualizado
 
         } catch (SQLException e) {
             e.printStackTrace(); // Imprime el error
         }
 
-        return null; // Retorna null si falló
+        return false; // Retorna null si falló
     }
+    
+    /**
+    * Actualiza el estado_activo de un elemento por su ID.
+    *
+    * @param id ID del elemento a modificar.
+    * @param estadoActivo Nuevo valor booleano del estado_activo (true o false).
+    * @return true si la operación fue exitosa, false si falló.
+    */
+   public boolean updateState(int id, boolean estadoActivo) {
+       String SQL = "UPDATE elementos SET estado_activo = ? WHERE id = ?";
+
+       try (Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+
+           stmt.setBoolean(1, estadoActivo); // Asigna el nuevo estado
+           stmt.setInt(2, id); // ID del elemento
+
+           int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
+
+           return filasAfectadas > 0; // Retorna true si al menos una fila fue modificada
+
+       } catch (SQLException e) {
+           e.printStackTrace(); // Muestra error en consola
+           return false; // Falló la operación
+       }
+   }    
 
     /**
      * Elimina un elemento de la base de datos por su ID.
@@ -218,6 +219,14 @@ public class ElementoDAO {
     public List<Elemento> getByIdTipoEstado(int estadoId) {
         return getAllByCampo("estado_id", estadoId); // Consulta por estado
     }
+    
+    public List<Elemento> getBySerial(String serial) {
+        return getAllByCampo("serial", serial); // Consulta por tipo
+    }
+
+    public List<Elemento> getByPlaca(long placa) {
+        return getAllByCampo("placa", placa); // Consulta por estado
+    }
 
     /**
      * Método auxiliar que realiza una consulta genérica por campo y valor.
@@ -227,36 +236,85 @@ public class ElementoDAO {
      * @return Lista de elementos que cumplen la condición.
      */
     private List<Elemento> getAllByCampo(String campo, int value) {
-        List<Elemento> elementos = new ArrayList<>(); // Lista para resultados
-        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ?"; // Consulta dinámica
+        List<Elemento> elementos = new ArrayList<>();
+        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ? ORDER BY id DESC";
 
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
 
-            stmt.setInt(1, value); // Asigna el valor al campo
-            ResultSet rs = stmt.executeQuery(); // Ejecuta la consulta
+            stmt.setInt(1, value); // Usa setInt para enteros
+            ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) { // Itera sobre resultados
-                Elemento elemento = new Elemento( // Crea objeto con los datos obtenidos
-                    rs.getInt("id"),
-                    rs.getLong("placa"),
-                    rs.getString("serial"),
-                    rs.getInt("tipo_elemento_id"),
-                    rs.getDate("fecha_adquisicion"),
-                    rs.getDouble("valor_monetario"),
-                    rs.getInt("estado_id"),
-                    rs.getString("observaciones"),
-                    rs.getBoolean("estado_activo"),
-                    rs.getInt("ambiente_id"),
-                    rs.getInt("inventario_id")
-                );
-                elementos.add(elemento); // Agrega a la lista
+            while (rs.next()) {
+                Elemento elemento = mapearElemento(rs);
+                elementos.add(elemento);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Imprime error
+            e.printStackTrace();
         }
 
-        return elementos; // Retorna la lista
+        return elementos;
+    }
+
+    private List<Elemento> getAllByCampo(String campo, String value) {
+        List<Elemento> elementos = new ArrayList<>();
+        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ? ORDER BY id DESC";
+
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+
+            stmt.setString(1, value); // Usa setString para strings
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Elemento elemento = mapearElemento(rs);
+                elementos.add(elemento);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return elementos;
+    }
+    
+    private List<Elemento> getAllByCampo(String campo, long value) {
+        List<Elemento> elementos = new ArrayList<>();
+        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ? ORDER BY id DESC";
+
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+
+            stmt.setLong(1, value); // Usa setString para strings
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Elemento elemento = mapearElemento(rs);
+                elementos.add(elemento);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return elementos;
+    }
+    
+    
+    private Elemento mapearElemento(ResultSet rs) throws SQLException {
+        return new Elemento(
+            rs.getInt("id"),
+            rs.getLong("placa"),
+            rs.getString("serial"),
+            rs.getInt("tipo_elemento_id"),
+            rs.getDate("fecha_adquisicion"),
+            rs.getDouble("valor_monetario"),
+            rs.getInt("estado_id"),
+            rs.getString("observaciones"),
+            rs.getBoolean("estado_activo"),
+            rs.getInt("ambiente_id"),
+            rs.getInt("inventario_id")
+        );
     }
 }

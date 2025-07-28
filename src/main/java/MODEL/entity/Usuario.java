@@ -1,19 +1,23 @@
 package model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Clase que representa la entidad Usuario del sistema.
  * 
- * Este modelo se usa para mapear los datos provenientes de la tabla 'usuarios'
- * en la base de datos. Se utiliza en operaciones de inserción, consulta,
- * actualización y eliminación a través del UsuarioDAO.
+ * Esta clase se utiliza para mapear los datos de la tabla 'usuarios' en la base de datos.
+ * Funciona como un POJO (Plain Old Java Object), lo que significa que solo contiene atributos,
+ * constructores y métodos getters/setters para transportar datos dentro de la aplicación.
  * 
- * También se considera un POJO (Plain Old Java Object) porque solo contiene
- * atributos, constructores y métodos getters y setters.
+ * Se usa en procesos de registro, inicio de sesión, edición de perfil, etc.
+ * 
+ * ⚠️ La contraseña está marcada con @JsonIgnore para que no se exponga al convertir
+ * el objeto a JSON (por seguridad).
  * 
  * @author Yariangel Aray
  */
 public class Usuario {
-    
+
     private int id;
     private String nombres;
     private String apellidos;
@@ -24,11 +28,16 @@ public class Usuario {
     private String correo;
     private int ficha_id;
     private String contrasena;
+    private boolean activo;
     private int rol_id;
 
-    public Usuario(){}
-    
-    public Usuario(int id, String nombres, String apellidos, int tipo_documento_id, String documento, int genero_id, String telefono, String correo, int ficha_id, String contrasena, int rol_id) {
+    // Constructor vacío (requerido por frameworks)
+    public Usuario() {}
+
+    // Constructor con todos los campos
+    public Usuario(int id, String nombres, String apellidos, int tipo_documento_id, String documento,
+                   int genero_id, String telefono, String correo, int ficha_id,
+                   String contrasena, boolean activo, int rol_id) {
         this.id = id;
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -39,8 +48,19 @@ public class Usuario {
         this.correo = correo;
         this.ficha_id = ficha_id;
         this.contrasena = contrasena;
+        this.activo = activo;
         this.rol_id = rol_id;
     }
+    // Getters y setters (todos los campos)
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
 
     public int getId() {
         return id;
@@ -114,6 +134,12 @@ public class Usuario {
         this.ficha_id = ficha_id;
     }
 
+    /**
+     * Contraseña del usuario (no se expone en respuestas JSON).
+     * 
+     * @return contraseña (oculta en respuestas JSON)
+     */
+    @JsonIgnore
     public String getContrasena() {
         return contrasena;
     }

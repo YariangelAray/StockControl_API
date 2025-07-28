@@ -16,15 +16,13 @@ public class Centro {
     private int id;
     private String nombre;
     private String direccion;
-    private int ciudad_id;
 
     public Centro() {}
 
-    public Centro(int id, String nombre, String direccion, int ciudad_id) {
+    public Centro(int id, String nombre, String direccion) {
         this.id = id;
         this.nombre = nombre;
-        this.direccion = direccion;
-        this.ciudad_id = ciudad_id;
+        this.direccion = direccion;        
     }
 
     public int getId() {
@@ -49,13 +47,5 @@ public class Centro {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
-    }
-
-    public int getCiudad_id() {
-        return ciudad_id;
-    }
-
-    public void setCiudad_id(int ciudad_id) {
-        this.ciudad_id = ciudad_id;
     }
 }

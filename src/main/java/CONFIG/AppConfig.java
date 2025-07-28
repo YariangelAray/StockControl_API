@@ -29,8 +29,7 @@ public class AppConfig extends ResourceConfig {
      * configuraciones y middleware de la aplicación.
      */
     public AppConfig() {
-        // DBConnection.conectar();
-        System.out.println(BCrypt.hashpw("#Admin12345", BCrypt.gensalt()));
+        // DBConnection.conectar();        
         packages("controller", "config", "middleware");
         register(MultiPartFeature.class);
     }

@@ -34,7 +34,7 @@ public class TipoElementoDAO {
         // Inicializa una lista para almacenar los tipos
         List<TipoElemento> tipos = new ArrayList<>();
         // Consulta SQL para seleccionar todos los tipos de elementos
-        String SQL = "SELECT * FROM tipos_elementos";
+        String SQL = "SELECT * FROM tipos_elementos ORDER BY id DESC";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -50,7 +50,7 @@ public class TipoElementoDAO {
                     rs.getString("descripcion"), // Obtiene la descripción
                     rs.getString("marca"), // Obtiene la marca
                     rs.getString("modelo"), // Obtiene el modelo
-                    rs.getString("observaciones") // Obtiene las observaciones
+                    rs.getString("detalles") // Obtiene las detalles
                 );
                 // Agrega el tipo a la lista
                 tipos.add(tipo);
@@ -94,7 +94,7 @@ public class TipoElementoDAO {
                     rs.getString("descripcion"), // Obtiene la descripción
                     rs.getString("marca"), // Obtiene la marca
                     rs.getString("modelo"), // Obtiene el modelo
-                    rs.getString("observaciones") // Obtiene las observaciones
+                    rs.getString("detalles") // Obtiene las detalles
                 );
             }
 
@@ -115,7 +115,7 @@ public class TipoElementoDAO {
      */
     public TipoElemento create(TipoElemento tipo) {
         // Consulta SQL para insertar un nuevo tipo
-        String SQL = "INSERT INTO tipos_elementos (nombre, descripcion, marca, modelo, observaciones) VALUES (?, ?, ?, ?, ?)";
+        String SQL = "INSERT INTO tipos_elementos (nombre, descripcion, marca, modelo, detalles) VALUES (?, ?, ?, ?, ?)";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -126,7 +126,7 @@ public class TipoElementoDAO {
             stmt.setString(2, tipo.getDescripcion());
             stmt.setString(3, tipo.getMarca());
             stmt.setString(4, tipo.getModelo());
-            stmt.setString(5, tipo.getObservaciones());
+            stmt.setString(5, tipo.getDetalles());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -158,7 +158,7 @@ public class TipoElementoDAO {
      */
     public TipoElemento update(int id, TipoElemento tipo) {
         // Consulta SQL para actualizar un tipo existente
-        String SQL = "UPDATE tipos_elementos SET nombre = ?, descripcion = ?, marca = ?, modelo = ?, observaciones = ? WHERE id = ?";
+        String SQL = "UPDATE tipos_elementos SET nombre = ?, descripcion = ?, marca = ?, modelo = ?, detalles = ? WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -169,7 +169,7 @@ public class TipoElementoDAO {
             stmt.setString(2, tipo.getDescripcion());
             stmt.setString(3, tipo.getMarca());
             stmt.setString(4, tipo.getModelo());
-            stmt.setString(5, tipo.getObservaciones());
+            stmt.setString(5, tipo.getDetalles());
             stmt.setInt(6, id); // Establece el ID del tipo a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas

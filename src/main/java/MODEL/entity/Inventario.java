@@ -1,24 +1,37 @@
 package model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.sql.Date;
 import java.util.List;
+
 
 /**
  * Clase que representa la entidad Inventario del sistema.
  * 
- * Este modelo se usa para mapear los datos provenientes de la tabla 'inventarios'
- * en la base de datos. Se utiliza en operaciones de inserción, consulta,
- * actualización y eliminación a través del InventarioDAO.
+ * Este modelo mapea la tabla 'inventarios' en la base de datos y se utiliza 
+ * para operaciones CRUD (crear, leer, actualizar, eliminar) en conjunto con el DAO.
  * 
- * También se considera un POJO (Plain Old Java Object) porque solo contiene
- * atributos, constructores y métodos getters y setters.
+ * También actúa como un POJO (Plain Old Java Object), con atributos, constructores, 
+ * métodos getters y setters.
+ * 
+ * Las fechas están anotadas para que al serializar a JSON se devuelvan en formato legible.
  * 
  * @author Yariangel Aray
  */
 public class Inventario {
     private int id;
     private String nombre;
-    private Date fecha_creacion;
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private Date fecha_creacion;  
+    
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private Date ultima_actualizacion;
+    
+    private double valor_monetario;
+    private int cantidad_elementos;  // Total de elementos asociados
+    private int ambientes_cubiertos; // Total de ambientes cubiertos
+
     private int usuario_admin_id;
     
     // Lista de elementos asociadas al inventario
@@ -26,11 +39,44 @@ public class Inventario {
 
     public Inventario() {}
 
-    public Inventario(int id, String nombre, Date fecha_creacion, int usuario_admin_id) {
+    public Inventario(int id, String nombre, Date fecha_creacion, Date ultima_actualizacion, int usuario_admin_id) {
         this.id = id;
         this.nombre = nombre;
         this.fecha_creacion = fecha_creacion;
         this.usuario_admin_id = usuario_admin_id;
+        this.ultima_actualizacion = ultima_actualizacion;
+    }
+
+    public int getCantidad_elementos() {
+        return cantidad_elementos;
+    }
+
+    public void setCantidad_elementos(int cantidad_elementos) {
+        this.cantidad_elementos = cantidad_elementos;
+    }
+
+    public int getAmbientes_cubiertos() {
+        return ambientes_cubiertos;
+    }
+
+    public void setAmbientes_cubiertos(int ambientes_cubiertos) {
+        this.ambientes_cubiertos = ambientes_cubiertos;
+    }
+    
+    public double getValor_monetario() {
+        return valor_monetario;
+    }
+
+    public void setValor_monetario(double valor_monetario) {
+        this.valor_monetario = valor_monetario;
+    }
+
+    public Date getUltima_actualizacion() {
+        return ultima_actualizacion;
+    }
+
+    public void setUltima_actualizacion(Date ultima_actualizacion) {
+        this.ultima_actualizacion = ultima_actualizacion;
     }
 
     public int getId() {
