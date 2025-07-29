@@ -25,8 +25,7 @@ public class CamposRol {
     public static List<Campo> obtener() {
         // Crea una nueva lista de campos
         List<Campo> campos = new ArrayList<>();
-
-        // Agrega el campo 'nombre' como obligatorio, tipo string, con mínimo 3 y máximo 30 caracteres
+        
         campos.add(new Campo("nombre", true, 3, 30, "string"));
         
         campos.add(new Campo("descripcion", false, 0, 250, "string"));

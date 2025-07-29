@@ -25,10 +25,20 @@ public class Campo {
         this.tipo = tipo;
     }
     
-    public String getNombre() { return nombre; }
-    public boolean isRequerido() { return requerido; }
-    public int getMinimo() { return minimo; }
-    public int getMaximo() { return maximo; }
-    public String getTipo() { return tipo; }
+    public String getNombre() { 
+        return nombre; 
+    }
+    public boolean isRequerido() { 
+        return requerido; 
+    }
+    public int getMinimo() { 
+        return minimo; 
+    }
+    public int getMaximo() { 
+        return maximo; 
+    }
+    public String getTipo() { 
+        return tipo; 
+    }
 }
 

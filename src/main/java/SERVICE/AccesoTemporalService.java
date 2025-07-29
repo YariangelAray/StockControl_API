@@ -26,7 +26,22 @@ public class AccesoTemporalService {
         daoInventario = new InventarioDAO();
     }
     
+    public Response obtenerUsuariosConAcceso(int inventarioId) {        
+        List<AccesoTemporal> accesos = dao.getAccesosPorInventario(inventarioId);
+        if (accesos.isEmpty()) {
+            return ResponseProvider.error("No hay usuarios con acceso temporal actualmente", 200);
+        }
+        return ResponseProvider.success(accesos, "Usuarios con acceso obtenidos correctamente", 200);
+    }
+
+    
     public Response registrarAcceso(AccesoTemporal acceso) {
+        List<Integer> accesosUsuario = dao.getInventariosAccesoUsuario(acceso.getUsuario_id());
+        
+        if (accesosUsuario.contains(acceso.getInventario_id())){
+            return ResponseProvider.error("Este usuario ya cuenta con acceso al inventario", 409);            
+        }
+        
         boolean creado = dao.createAcceso(acceso);
         if (creado) {
             return ResponseProvider.success(null, "Acceso éxitoso", 201);
@@ -34,7 +49,7 @@ public class AccesoTemporalService {
         return ResponseProvider.error("Error al acceder al inventario", 400);
     }
 
-    public Response obtenerInventariosActivos(int usuarioId) {
+    public Response obtenerInventariosConAccesPorUsuario(int usuarioId) {
         List<Integer> inventarios_id = dao.getInventariosAccesoUsuario(usuarioId);
         if (inventarios_id.isEmpty()) {
             return ResponseProvider.error("No hay inventarios activos para este usuario", 404);
@@ -64,6 +79,11 @@ public class AccesoTemporalService {
     }
 
     public Response eliminarAccesosPorInventario(int inventarioId) {
+        List<AccesoTemporal> accesos = dao.getAccesosPorInventario(inventarioId);
+        if (accesos.isEmpty()) {
+            return ResponseProvider.error("No hay usuarios con acceso para eliminar", 404);
+        }
+
         boolean eliminado = dao.deleteAccesosInventario(inventarioId);
         if (eliminado) {
             return ResponseProvider.success(null, "Accesos del inventario eliminados correctamente", 200);

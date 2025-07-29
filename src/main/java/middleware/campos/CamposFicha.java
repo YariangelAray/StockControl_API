@@ -27,7 +27,7 @@ public class CamposFicha {
         List<Campo> campos = new ArrayList<>();
        
         campos.add(new Campo("ficha", true, 7, 20, "string"));
-        campos.add(new Campo("programa_id", false, 1, 2, "numero"));
+        campos.add(new Campo("programa_id", true, 1, 2, "numero"));
 
         // Retorna la lista completa de campos
         return campos;

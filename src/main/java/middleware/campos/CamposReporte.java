@@ -25,11 +25,11 @@ public class CamposReporte {
         // Crea una nueva lista para almacenar los campos
         List<Campo> campos = new ArrayList<>();
 
-        // Campo asunto: obligatorio, texto, entre 5 y 100 caracteres
-        campos.add(new Campo("asunto", true, 5, 100, "string"));
+        // Campo asunto: obligatorio, texto, entre 1 y 100 caracteres
+        campos.add(new Campo("asunto", true, 1, 100, "string"));
 
-        // Campo mensaje: obligatorio, tipo texto largo, mínimo 5 caracteres, sin máximo definido
-        campos.add(new Campo("mensaje", true, 5, 250, "string"));
+        // Campo mensaje: obligatorio, tipo texto largo, mínimo 1 caracteres, sin máximo definido
+        campos.add(new Campo("mensaje", true, 1, 1000, "string"));
 
         // Campo usuario_id: obligatorio, numérico (representa al usuario que hace el reporte)
         campos.add(new Campo("usuario_id", true, 1, 2, "numero"));

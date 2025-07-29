@@ -21,6 +21,18 @@ public class AccesoTemporalController {
         service = new AccesoTemporalService();
     }
 
+    @GET
+    @Path("/inventario/{inventarioId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerUsuariosConAcceso(@PathParam("inventarioId") int inventarioId) {
+        try {
+            return service.obtenerUsuariosConAcceso(inventarioId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno al obtener accesos", 500);
+        }
+    }
+
     @POST
     @Path("/acceder")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -37,9 +49,9 @@ public class AccesoTemporalController {
     @GET
     @Path("/{usuarioId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerInventariosActivos(@PathParam("usuarioId") int usuarioId) {
+    public Response obtenerInventariosConAccesPorUsuario(@PathParam("usuarioId") int usuarioId) {
         try {
-            return service.obtenerInventariosActivos(usuarioId);
+            return service.obtenerInventariosConAccesPorUsuario(usuarioId);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno al obtener inventarios", 500);

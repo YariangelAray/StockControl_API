@@ -12,6 +12,30 @@ import java.util.List;
  * @author YariangelAray
  */
 public class AccesoTemporalDAO {
+    
+    public List<AccesoTemporal> getAccesosPorInventario(int inventarioId) {
+        List<AccesoTemporal> accesos = new ArrayList<>();
+        String SQL = "SELECT * FROM accesos_temporales WHERE inventario_id = ?";
+
+        try (Connection conn = DBConnection.conectar();
+             PreparedStatement stmt = conn.prepareStatement(SQL)) {
+            stmt.setInt(1, inventarioId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                AccesoTemporal acceso = new AccesoTemporal();
+                acceso.setId(rs.getInt("id"));
+                acceso.setUsuario_id(rs.getInt("usuario_id"));
+                acceso.setInventario_id(rs.getInt("inventario_id"));
+                accesos.add(acceso);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return accesos;
+    }
+
 
     /**
      * Registra un nuevo acceso temporal para un usuario a un inventario.

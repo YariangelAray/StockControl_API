@@ -19,8 +19,9 @@ public class TipoElemento {
     private String marca;
     private String modelo;
     private String detalles;
+    private int cantidadElementos;
 
-    public TipoElemento() {}
+    public TipoElemento() {}    
 
     public TipoElemento(int id, String nombre, String descripcion, String marca, String modelo, String detalles) {
         this.id = id;
@@ -77,5 +78,13 @@ public class TipoElemento {
 
     public void setDetalles(String detalles) {
         this.detalles = detalles;
+    }
+    
+    public int getCantidadElementos() {
+        return cantidadElementos;
+    }
+
+    public void setCantidadElementos(int cantidadElementos) {
+        this.cantidadElementos = cantidadElementos;
     }
 }

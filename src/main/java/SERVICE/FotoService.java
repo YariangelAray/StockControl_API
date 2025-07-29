@@ -100,23 +100,15 @@ public class FotoService {
      * @param reporteId ID del reporte al que pertenecen las fotos.
      * @return Lista de fotos o error si no se encontraron.
      */
-    public Response obtenerFotosPorReporte(int reporteId) {
+    public Response obtenerFotosPorReporteId(int reporteId) {
         List<Foto> fotos = dao.getAllByIdReporte(reporteId);
 
         if (fotos.isEmpty()) {
-            return ResponseProvider.error("No se encontraron fotos para este reporte", 404);
+            System.out.println(fotos);
+            return ResponseProvider.error("No se encontraron fotos para este reporte", 200);
         }
 
         return ResponseProvider.success(fotos, "Fotos obtenidas correctamente", 200);
-    }
-
-    /**
-     * Lista todas las fotos asociadas a un reporte
-     */
-    public Response obtenerPorReporteId(int reporteId) {
-        List<Foto> fotos = dao.getAllByIdReporte(reporteId);
-        if (fotos.isEmpty()) return ResponseProvider.error("No se encontraron fotos para el reporte", 404);
-        return ResponseProvider.success(fotos, "Fotos del reporte obtenidas", 200);
     }
 
     /**

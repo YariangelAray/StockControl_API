@@ -74,9 +74,9 @@ public class FotoController {
     @GET
     @Path("/reporte/{id}") // Ruta para obtener fotos por reporte
     @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerFotosPorReporte(@PathParam("id") int id) {
+    public Response obtenerFotosPorReporteId(@PathParam("id") int id) {
         try {
-            return service.obtenerFotosPorReporte(id);
+            return service.obtenerFotosPorReporteId(id);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

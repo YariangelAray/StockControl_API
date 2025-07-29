@@ -25,11 +25,12 @@ import javax.ws.rs.core.Response;
  */
 public class TipoElementoService {
 
-    private TipoElementoDAO dao; // Instancia del DAO para acceder a los datos de tipo_elemento
-
+    TipoElementoDAO dao; // Instancia del DAO para acceder a los datos de tipo_elemento
+    ElementoDAO elementoDao;
     public TipoElementoService() {
         // Instancia el DAO que se encarga del acceso directo a la base de datos
         dao = new TipoElementoDAO();
+        elementoDao = new ElementoDAO();
     }
 
     /**
@@ -45,6 +46,10 @@ public class TipoElementoService {
         if (tipos.isEmpty()) {
             // Retorna un error si no se encontraron registros
             return ResponseProvider.error("No se encontraron tipos de elementos", 404);
+        }
+        
+        for (TipoElemento tipo : tipos) {
+            tipo.setCantidadElementos(elementoDao.getAllByIdTipoElemento(tipo.getId()).size());
         }
 
         // Retorna la lista si se encontraron
@@ -129,8 +134,7 @@ public class TipoElementoService {
             return ResponseProvider.error("Tipo de elemento no encontrado", 404);
         }
 
-        // Validar si existen elementos relacionados con este tipo
-        ElementoDAO elementoDao = new ElementoDAO();
+        // Validar si existen elementos relacionados con este tipo     
         List<Elemento> elementos = elementoDao.getAllByIdTipoElemento(id);
 
         // Si hay elementos asociados, se impide la eliminación
