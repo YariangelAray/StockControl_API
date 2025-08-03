@@ -34,7 +34,7 @@ public class RolDAO {
         // Inicializa una lista para almacenar los roles
         List<Rol> roles = new ArrayList<>();
         // Consulta SQL para seleccionar todos los roles
-        String SQL = "SELECT * FROM roles";
+        String SQL = "SELECT * FROM roles WHERE id != 1";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos

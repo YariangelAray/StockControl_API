@@ -22,10 +22,9 @@ public class Inventario {
     private int id;
     private String nombre;
     
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date fecha_creacion;  
-    
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")    
+    private Date fecha_creacion;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date ultima_actualizacion;
     
     private double valor_monetario;

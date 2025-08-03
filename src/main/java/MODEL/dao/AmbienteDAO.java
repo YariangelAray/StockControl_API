@@ -35,7 +35,7 @@ public class AmbienteDAO {
         // Inicializa una lista para almacenar los ambientes
         List<Ambiente> ambientes = new ArrayList<>();
         // Consulta SQL para seleccionar todos los ambientes
-        String SQL = "SELECT * FROM ambientes";
+        String SQL = "SELECT * FROM ambientes ORDER BY id DESC";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -216,7 +216,7 @@ public class AmbienteDAO {
         // Inicializa una lista para almacenar los ambientes
         List<Ambiente> ambientes = new ArrayList<>();
         // Consulta SQL para seleccionar ambientes por centro_id
-        String SQL = "SELECT * FROM ambientes WHERE centro_id = ?";
+        String SQL = "SELECT * FROM ambientes WHERE centro_id = ? ORDER BY id DESC";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos

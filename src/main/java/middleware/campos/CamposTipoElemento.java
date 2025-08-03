@@ -13,7 +13,7 @@ import java.util.List;
  * Se usa en conjunto con la clase `Validar` para procesar solicitudes JSON
  * y verificar que todos los campos cumplen con lo que se espera.
  * 
- * @author Yari
+ * @author Yariangel Aray
  */
 public class CamposTipoElemento {
 
@@ -27,6 +27,9 @@ public class CamposTipoElemento {
 
         // Campo obligatorio, nombre del tipo de elemento, entre 3 y 50 caracteres
         campos.add(new Campo("nombre", true, 3, 50, "string"));
+        
+        // Campo obligatorio, consecutivo del tipo de elemento, entre 1 y 50 caracteres
+        campos.add(new Campo("consecutivo", true, 1, 10, "numero"));
 
         // Campo opcional, descripción del tipo, hasta 250 caracteres
         campos.add(new Campo("descripcion", false, 0, 250, "string"));
@@ -37,8 +40,8 @@ public class CamposTipoElemento {
         // Campo opcional, modelo del tipo, entre 2 y 50 caracteres
         campos.add(new Campo("modelo", false, 0, 50, "string"));
 
-        // Campo opcional, detalles generales
-        campos.add(new Campo("detalles", false, 0, 250, "string"));
+        // Campo obligatorio, atributos generales
+        campos.add(new Campo("atributos", true, 3, 250, "string"));
 
         return campos;
     }

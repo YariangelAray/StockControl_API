@@ -40,7 +40,7 @@ public class RolService {
     public Response obtenerTodos() {
         // Obtiene la lista de roles desde el DAO
         List<Rol> roles = dao.getAll();
-
+        
         // Verifica si la lista está vacía
         if (roles.isEmpty()) {
             // Retorna un error si no se encontraron roles

@@ -49,6 +49,23 @@ public class TipoElementoController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    /**
+     * Obtiene todos los tipos de elementos registrados en el sistema.
+     * Pero le concatena la cantidad de elementos que tiene en ese inventario
+     *
+     * @return Lista de tipos o mensaje de error si ocurre una excepción.
+     */
+    @GET
+    @Path("/inventario/{idInventario}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerTodosPorInventario(@PathParam("idInventario") int id) {
+        try {
+            return service.obtenerTodosPorInventario(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
 
     /**
      * Busca un tipo de elemento por su ID.

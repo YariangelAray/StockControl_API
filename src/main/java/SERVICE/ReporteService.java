@@ -84,7 +84,7 @@ public class ReporteService {
         // Verifica si la lista está vacía
         if (reportes == null || reportes.isEmpty()) {
             // Retorna un error si no se encontraron reportes
-            return ResponseProvider.error("No se encontraron reportes para este inventario", 404);
+            return ResponseProvider.error("No se encontraron reportes para este inventario", 204);
         }
 
         // Retorna la lista de reportes si existen

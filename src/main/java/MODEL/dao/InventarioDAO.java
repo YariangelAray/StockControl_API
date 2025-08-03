@@ -35,7 +35,7 @@ public class InventarioDAO {
         // Inicializa una lista para almacenar los inventarios
         List<Inventario> inventarios = new ArrayList<>();
         // Consulta SQL para seleccionar todos los inventarios
-        String SQL = "SELECT * FROM inventarios";
+        String SQL = "SELECT * FROM inventarios ORDER BY id DESC";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -45,13 +45,7 @@ public class InventarioDAO {
             // Itera sobre los resultados obtenidos
             while (rs.next()) {
                 // Crea un nuevo objeto Inventario a partir de los datos de la fila actual
-                Inventario inventario = new Inventario(
-                    rs.getInt("id"), // Obtiene el ID del inventario
-                    rs.getString("nombre"), // Obtiene el nombre del inventario
-                    rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
-                    rs.getDate("ultima_actualizacion"), // Obtiene la fecha de actualización del inventario
-                    rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
-                );
+                Inventario inventario = mapearInventario(rs);
                 // Agrega el inventario a la lista
                 inventarios.add(inventario);
             }
@@ -133,13 +127,7 @@ public class InventarioDAO {
             // Verifica si hay resultados
             if (rs.next()) {
                 // Crea un nuevo objeto Inventario a partir de los datos de la fila actual
-                inventario = new Inventario(
-                    rs.getInt("id"), // Obtiene el ID del inventario
-                    rs.getString("nombre"), // Obtiene el nombre del inventario
-                    rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
-                    rs.getDate("ultima_actualizacion"), // Obtiene la fecha de actualización del inventario
-                    rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
-                );
+                inventario = mapearInventario(rs);
             }
 
         } catch (SQLException e) {
@@ -208,8 +196,8 @@ public class InventarioDAO {
 
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, inventario.getNombre());
-            stmt.setInt(2, inventario.getUsuario_admin_id());
-            stmt.setDate(3, new java.sql.Date(inventario.getFecha_creacion().getTime())); // Asigna fecha
+            stmt.setDate(2, new java.sql.Date(inventario.getFecha_creacion().getTime())); // Asigna fecha
+            stmt.setInt(3, inventario.getUsuario_admin_id());
             stmt.setInt(4, id); // Establece el ID del inventario a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
@@ -271,7 +259,7 @@ public class InventarioDAO {
        List<Inventario> inventarios = new ArrayList<>();
 
        // Arma dinámicamente la consulta SQL con el campo recibido
-       String SQL = "SELECT * FROM inventarios WHERE " + campo + " = ?";
+       String SQL = "SELECT * FROM inventarios WHERE " + campo + " = ? ORDER BY id DESC";
 
        // Intenta establecer una conexión y ejecutar la consulta
        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -286,13 +274,7 @@ public class InventarioDAO {
            // Itera sobre los resultados obtenidos
            while (rs.next()) {
                // Crea un nuevo objeto Inventario con los datos de la fila actual
-               Inventario inventario = new Inventario(
-                   rs.getInt("id"),                       // ID del inventario
-                   rs.getString("nombre"),               // Nombre del inventario
-                   rs.getDate("fecha_creacion"),         // Fecha de creación
-                   rs.getDate("ultima_actualizacion"),   // Última actualización
-                   rs.getInt("usuario_admin_id")         // ID del usuario que administra el inventario
-               );
+               Inventario inventario = mapearInventario(rs);
 
                // Agrega el inventario a la lista de resultados
                inventarios.add(inventario);
@@ -306,5 +288,14 @@ public class InventarioDAO {
        // Retorna la lista de inventarios encontrados (puede estar vacía)
        return inventarios;
    }
-
+   
+   private Inventario mapearInventario (ResultSet rs) throws SQLException {
+       return new Inventario(
+            rs.getInt("id"), // Obtiene el ID del inventario
+            rs.getString("nombre"), // Obtiene el nombre del inventario
+            rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
+            rs.getDate("ultima_actualizacion"), // Obtiene la fecha de actualización del inventario
+            rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
+        );
+   }
 }

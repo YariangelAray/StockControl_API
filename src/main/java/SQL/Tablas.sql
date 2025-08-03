@@ -35,10 +35,10 @@ tipo_documento_id int,
 documento varchar(11) unique not null,  
 genero_id int,
 telefono varchar(15),
-correo varchar(100) unique,
+correo varchar(100) unique not null,
 ficha_id int default 1, -- No Aplica
 contrasena varchar(100),  
-rol_id int default 2, -- Aprendices
+rol_id int default 3, -- Aprendices
 activo boolean default true,
 foreign key (tipo_documento_id) references tipos_documento(id),
 foreign key (genero_id) references generos(id),
@@ -86,19 +86,19 @@ foreign key (centro_id) references centros(id)
    
 -- ELEMENTOS   
 
-create table tipos_elementos(  
-id int auto_increment primary key,  
-nombre varchar(50),                 -- Ej: Portátil, Silla
-descripcion varchar(250),           -- Opcional
-marca varchar(50),                  -- Ej: HP, Genérica
-modelo varchar(50),                 -- Ej: G5, GWC24ACEXF
-detalles text                  -- Detalles comunes del tipo, 
-);
-
-  
 create table estados(
 id int auto_increment primary key,
 nombre varchar (20));
+
+create table tipos_elementos(  
+id int auto_increment primary key,  
+nombre varchar(50),  
+consecutivo int unique not null,              
+descripcion varchar(250),           
+marca varchar(50),                 
+modelo varchar(50),              
+atributos text                  
+);
 
 create table elementos(  
 id int auto_increment primary key,  
@@ -110,7 +110,7 @@ valor_monetario decimal(12,2),
 estado_id int,
 observaciones text,
 estado_activo boolean default true,
-ambiente_id int,
+ambiente_id int null,
 inventario_id int,
 foreign key (tipo_elemento_id) references tipos_elementos(id),
 foreign key (estado_id) references estados(id),
@@ -144,7 +144,7 @@ DELIMITER ;
 
 create table reportes( 
 id int auto_increment primary key, 
-fecha timestamp default current_timestamp,
+fecha date default (curdate()),
 asunto varchar(100), 
 mensaje text, 
 usuario_id int, 
@@ -166,7 +166,7 @@ create table codigos_acceso (
   id int primary key auto_increment,
   codigo varchar(10) not null unique,
   inventario_id int not null,
-  fecha_creacion timestamp default current_timestamp,
+  fecha_creacion datetime default current_timestamp,
   fecha_expiracion datetime not null,
   foreign key (inventario_id) references inventarios(id)
 );

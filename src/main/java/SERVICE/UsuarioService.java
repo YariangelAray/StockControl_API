@@ -48,10 +48,28 @@ public class UsuarioService {
         if (usuarios.isEmpty()) {
             // Retorna un error si no se encontraron usuarios
             return ResponseProvider.error("No se encontraron usuarios", 404);
-        }
+        }                
 
         // Retorna la lista de usuarios si se encontraron
         return ResponseProvider.success(usuarios, "Usuarios obtenidos correctamente", 200);
+    }
+    /**
+     * Retorna todos los usuarios registrados en la base de datos.
+     *
+     * @return Lista de usuarios o error si no hay resultados.
+     */
+    public Response obtenerTodosAdministrativos() {
+        // Obtiene la lista de usuarios desde el DAO
+        List<Usuario> usuarios = dao.getAll().stream().filter(usuario -> usuario.getRol_id() == 2).toList();
+
+        // Verifica si la lista está vacía
+        if (usuarios.isEmpty()) {
+            // Retorna un error si no se encontraron usuarios
+            return ResponseProvider.error("No se encontraron usuarios administrativos", 404);
+        }                
+
+        // Retorna la lista de usuarios si se encontraron
+        return ResponseProvider.success(usuarios, "Usuarios administrativos obtenidos correctamente", 200);
     }
 
     /**
@@ -96,17 +114,22 @@ public class UsuarioService {
         }
         
         // Si no se especifica un rol, se asigna el rol por defecto (2 = Usuario Corriente)
-        if (usuario.getRol_id() == 0) usuario.setRol_id(2);        
+        if (usuario.getRol_id() == 0) usuario.setRol_id(3);        
         
         // Si no vino ficha_id, se le asigna 1 por defecto (No aplica)
         if (usuario.getFicha_id() == 0) usuario.setFicha_id(1);                        
         
+        System.out.println(usuario.getContrasena());
+        
         String contrasenaHasheada = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
         usuario.setContrasena(contrasenaHasheada);
+        
+        System.out.println(usuario.getContrasena());
 
         // Intentar crear el usuario en la base de datos
         Usuario nuevoUsuario = dao.create(usuario);
         if (nuevoUsuario != null) {            
+            nuevoUsuario.setActivo(true);
             // Retorna el nuevo usuario si fue creado correctamente            
             return ResponseProvider.success(nuevoUsuario, "Usuario creado correctamente", 201);
         } else {
@@ -146,20 +169,16 @@ public class UsuarioService {
             if (usuarioRegistrado.getCorreo()== usuario.getCorreo()){
                 return ResponseProvider.error("Este correo ya fue registrado", 409);
             }
-
-        // Si no se recibió una contraseña o es 'restringido', se mantiene la actual
-        String contrasena = usuario.getContrasena();
-        if (contrasena == null || "restringido".equals(contrasena)) {
-            usuario.setContrasena(usuarioExistente.getContrasena());
-        }
-
+      
         if (usuario.getRol_id() == 0) {
             usuario.setRol_id(usuarioExistente.getRol_id());
         }
 
         // Intentar actualizar el usuario en la base de datos
         Usuario usuarioActualizado = dao.update(id, usuario);
+        
         if (usuarioActualizado != null) {
+            usuarioActualizado.setActivo(usuarioExistente.isActivo());
             // Retorna el usuario actualizado si fue exitoso                
             return ResponseProvider.success(usuarioActualizado, "Usuario actualizado correctamente", 200);
         } else {
@@ -209,8 +228,7 @@ public class UsuarioService {
     *
     * @param loginDatos Objeto LoginDTO que contiene:
     *                   - documento: Identificador del usuario.
-    *                   - contrasena: Contraseña ingresada por el usuario (texto plano).
-    *                   - rol_id: ID del rol con el que intenta iniciar sesión.
+    *                   - contrasena: Contraseña ingresada por el usuario (texto plano).    
     * @return Response con mensaje y código de estado HTTP indicando el resultado del login.
     */
     public Response login(LoginDTO loginDatos) {
@@ -223,17 +241,11 @@ public class UsuarioService {
         }
 
         // Verifica que la contraseña proporcionada coincida con el hash almacenado
-        boolean contraseñaCorrecta = BCrypt.checkpw(loginDatos.getContrasena(), usuario.getContrasena());
-                //|| loginDatos.getContrasena().equals(usuario.getContrasena());
+        boolean contraseñaCorrecta = BCrypt.checkpw(loginDatos.getContrasena(), usuario.getContrasena());                
 
         // Si la contraseña no coincide, devuelve un error 401 (no autorizado)
         if (!contraseñaCorrecta) {
             return ResponseProvider.error("Contraseña incorrecta", 401);
-        }
-
-        // Si la contraseña es correcta pero el rol no coincide, también devuelve 401
-        if (loginDatos.getRol_id() != usuario.getRol_id()) {
-            return ResponseProvider.error("Rol del usuario no autorizado", 401);
         }
                 
         return ResponseProvider.success(usuario, "Inicio de sesión exitoso", 200);
@@ -255,11 +267,9 @@ public class UsuarioService {
             return ResponseProvider.error("La contraseña actual es incorrecta", 401);
                         
         // Hash y guardar nueva contraseña
-        String nuevaHash = BCrypt.hashpw(dto.getContrasena_nueva(), BCrypt.gensalt());
-        usuario.setContrasena(nuevaHash);        
-        
-        Usuario usuarioActualizado = dao.update(id, usuario);
-        if (usuarioActualizado != null) {
+        String nuevaHash = BCrypt.hashpw(dto.getContrasena_nueva(), BCrypt.gensalt());         
+                
+        if (dao.updatePassword(id, nuevaHash)) {
             return ResponseProvider.success(null, "Contraseña actualizada correctamente", 200);
         } else {
             return ResponseProvider.error("Error al actualizar la contraseña", 400);
@@ -281,12 +291,32 @@ public class UsuarioService {
         if (!BCrypt.checkpw(dto.getContrasena_actual(), usuario.getContrasena()))
             return ResponseProvider.error("Contraseña incorrecta", 401);
         
-        boolean desactivado = dao.softDelete(id);
+        boolean desactivado = dao.updateState(id, false);
         
         if (desactivado) {
             return ResponseProvider.success(null, "Cuenta desactivada correctamente", 200);
         } else {
             return ResponseProvider.error("Error al desactivar la cuenta", 400);
+        }
+    }
+    /**
+     * @param id ID del usuario
+     * @param rol Rol del usuario
+     * @param estado Estado al que lo desea cambiar
+     * @return Respuesta con estado y mensaje
+     */
+    public Response cambiarEstado(int id, int rol, boolean estado) {
+        Usuario usuario = dao.getById(id);
+        if (usuario == null) return ResponseProvider.error("Usuario no encontrado", 404);
+
+        if (rol != 1) return ResponseProvider.error("No cuenta con los permisos para realizar esta solicitud", 400);
+        
+        boolean cambiado = dao.updateState(id, estado);
+        
+        if (cambiado) {
+            return ResponseProvider.success(null, "Estado cambiado correctamente", 200);
+        } else {
+            return ResponseProvider.error("Error al cambiar el estado de la cuenta", 400);
         }
     }
 }

@@ -67,7 +67,7 @@ public class CodigoAccesoService {
     public Response obtenerCodigoActivo(int inventarioId) {        
         CodigoAcceso codigo = dao.getCodigoActivo(inventarioId);
         if (codigo == null) 
-            return ResponseProvider.error("No hay código activo", 404);        
+            return ResponseProvider.error("No hay código activo", 204);        
 
         return ResponseProvider.success(codigo, "Código activo del inventario", 201);
     }

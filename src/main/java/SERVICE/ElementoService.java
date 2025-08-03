@@ -43,7 +43,7 @@ public class ElementoService {
         List<Elemento> elementos = dao.getAll(); // Obtiene elementos
 
         if (elementos.isEmpty()) {
-            return ResponseProvider.error("No se encontraron elementos", 404); // Si está vacía
+            return ResponseProvider.error("No se encontraron elementos", 204); // Si está vacía
         }
 
         return ResponseProvider.success(elementos, "Elementos obtenidos correctamente", 200);
@@ -59,7 +59,7 @@ public class ElementoService {
         List<Elemento> elementos = dao.getAllByIdInventario(idInventario); // Llama al DAO
 
         if (elementos.isEmpty()) {
-            return ResponseProvider.error("No se encontraron elementos para este inventario", 404); // Si no hay
+            return ResponseProvider.error("No se encontraron elementos para este inventario", 204); // Si no hay
         }
 
         return ResponseProvider.success(elementos, "Elementos del inventario obtenidos correctamente", 200); // Éxito

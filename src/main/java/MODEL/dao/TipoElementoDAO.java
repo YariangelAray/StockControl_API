@@ -7,20 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Clase DAO (Data Access Object) para realizar operaciones CRUD 
+ * Clase DAO (Data Access Object) para realizar operaciones CRUD
  * sobre la tabla 'tipos_elementos' en la base de datos.
- * 
+ *
  * Esta clase utiliza la clase utilitaria DBConnection para establecer conexión con la base de datos.
- * 
+ *
  * Métodos disponibles:
  * - getAll(): Obtiene todos los tipos de elementos.
  * - getById(int id): Busca un tipo de elemento por su ID.
+ * - getByConsecutivo(int consecutivo): Busca un tipo de elemento por su consecutivo (único).
  * - create(TipoElemento tipoElemento): Crea un nuevo tipo de elemento y retorna el objeto creado.
  * - update(int id, TipoElemento tipoElemento): Actualiza un tipo de elemento por su ID y retorna el objeto actualizado.
  * - delete(int id): Elimina un tipo de elemento por su ID.
- * 
+ *
  * Esta clase no contiene lógica de negocio, solo acceso a datos.
- * 
+ *
  * @author Yariangel Aray
  */
 public class TipoElementoDAO {
@@ -31,36 +32,20 @@ public class TipoElementoDAO {
      * @return Lista de objetos TipoElemento con todos los tipos registrados.
      */
     public List<TipoElemento> getAll() {
-        // Inicializa una lista para almacenar los tipos
         List<TipoElemento> tipos = new ArrayList<>();
-        // Consulta SQL para seleccionar todos los tipos de elementos
         String SQL = "SELECT * FROM tipos_elementos ORDER BY id DESC";
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL); // Prepara la consulta
-             ResultSet rs = stmt.executeQuery()) { // Ejecuta la consulta y obtiene los resultados
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL);
+             ResultSet rs = stmt.executeQuery()) {
 
-            // Itera sobre los resultados obtenidos
             while (rs.next()) {
-                // Crea un nuevo objeto TipoElemento a partir de los datos de la fila actual
-                TipoElemento tipo = new TipoElemento(
-                    rs.getInt("id"), // Obtiene el ID
-                    rs.getString("nombre"), // Obtiene el nombre
-                    rs.getString("descripcion"), // Obtiene la descripción
-                    rs.getString("marca"), // Obtiene la marca
-                    rs.getString("modelo"), // Obtiene el modelo
-                    rs.getString("detalles") // Obtiene las detalles
-                );
-                // Agrega el tipo a la lista
+                TipoElemento tipo = mapearTipoElemento(rs);
                 tipos.add(tipo);
             }
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-
-        // Retorna la lista de tipos
         return tipos;
     }
 
@@ -71,39 +56,48 @@ public class TipoElementoDAO {
      * @return El objeto TipoElemento si se encuentra, o null si no existe.
      */
     public TipoElemento getById(int id) {
-        // Inicializa el objeto como null
         TipoElemento tipo = null;
-        // Consulta SQL para seleccionar un tipo por ID
         String SQL = "SELECT * FROM tipos_elementos WHERE id = ?";
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
 
-            // Establece el valor del parámetro id en la consulta
             stmt.setInt(1, id);
-            // Ejecuta la consulta y obtiene los resultados
             ResultSet rs = stmt.executeQuery();
 
-            // Verifica si hay resultados
             if (rs.next()) {
-                // Crea un nuevo objeto TipoElemento a partir de los datos de la fila actual
-                tipo = new TipoElemento(
-                    rs.getInt("id"), // Obtiene el ID
-                    rs.getString("nombre"), // Obtiene el nombre
-                    rs.getString("descripcion"), // Obtiene la descripción
-                    rs.getString("marca"), // Obtiene la marca
-                    rs.getString("modelo"), // Obtiene el modelo
-                    rs.getString("detalles") // Obtiene las detalles
-                );
+                tipo = mapearTipoElemento(rs);
             }
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
+        return tipo;
+    }
 
-        // Retorna el tipo encontrado o null si no existe
+    /**
+     * Busca un tipo de elemento por su consecutivo (único).
+     *
+     * @param consecutivo El consecutivo único del tipo de elemento.
+     * @return El objeto TipoElemento si se encuentra, o null si no existe.
+     */
+    public TipoElemento getByConsecutivo(int consecutivo) {
+        TipoElemento tipo = null;
+        String SQL = "SELECT * FROM tipos_elementos WHERE consecutivo = ?";
+
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+
+            stmt.setInt(1, consecutivo);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                tipo = mapearTipoElemento(rs);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return tipo;
     }
 
@@ -114,38 +108,30 @@ public class TipoElementoDAO {
      * @return TipoElemento creado con el ID generado, o null si hubo error.
      */
     public TipoElemento create(TipoElemento tipo) {
-        // Consulta SQL para insertar un nuevo tipo
-        String SQL = "INSERT INTO tipos_elementos (nombre, descripcion, marca, modelo, detalles) VALUES (?, ?, ?, ?, ?)";
+        String SQL = "INSERT INTO tipos_elementos (nombre, consecutivo, descripcion, marca, modelo, atributos) VALUES (?, ?, ?, ?, ?, ?)";
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) { // Prepara la consulta y permite obtener el ID generado
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            // Establece los valores de los parámetros en la consulta
             stmt.setString(1, tipo.getNombre());
-            stmt.setString(2, tipo.getDescripcion());
-            stmt.setString(3, tipo.getMarca());
-            stmt.setString(4, tipo.getModelo());
-            stmt.setString(5, tipo.getDetalles());
+            stmt.setInt(2, tipo.getConsecutivo());
+            stmt.setString(3, tipo.getDescripcion());
+            stmt.setString(4, tipo.getMarca());
+            stmt.setString(5, tipo.getModelo());
+            stmt.setString(6, tipo.getAtributos());
 
-            // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
-            // Verifica si se insertó al menos un registro
             if (filasAfectadas > 0) {
-                // Obtiene las claves generadas (ID del nuevo tipo)
                 ResultSet generatedKeys = stmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    // Establece el ID en el objeto tipo y lo retorna
                     tipo.setId(generatedKeys.getInt(1));
                     return tipo;
                 }
             }
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-        // Retorna null si hubo un error al crear el tipo
         return null;
     }
 
@@ -157,35 +143,28 @@ public class TipoElementoDAO {
      * @return TipoElemento actualizado si fue exitoso, o null si falló.
      */
     public TipoElemento update(int id, TipoElemento tipo) {
-        // Consulta SQL para actualizar un tipo existente
-        String SQL = "UPDATE tipos_elementos SET nombre = ?, descripcion = ?, marca = ?, modelo = ?, detalles = ? WHERE id = ?";
+        String SQL = "UPDATE tipos_elementos SET nombre = ?, consecutivo = ?, descripcion = ?, marca = ?, modelo = ?, atributos = ? WHERE id = ?";
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
 
-            // Establece los valores de los parámetros en la consulta
             stmt.setString(1, tipo.getNombre());
-            stmt.setString(2, tipo.getDescripcion());
-            stmt.setString(3, tipo.getMarca());
-            stmt.setString(4, tipo.getModelo());
-            stmt.setString(5, tipo.getDetalles());
-            stmt.setInt(6, id); // Establece el ID del tipo a actualizar
+            stmt.setInt(2, tipo.getConsecutivo());
+            stmt.setString(3, tipo.getDescripcion());
+            stmt.setString(4, tipo.getMarca());
+            stmt.setString(5, tipo.getModelo());
+            stmt.setString(6, tipo.getAtributos());
+            stmt.setInt(7, id);
 
-            // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
-            // Verifica si se actualizó al menos un registro
             if (filasAfectadas > 0) {
-                // Establece el ID en el objeto tipo y lo retorna
                 tipo.setId(id);
                 return tipo;
             }
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-        // Retorna null si hubo un error al actualizar el tipo
         return null;
     }
 
@@ -196,24 +175,29 @@ public class TipoElementoDAO {
      * @return true si la eliminación fue exitosa, false si falló.
      */
     public boolean delete(int id) {
-        // Consulta SQL para eliminar un tipo por ID
         String SQL = "DELETE FROM tipos_elementos WHERE id = ?";
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+        try (Connection conexion = DBConnection.conectar();
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
 
-            // Establece el valor del parámetro id en la consulta
             stmt.setInt(1, id);
-            // Ejecuta la consulta y obtiene el número de filas afectadas
-            int filasAfectadas = stmt.executeUpdate();
-            // Retorna true si se eliminó al menos un registro
-            return filasAfectadas > 0;
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
-            return false; // Retorna false si hubo un error
+            return false;
         }
+    }
+    
+    private TipoElemento mapearTipoElemento (ResultSet rs) throws SQLException {
+        return new TipoElemento(
+            rs.getInt("id"),
+            rs.getString("nombre"),
+            rs.getInt("consecutivo"),
+            rs.getString("descripcion"),
+            rs.getString("marca"),
+            rs.getString("modelo"),
+            rs.getString("atributos")
+        );
     }
 }

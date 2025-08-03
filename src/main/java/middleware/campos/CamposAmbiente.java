@@ -30,7 +30,7 @@ public class CamposAmbiente {
         campos.add(new Campo("nombre", true, 3, 50, "string"));
 
         // Agrega el campo 'centro_id' como obligatorio, sin longitud, tipo entero
-        campos.add(new Campo("centro_id", true, 1, 2, "int"));
+        campos.add(new Campo("centro_id", true, 1, 2, "numero"));
 
         // Retorna la lista completa de campos
         return campos;

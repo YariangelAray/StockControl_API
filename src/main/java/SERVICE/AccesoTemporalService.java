@@ -29,7 +29,7 @@ public class AccesoTemporalService {
     public Response obtenerUsuariosConAcceso(int inventarioId) {        
         List<AccesoTemporal> accesos = dao.getAccesosPorInventario(inventarioId);
         if (accesos.isEmpty()) {
-            return ResponseProvider.error("No hay usuarios con acceso temporal actualmente", 200);
+            return ResponseProvider.error("No hay usuarios con acceso temporal actualmente", 204);
         }
         return ResponseProvider.success(accesos, "Usuarios con acceso obtenidos correctamente", 200);
     }
@@ -52,7 +52,7 @@ public class AccesoTemporalService {
     public Response obtenerInventariosConAccesPorUsuario(int usuarioId) {
         List<Integer> inventarios_id = dao.getInventariosAccesoUsuario(usuarioId);
         if (inventarios_id.isEmpty()) {
-            return ResponseProvider.error("No hay inventarios activos para este usuario", 404);
+            return ResponseProvider.success(null, "No hay inventarios activos para este usuario", 204);
         }
         
         List<Inventario> inventarios = new ArrayList<>();
@@ -81,7 +81,7 @@ public class AccesoTemporalService {
     public Response eliminarAccesosPorInventario(int inventarioId) {
         List<AccesoTemporal> accesos = dao.getAccesosPorInventario(inventarioId);
         if (accesos.isEmpty()) {
-            return ResponseProvider.error("No hay usuarios con acceso para eliminar", 404);
+            return ResponseProvider.success(null, "No hay usuarios con acceso para eliminar", 204);
         }
 
         boolean eliminado = dao.deleteAccesosInventario(inventarioId);

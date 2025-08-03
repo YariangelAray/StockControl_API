@@ -54,9 +54,7 @@ public class FotoService {
             String nombreUnico = "foto_reporte_" + reporteId + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
 
             // Ruta completa donde se guardará el archivo
-            Path rutaDestino = Paths.get(basePath, nombreUnico);
-
-            System.out.println("Ruta en donde se guardará la imagen: " + rutaDestino.toString());
+            Path rutaDestino = Paths.get(basePath, nombreUnico);            
             
             // Copia el archivo desde el stream a la carpeta
             Files.copy(archivoStream, rutaDestino, StandardCopyOption.REPLACE_EXISTING);
@@ -105,7 +103,7 @@ public class FotoService {
 
         if (fotos.isEmpty()) {
             System.out.println(fotos);
-            return ResponseProvider.error("No se encontraron fotos para este reporte", 200);
+            return ResponseProvider.success(null, "No se encontraron fotos para este reporte", 204);
         }
 
         return ResponseProvider.success(fotos, "Fotos obtenidas correctamente", 200);

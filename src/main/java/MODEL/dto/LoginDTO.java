@@ -19,27 +19,17 @@ package model.dto;
  * 
  * @author Yariangel Aray
  */
-public class LoginDTO {
-    private int rol_id;
+public class LoginDTO {    
     private String documento;
     private String contrasena;
 
     public LoginDTO() { }
 
     // Constructor con parámetros para crear el objeto fácilmente
-    public LoginDTO(int rol_id, String documento, String contrasena) {
-        this.rol_id = rol_id;
+    public LoginDTO(String documento, String contrasena) {        
         this.documento = documento;
         this.contrasena = contrasena;
     }        
-
-    public int getRol_id() {
-        return rol_id;
-    }
-
-    public void setRol_id(int rol_id) {
-        this.rol_id = rol_id;
-    }
 
     public String getDocumento() {
         return documento;

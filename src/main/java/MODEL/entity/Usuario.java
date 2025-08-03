@@ -1,6 +1,7 @@
 package model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 /**
  * Clase que representa la entidad Usuario del sistema.
@@ -134,12 +135,7 @@ public class Usuario {
         this.ficha_id = ficha_id;
     }
 
-    /**
-     * Contraseña del usuario (no se expone en respuestas JSON).
-     * 
-     * @return contraseña (oculta en respuestas JSON)
-     */
-    @JsonIgnore
+    @JsonProperty(access = Access.WRITE_ONLY)
     public String getContrasena() {
         return contrasena;
     }

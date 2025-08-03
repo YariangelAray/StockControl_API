@@ -52,6 +52,24 @@ public class UsuarioController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    /**
+     * Obtiene todos los usuarios registrados en el sistema.
+     *
+     * @return Lista de usuarios o mensaje de error si ocurre una excepción.
+     */
+    @GET // Método HTTP GET
+    @Path("/administrativos")
+    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    public Response obtenerTodosAdministraativos() {
+        try {
+            // Llama al servicio para obtener todos los usuarios
+            return service.obtenerTodosAdministrativos();
+        } catch (Exception e) {
+            e.printStackTrace(); // Imprime el error en la consola
+            // Retorna un error 500 si ocurre una excepción
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
 
     /**
      * Busca un usuario por su ID único.
@@ -139,7 +157,7 @@ public class UsuarioController {
     * Método que maneja la solicitud de inicio de sesión de un usuario.
     * 
     * Este método recibe un objeto LoginDTO que contiene los datos del intento de login,
-    * incluyendo el documento del usuario, la contraseña y el rol. Luego delega la lógica
+    * incluyendo el documento del usuario y la contraseña Luego delega la lógica
     * de autenticación al servicio correspondiente. Si ocurre un error inesperado,
     * devuelve una respuesta con estado 500.
     *
@@ -177,7 +195,6 @@ public class UsuarioController {
    public Response cambiarContrasena(@PathParam("id") int id, ContrasenaDTO dto) {
        try {                                        
             // Llama al servicio de cambio de contraseña con los datos recibidos
-            System.out.println("Entro a controlador");
             return service.cambiarContrasena(id, dto);            
         } catch (Exception e) {           
             e.printStackTrace();
@@ -201,8 +218,27 @@ public class UsuarioController {
    @Produces(MediaType.APPLICATION_JSON)
    public Response desactivarCuenta(@PathParam("id") int id, ContrasenaDTO dto) {
        try {                                        
-            // Llama al servicio de cambio de contraseña con los datos recibidos
+            // Llama al servicio de desactivacion de cuenta los datos recibidos
             return service.desactivarCuenta(id, dto);            
+        } catch (Exception e) {           
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }  
+   }
+   /**
+    * Endpoint para desactivar la cuenta de un usuario.
+    *
+    * 
+    * @param id ID del usuario a desactivar
+    * @param rol del usuario (requerido:superadministrador)
+    * @return Respuesta indicando si se desactivó correctamente o no
+    */
+   @PUT
+   @Path("/{id}/estado/{estado}/permiso/{rol}")   
+   @Produces(MediaType.APPLICATION_JSON)
+   public Response cambiarEstado(@PathParam("id") int id, @PathParam("rol") int rol, @PathParam("estado") boolean estado) {
+       try {                                                    
+            return service.cambiarEstado(id, rol, estado);            
         } catch (Exception e) {           
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

@@ -25,11 +25,11 @@ public class CamposElemento {
     public static List<Campo> obtener() {
         List<Campo> campos = new ArrayList<>(); // Crea la lista de campos
 
-        // Campo placa: obligatorio, tipo string (ya que puede ser largo), entre 1 y 50 dígitos
-        campos.add(new Campo("placa", true, 1, 50, "numero"));
+        // Campo placa: obligatorio, tipo string (ya que puede ser largo), entre 1 y 15 dígitos
+        campos.add(new Campo("placa", true, 1, 15, "numero"));
 
-        // Campo serial: opcional, tipo string, máximo 50 caracteres
-        campos.add(new Campo("serial", false, 0, 50, "string"));
+        // Campo serial: opcional, tipo string, máximo 15 caracteres
+        campos.add(new Campo("serial", false, 0, 15, "string"));
 
         // Campo tipoElementoId: obligatorio, tipo entero
         campos.add(new Campo("tipo_elemento_id", true, 1, 2, "numero"));

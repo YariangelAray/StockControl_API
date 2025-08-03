@@ -98,8 +98,13 @@ public class ElementoDAO {
             stmt.setDate(4, new java.sql.Date(elemento.getFecha_adquisicion().getTime())); // Asigna fecha
             stmt.setDouble(5, elemento.getValor_monetario()); // Asigna valor
             stmt.setInt(6, elemento.getEstado_id()); // Asigna estado
-            stmt.setString(7, elemento.getObservaciones()); // Asigna observaciones                    
-            stmt.setInt(8, elemento.getAmbiente_id()); // Asigna ambiente
+            stmt.setString(7, elemento.getObservaciones()); // Asigna observaciones  
+            
+            if (elemento.getAmbiente_id() == 0) { // Asigna ambiente, evaluamos que no sea 0
+                stmt.setNull(8, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(8, elemento.getAmbiente_id());
+            }                     
             stmt.setInt(9, elemento.getInventario_id()); // Asigna inventario
 
             int filasAfectadas = stmt.executeUpdate(); // Ejecuta la inserción
@@ -139,7 +144,12 @@ public class ElementoDAO {
             stmt.setDouble(5, elemento.getValor_monetario()); // Asigna valor
             stmt.setInt(6, elemento.getEstado_id()); // Asigna estado
             stmt.setString(7, elemento.getObservaciones()); // Asigna observaciones
-            stmt.setInt(8, elemento.getAmbiente_id()); // Asigna ambiente
+            
+            if (elemento.getAmbiente_id() == 0) { // Asigna ambiente, evaluamos que no sea 0
+                stmt.setNull(8, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(8, elemento.getAmbiente_id());
+            }   
             stmt.setInt(9, elemento.getInventario_id()); // Asigna inventario
             stmt.setInt(10, id); // ID del elemento a actualizar
 

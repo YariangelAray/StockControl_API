@@ -83,7 +83,7 @@ public class InventarioService {
         // Verifica si la lista está vacía
         if (inventarios.isEmpty()) {
             // Retorna un error si no se encontraron inventarios
-            return ResponseProvider.error("No se encontraron inventarios", 404);
+            return ResponseProvider.error("No se encontraron inventarios", 204);
         }
         
         // Instancia el DAO de elemento para poder consultar los elementos asociadas a cada inventario
@@ -237,7 +237,7 @@ public class InventarioService {
     public Response obtenerAmbientesPorInventario(int idInventario) {
         List<AmbienteDTO> ambientes = dao.getAllAmbientesByInventario(idInventario);
         if (ambientes.isEmpty()) {            
-            return ResponseProvider.error("No se encontraron ambientes", 404);
+            return ResponseProvider.error("No se encontraron ambientes", 204);
         }
 
         return ResponseProvider.success(ambientes, "Ambientes obtenidos correctamente", 200);

@@ -55,6 +55,33 @@ public class TipoElementoService {
         // Retorna la lista si se encontraron
         return ResponseProvider.success(tipos, "Tipos de elementos obtenidos correctamente", 200);
     }
+    /**
+     * Retorna todos los tipos de elementos registrados en la base de datos.
+     *
+     * @return Lista de tipos o error si no hay resultados.
+     */
+    public Response obtenerTodosPorInventario(int idInventario) {
+        // Obtiene la lista desde el DAO
+        List<TipoElemento> tipos = dao.getAll();
+
+        // Verifica si la lista está vacía
+        if (tipos.isEmpty()) {
+            // Retorna un error si no se encontraron registros
+            return ResponseProvider.error("No se encontraron tipos de elementos", 404);
+        }
+        
+        for (TipoElemento tipo : tipos) {
+            int cantidadElementos = 0;
+            List<Elemento> elementosInventario = elementoDao.getAllByIdInventario(idInventario);          
+            for (Elemento elemento : elementosInventario) {
+                if (elemento.getTipo_elemento_id() == tipo.getId()) cantidadElementos++;                                
+            }
+            tipo.setCantidadElementos(cantidadElementos);
+        }
+
+        // Retorna la lista si se encontraron
+        return ResponseProvider.success(tipos, "Tipos de elementos obtenidos correctamente", 200);
+    }
 
     /**
      * Busca y retorna un tipo de elemento por su ID.
@@ -84,6 +111,11 @@ public class TipoElementoService {
      */
     public Response crearTipoElemento(TipoElemento tipoElemento) {
         // Intentar crear el tipo en la base de datos
+        TipoElemento existentePorConsecutivo = dao.getByConsecutivo(tipoElemento.getConsecutivo());
+        if (existentePorConsecutivo != null) {
+            return ResponseProvider.error("Ya existe un tipo de elemento con este consecutivo", 409);
+        }
+        
         TipoElemento nuevoTipo = dao.create(tipoElemento);
         if (nuevoTipo != null) {
             // Retorna el nuevo tipo si fue creado correctamente
@@ -107,6 +139,11 @@ public class TipoElementoService {
         if (tipoExistente == null) {
             // Retorna un error si no fue encontrado
             return ResponseProvider.error("Tipo de elemento no encontrado", 404);
+        }
+        
+        TipoElemento existentePorConsecutivo = dao.getByConsecutivo(tipoElemento.getConsecutivo());
+        if (existentePorConsecutivo != null) {
+            return ResponseProvider.error("Ya existe un tipo de elemento con este consecutivo", 409);
         }
 
         // Intentar actualizar en la base de datos

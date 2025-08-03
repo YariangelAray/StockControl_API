@@ -28,8 +28,7 @@ public class AppConfig extends ResourceConfig {
      * Constructor que registra los paquetes donde se encuentran los recursos REST,
      * configuraciones y middleware de la aplicación.
      */
-    public AppConfig() {
-        // DBConnection.conectar();        
+    public AppConfig() {                                  
         packages("controller", "config", "middleware");
         register(MultiPartFeature.class);
     }

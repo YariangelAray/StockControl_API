@@ -6,8 +6,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 /**
  * Clase DAO (Data Access Object) para realizar operaciones CRUD 
  * sobre la tabla 'usuarios' en la base de datos.
@@ -41,7 +39,7 @@ public class UsuarioDAO {
         // Inicializa una lista para almacenar los usuarios
         List<Usuario> usuarios = new ArrayList<>();
         // Consulta SQL para seleccionar todos los usuarios
-        String SQL = "SELECT * FROM usuarios";
+        String SQL = "SELECT * FROM usuarios WHERE rol_id != 1 ORDER BY id DESC";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -51,20 +49,7 @@ public class UsuarioDAO {
             // Itera sobre los resultados obtenidos
             while (rs.next()) {
                 // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
-                Usuario usuario = new Usuario(
-                    rs.getInt("id"), // Obtiene el ID del usuario
-                    rs.getString("nombres"), // Obtiene el nombre del usuario
-                    rs.getString("apellidos"), // Obtiene el apellido del usuario
-                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
-                    rs.getString("documento"), // Obtiene el número de documento
-                    rs.getInt("genero_id"), // Obtiene el ID del género
-                    rs.getString("telefono"), // Obtiene el número de teléfono
-                    rs.getString("correo"), // Obtiene el correo electrónico
-                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
-                    rs.getString("contrasena"), // Obtiene la contraseña
-                    rs.getBoolean("activo"), // Obtiene el estado
-                    rs.getInt("rol_id") // Obtiene el ID del rol
-                );
+                Usuario usuario = mapearUsuario(rs);
                 // Agrega el usuario a la lista
                 usuarios.add(usuario);
             }
@@ -141,20 +126,7 @@ public class UsuarioDAO {
             // Verifica si hay resultados
             if (rs.next()) {
                 // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
-                usuario = new Usuario(
-                    rs.getInt("id"), // Obtiene el ID del usuario
-                    rs.getString("nombres"), // Obtiene el nombre del usuario
-                    rs.getString("apellidos"), // Obtiene el apellido del usuario
-                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
-                    rs.getString("documento"), // Obtiene el número de documento
-                    rs.getInt("genero_id"), // Obtiene el ID del género
-                    rs.getString("telefono"), // Obtiene el número de teléfono
-                    rs.getString("correo"), // Obtiene el correo electrónico
-                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
-                    rs.getString("contrasena"), // Obtiene la contraseña
-                    rs.getBoolean("activo"), // Obtiene el estado
-                    rs.getInt("rol_id") // Obtiene el ID del rol
-                );
+                usuario = mapearUsuario(rs);
             }
 
         } catch (SQLException e) {
@@ -190,20 +162,7 @@ public class UsuarioDAO {
             // Verifica si hay resultados
             if (rs.next()) {
                 // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
-                usuario = new Usuario(
-                    rs.getInt("id"), // Obtiene el ID del usuario
-                    rs.getString("nombres"), // Obtiene el nombre del usuario
-                    rs.getString("apellidos"), // Obtiene el apellido del usuario
-                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
-                    rs.getString("documento"), // Obtiene el número de documento
-                    rs.getInt("genero_id"), // Obtiene el ID del género
-                    rs.getString("telefono"), // Obtiene el número de teléfono
-                    rs.getString("correo"), // Obtiene el correo electrónico
-                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
-                    rs.getString("contrasena"), // Obtiene la contraseña
-                    rs.getBoolean("activo"), // Obtiene el estado
-                    rs.getInt("rol_id") // Obtiene el ID del rol
-                );
+                usuario = mapearUsuario(rs);
             }
 
         } catch (SQLException e) {
@@ -239,20 +198,7 @@ public class UsuarioDAO {
             // Verifica si hay resultados
             if (rs.next()) {
                 // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
-                usuario = new Usuario(
-                    rs.getInt("id"), // Obtiene el ID del usuario
-                    rs.getString("nombres"), // Obtiene el nombre del usuario
-                    rs.getString("apellidos"), // Obtiene el apellido del usuario
-                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
-                    rs.getString("documento"), // Obtiene el número de documento
-                    rs.getInt("genero_id"), // Obtiene el ID del género
-                    rs.getString("telefono"), // Obtiene el número de teléfono
-                    rs.getString("correo"), // Obtiene el correo electrónico
-                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
-                    rs.getString("contrasena"), // Obtiene la contraseña
-                    rs.getBoolean("activo"), // Obtiene el estado
-                    rs.getInt("rol_id") // Obtiene el ID del rol
-                );
+                usuario = mapearUsuario(rs);
             }
 
         } catch (SQLException e) {
@@ -320,7 +266,7 @@ public class UsuarioDAO {
      */
     public Usuario update(int id, Usuario usuario) {
         // Consulta SQL para actualizar un usuario existente
-        String SQL = "UPDATE usuarios SET nombres = ?, apellidos = ?, tipo_documento_id = ?, documento = ?, genero_id = ?, telefono = ?, correo = ?, ficha_id = ?, contrasena = ?, rol_id = ? WHERE id = ?";
+        String SQL = "UPDATE usuarios SET nombres = ?, apellidos = ?, tipo_documento_id = ?, documento = ?, genero_id = ?, telefono = ?, correo = ?, ficha_id = ?, rol_id = ? WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -334,10 +280,9 @@ public class UsuarioDAO {
             stmt.setInt(5, usuario.getGenero_id());
             stmt.setString(6, usuario.getTelefono());
             stmt.setString(7, usuario.getCorreo());
-            stmt.setInt(8, usuario.getFicha_id());
-            stmt.setString(9, usuario.getContrasena());
-            stmt.setInt(10, usuario.getRol_id());
-            stmt.setInt(11, id); // Establece el ID del usuario a actualizar
+            stmt.setInt(8, usuario.getFicha_id());            
+            stmt.setInt(9, usuario.getRol_id());
+            stmt.setInt(10, id); // Establece el ID del usuario a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -383,25 +328,33 @@ public class UsuarioDAO {
             return false; // Retorna false si hubo un error
         }
     }
-    
-    /**
-    * Realiza una eliminación lógica (soft delete) de un usuario.
-    *
-    * En lugar de borrar el registro de la base de datos, este método actualiza el campo `activo` a `false`,
-    * indicando que el usuario ha sido desactivado. Esta técnica permite conservar la información
-    * del usuario para auditoría o posibles restauraciones futuras.
-    *
-    * @param id ID del usuario a desactivar (eliminar lógicamente).
-    * @return true si se actualizó correctamente, false si hubo un error.
-    */
-   public boolean softDelete(int id) {
+
+   public boolean updateState(int id, boolean estado) {
        // Consulta SQL para desactivar el usuario en lugar de eliminarlo
-       String SQL = "UPDATE usuarios SET activo = false WHERE id = ?";
+       String SQL = "UPDATE usuarios SET activo = ? WHERE id = ?";
 
        try (Connection conexion = DBConnection.conectar();              // Conexión a la base de datos
            PreparedStatement stmt = conexion.prepareStatement(SQL)) {  // Prepara la sentencia SQL
        
-           stmt.setInt(1, id);                                         // Asigna el ID al parámetro
+           stmt.setBoolean(1, estado);                                 // Asigna el estado al parámetro
+           stmt.setInt(2, id);                                         // Asigna el ID al parámetro
+           int filasAfectadas = stmt.executeUpdate();                  // Ejecuta la actualización
+           return filasAfectadas > 0;                                  // Devuelve true si se modificó al menos una fila
+       } catch (SQLException e) {
+           e.printStackTrace();                                        // Imprime el error si ocurre
+           return false;                                               // Retorna false en caso de fallo
+       }
+   }
+   
+   public boolean updatePassword(int id, String nuevaContrasena) {
+       // Consulta SQL para desactivar el usuario en lugar de eliminarlo
+       String SQL = "UPDATE usuarios SET contrasena = ? WHERE id = ?";
+
+       try (Connection conexion = DBConnection.conectar();              // Conexión a la base de datos
+           PreparedStatement stmt = conexion.prepareStatement(SQL)) {  // Prepara la sentencia SQL
+       
+           stmt.setString(1, nuevaContrasena);
+           stmt.setInt(2, id);                                         // Asigna el ID al parámetro
            int filasAfectadas = stmt.executeUpdate();                  // Ejecuta la actualización
            return filasAfectadas > 0;                                  // Devuelve true si se modificó al menos una fila
        } catch (SQLException e) {
@@ -420,7 +373,7 @@ public class UsuarioDAO {
      */
     private List<Usuario> getAllByCampo(String campo, int value) {
         List<Usuario> usuarios = new ArrayList<>(); // Lista para resultados
-        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ?"; // Consulta dinámica
+        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ? ORDER BY id DESC"; // Consulta dinámica
 
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
@@ -430,20 +383,7 @@ public class UsuarioDAO {
 
             while (rs.next()) { // Itera sobre resultados
                 // Crea un nuevo objeto Usuario a partir de los datos de la fila actual
-                Usuario usuario = new Usuario(
-                    rs.getInt("id"), // Obtiene el ID del usuario
-                    rs.getString("nombres"), // Obtiene el nombre del usuario
-                    rs.getString("apellidos"), // Obtiene el apellido del usuario
-                    rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
-                    rs.getString("documento"), // Obtiene el número de documento
-                    rs.getInt("genero_id"), // Obtiene el ID del género
-                    rs.getString("telefono"), // Obtiene el número de teléfono
-                    rs.getString("correo"), // Obtiene el correo electrónico
-                    rs.getInt("ficha_id"), // Obtiene el ID de la ficha
-                    rs.getString("contrasena"), // Obtiene la contraseña
-                    rs.getBoolean("activo"), // Obtiene el estado
-                    rs.getInt("rol_id") // Obtiene el ID del rol
-                );
+                Usuario usuario = mapearUsuario(rs);
                 // Agrega el usuario a la lista
                 usuarios.add(usuario);
             }
@@ -453,4 +393,23 @@ public class UsuarioDAO {
         }
         return usuarios; // Retorna la lista
     }
+    
+    private Usuario mapearUsuario(ResultSet rs) throws SQLException {
+        return new Usuario(
+            rs.getInt("id"), // Obtiene el ID del usuario
+            rs.getString("nombres"), // Obtiene el nombre del usuario
+            rs.getString("apellidos"), // Obtiene el apellido del usuario
+            rs.getInt("tipo_documento_id"), // Obtiene el tipo de documento
+            rs.getString("documento"), // Obtiene el número de documento
+            rs.getInt("genero_id"), // Obtiene el ID del género
+            rs.getString("telefono"), // Obtiene el número de teléfono
+            rs.getString("correo"), // Obtiene el correo electrónico
+            rs.getInt("ficha_id"), // Obtiene el ID de la ficha
+            rs.getString("contrasena"), // Obtiene la contraseña
+            rs.getBoolean("activo"), // Obtiene el estado
+            rs.getInt("rol_id") // Obtiene el ID del rol
+        );
+    }
 }
+
+

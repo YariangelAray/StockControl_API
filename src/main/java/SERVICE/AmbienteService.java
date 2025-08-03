@@ -76,7 +76,7 @@ public class AmbienteService {
         // Verifica si el ambiente fue encontrado
         if (ambiente == null) {
             // Retorna un error si no se encontró el ambiente
-            return ResponseProvider.error("Ambiente no encontrado", 404);
+            return ResponseProvider.error("Ambiente no encontrado", 204);
         }
         
         // Instancia el DAO de elemento para poder consultar los elementos asociadas al ambiente

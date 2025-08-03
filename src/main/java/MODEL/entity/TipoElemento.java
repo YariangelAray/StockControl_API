@@ -15,21 +15,23 @@ package model.entity;
 public class TipoElemento {
     private int id;
     private String nombre;
+    private int consecutivo;
     private String descripcion;
     private String marca;
     private String modelo;
-    private String detalles;
+    private String atributos;
     private int cantidadElementos;
 
     public TipoElemento() {}    
 
-    public TipoElemento(int id, String nombre, String descripcion, String marca, String modelo, String detalles) {
+    public TipoElemento(int id, String nombre, int consecutivo, String descripcion, String marca, String modelo, String atributos) {
         this.id = id;
         this.nombre = nombre;
+        this.consecutivo = consecutivo;
         this.descripcion = descripcion;
         this.marca = marca;
         this.modelo = modelo;
-        this.detalles = detalles;
+        this.atributos = atributos;
     }
 
     public int getId() {
@@ -47,6 +49,14 @@ public class TipoElemento {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public int getConsecutivo() {
+        return consecutivo;
+    }
+
+    public void setConsecutivo(int consecutivo) {
+        this.consecutivo = consecutivo;
+    }        
 
     public String getDescripcion() {
         return descripcion;
@@ -72,12 +82,12 @@ public class TipoElemento {
         this.modelo = modelo;
     }
 
-    public String getDetalles() {
-        return detalles;
+    public String getAtributos() {
+        return atributos;
     }
 
-    public void setDetalles(String detalles) {
-        this.detalles = detalles;
+    public void setAtributos(String atributos) {
+        this.atributos = atributos;
     }
     
     public int getCantidadElementos() {
