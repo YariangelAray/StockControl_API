@@ -78,7 +78,7 @@ public class InventarioDAO {
         List<AmbienteDTO> ambientes = new ArrayList<>();
 
         String SQL = """ 
-            SELECT a.id AS ambiente_id, a.nombre AS ambiente_nombre, COUNT(e.id) AS cantidad_elementos
+            SELECT a.id AS ambiente_id, a.nombre AS ambiente_nombre, a.mapa AS ambiente_mapa, COUNT(e.id) AS cantidad_elementos
             FROM elementos e JOIN ambientes a ON e.ambiente_id = a.id WHERE e.inventario_id = ? GROUP BY a.id, a.nombre ORDER BY a.nombre""";
 
         try (Connection conexion = DBConnection.conectar();
@@ -91,6 +91,7 @@ public class InventarioDAO {
                 AmbienteDTO ambiente = new AmbienteDTO(
                     rs.getInt("ambiente_id"),
                     rs.getString("ambiente_nombre"),
+                    rs.getString("ambiente_mapa"),
                     rs.getInt("cantidad_elementos")
                 );
                 ambientes.add(ambiente);

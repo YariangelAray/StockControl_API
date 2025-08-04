@@ -81,6 +81,21 @@ public class ElementoService {
 
         return ResponseProvider.success(elemento, "Elemento obtenido correctamente", 200);
     }
+    /**
+     * Busca un elemento por su ID.
+     *
+     * @param id ID del elemento.
+     * @return Elemento encontrado o error.
+     */
+    public Response obtenerElementoPorPlaca(long placa) {
+        Elemento elemento = (dao.getByPlaca(placa)).getFirst(); // Busca por placa
+
+        if (elemento == null) {
+            return ResponseProvider.error("Elemento no encontrado", 404); // Si no existe
+        }
+
+        return ResponseProvider.success(elemento, "Elemento obtenido correctamente", 200);
+    }
 
     /**
      * Crea un nuevo elemento.

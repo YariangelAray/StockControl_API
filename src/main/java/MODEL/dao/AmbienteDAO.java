@@ -48,7 +48,8 @@ public class AmbienteDAO {
                 Ambiente ambiente = new Ambiente(
                     rs.getInt("id"), // Obtiene el ID del ambiente
                     rs.getString("nombre"), // Obtiene el nombre del ambiente
-                    rs.getInt("centro_id") // Obtiene el ID del centro asociado
+                    rs.getInt("centro_id"), // Obtiene el ID del centro asociado
+                    rs.getString("mapa") // Obtiene el mapa del ambiente
                 );
                 // Agrega el ambiente a la lista
                 ambientes.add(ambiente);
@@ -89,7 +90,8 @@ public class AmbienteDAO {
                 ambiente = new Ambiente(
                     rs.getInt("id"), // Obtiene el ID del ambiente
                     rs.getString("nombre"), // Obtiene el nombre del ambiente
-                    rs.getInt("centro_id") // Obtiene el ID del centro asociado
+                    rs.getInt("centro_id"), // Obtiene el ID del centro asociado
+                    rs.getString("mapa") // Obtiene el mapa del ambiente
                 );
             }
 
@@ -110,7 +112,7 @@ public class AmbienteDAO {
      */
     public Ambiente create(Ambiente ambiente) {
         // Consulta SQL para insertar un nuevo ambiente
-        String SQL = "INSERT INTO ambientes (nombre, centro_id) VALUES (?, ?)";
+        String SQL = "INSERT INTO ambientes (nombre, centro_id, mapa) VALUES (?, ?, ?)";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -119,6 +121,7 @@ public class AmbienteDAO {
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, ambiente.getNombre());
             stmt.setInt(2, ambiente.getCentro_id());
+            stmt.setString(3, ambiente.getMapa());
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -150,7 +153,7 @@ public class AmbienteDAO {
      */
     public Ambiente update(int id, Ambiente ambiente) {
         // Consulta SQL para actualizar un ambiente existente
-        String SQL = "UPDATE ambientes SET nombre = ?, centro_id = ? WHERE id = ?";
+        String SQL = "UPDATE ambientes SET nombre = ?, centro_id = ?, mapa = ? WHERE id = ?";
 
         // Intenta establecer una conexión y ejecutar la consulta
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
@@ -159,7 +162,8 @@ public class AmbienteDAO {
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, ambiente.getNombre());
             stmt.setInt(2, ambiente.getCentro_id());
-            stmt.setInt(3, id); // Establece el ID del ambiente a actualizar
+            stmt.setString(2, ambiente.getMapa());
+            stmt.setInt(4, id); // Establece el ID del ambiente a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
             int filasAfectadas = stmt.executeUpdate();
@@ -233,7 +237,8 @@ public class AmbienteDAO {
                 Ambiente ambiente = new Ambiente(
                     rs.getInt("id"), // Obtiene el ID del ambiente
                     rs.getString("nombre"), // Obtiene el nombre del ambiente
-                    rs.getInt("centro_id") // Obtiene el ID del centro asociado
+                    rs.getInt("centro_id"), // Obtiene el ID del centro asociado
+                    rs.getString("mapa") // Obtiene el mapa del ambiente
                 );
                 // Agrega el ambiente a la lista
                 ambientes.add(ambiente);

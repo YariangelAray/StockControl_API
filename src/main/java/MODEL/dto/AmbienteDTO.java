@@ -8,11 +8,13 @@ package model.dto;
 public class AmbienteDTO {
     private int id;
     private String nombre;
+    private String mapa;
     private int cantidad_elementos;
 
-    public AmbienteDTO(int id, String nombre, int cantidad_elementos) {
+    public AmbienteDTO(int id, String nombre, String mapa, int cantidad_elementos) {
         this.id = id;
         this.nombre = nombre;
+        this.mapa = mapa;
         this.cantidad_elementos = cantidad_elementos;
     }
 
@@ -22,6 +24,14 @@ public class AmbienteDTO {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public String getMapa() {
+        return mapa;
+    }
+
+    public void setMapa(String mapa) {
+        this.mapa = mapa;
     }
 
     public int getCantidad_elementos() {

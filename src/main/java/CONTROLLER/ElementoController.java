@@ -85,6 +85,23 @@ public class ElementoController {
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
+    /**
+     * Busca un elemento por su ID.
+     *
+     * @param id ID del elemento.
+     * @return Elemento encontrado o error si no existe.
+     */
+    @GET
+    @Path("/placa/{placa}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerElementoPorPlaca(@PathParam("placa") long placa) {
+        try {
+            return service.obtenerElementoPorPlaca(placa); // Solicita el elemento al servicio
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseProvider.error("Error interno en el servidor", 500);
+        }
+    }
 
     /**
      * Registra un nuevo elemento en el sistema.

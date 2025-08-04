@@ -18,16 +18,18 @@ public class Ambiente {
     private int id;
     private String nombre;
     private int centro_id;
+    private String mapa;
     
     // Lista de elementos asociadas al ambiente
     private List<Elemento> elementos;
 
     public Ambiente() {}
 
-    public Ambiente(int id, String nombre, int centro_id) {
+    public Ambiente(int id, String nombre, int centro_id, String mapa) {
         this.id = id;
         this.nombre = nombre;
         this.centro_id = centro_id;
+        this.mapa = mapa;
     }
 
     public int getId() {
@@ -61,4 +63,12 @@ public class Ambiente {
     public void setElementos(List<Elemento> elementos) {
         this.elementos = elementos;
     }
+
+    public String getMapa() {
+        return mapa;
+    }
+
+    public void setMapa(String mapa) {
+        this.mapa = mapa;
+    }       
 }
