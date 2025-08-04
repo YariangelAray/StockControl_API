@@ -49,6 +49,15 @@ insert into ambientes (nombre, centro_id) values
 ('Fabrica de Software', 1), 
 ('Desarrollo de Software', 1);
 
+update ambientes set mapa = '[
+    { "id": 1, "tipo": "Mesa", "placa": 92248961, "x": 100, "y": 100, "width": 180, "height": 80 },
+    { "id": 2, "tipo": "Mesa", "placa": 92248960, "x": 300, "y": 100, "width": 180, "height": 80 },
+    { "id": 3, "tipo": "Mesa", "placa": 92248959, "x": 470, "y": 100, "width": 180, "height": 80 },
+    { "id": 4, "tipo": "PC", "placa": 92241017084, "x": 100, "y": 180, "width": 70, "height": 70 },
+    { "id": 5, "tipo": "PC", "placa": 92241017083, "x": 300, "y": 180, "width": 70, "height": 70 },
+    { "id": 6, "tipo": "PC", "placa": 92241017082, "x": 470, "y": 180, "width": 70, "height": 70 }
+  ]' where id = 1;
+
 insert into estados(nombre) values 
 ('Bueno'), 
 ('Regular'), 
@@ -89,18 +98,19 @@ insert into elementos(placa, serial, tipo_elemento_id, fecha_adquisicion, valor_
 insert into tipos_elementos(nombre, consecutivo, descripcion, marca, modelo, atributos) values
 ('SUPERFICIE DE TRABAJO', 249371, 'TIPO ELEMENTO DEVOLUTIVO UNIDAD DE MEDIDA UNIDAD CARACTERISTICA RECEPCION RECTANGULAR DIMENSION 2.10 X 0.60 MT MATERIAL FORMICA', null, null, 'SUPERFICIE RECTA DE 1.60*60*30 CON DOS OROFICIOS PASA CABLES');
 insert into elementos(placa, serial, tipo_elemento_id, fecha_adquisicion, valor_monetario, estado_id, ambiente_id, inventario_id) values
-(92248961, null, 4, '2013-12-20', 269300, 1, 2, 1),
-(92248960, null, 4, '2013-12-20', 269300, 1, 2, 1),
-(92248959, null, 4, '2013-12-20', 269300, 1, 2, 1),
-(92248958, null, 4, '2013-12-20', 269300, 1, 2, 1),
-(92248957, null, 4, '2013-12-20', 269300, 1, 2, 1);
+(92248961, null, 4, '2013-12-20', 269300, 1, 1, 1),
+(92248960, null, 4, '2013-12-20', 269300, 1, 1, 1),
+(92248959, null, 4, '2013-12-20', 269300, 1, 1, 1),
+(92248958, null, 4, '2013-12-20', 269300, 1, 1, 1),
+(92248957, null, 4, '2013-12-20', 269300, 1, 1, 1);
 
 -- REPORTES
 insert into reportes (asunto, mensaje, usuario_id, elemento_id) values
-('El equipo se apaga automáticamente','El computador se apaga de forma inesperada tras 10–15 minutos de uso sin previo aviso. No hay mensajes de error ni advertencias, simplemente se corta la energía.', 1, 1),
-('Teclado con teclas atascadas', 'Varias teclas del teclado quedan atascadas o no registran la pulsación. Esto dificulta la escritura de documentos largos.',  1, 7),
-('Ruedas dañadas', 'Dos de las patas para las ruedas de la silla están rotas y no giran libremente, lo que dificulta moverla por el ambiente.', 1, 12),
-('Recubrimiento descascarado', 'El borde de la superficie de trabajo presenta descascarillado en el recubrimiento de formica, dejando la madera expuesta.', 1, 17);
+('El equipo se apaga automáticamente','El computador se apaga de forma inesperada tras 10–15 minutos de uso sin previo aviso. No hay mensajes de error ni advertencias, simplemente se corta la energía.', 3, 1),
+('Teclado con teclas atascadas', 'Varias teclas del teclado quedan atascadas o no registran la pulsación. Esto dificulta la escritura de documentos largos.',  3, 7),
+('Ruedas dañadas', 'Dos de las patas para las ruedas de la silla están rotas y no giran libremente, lo que dificulta moverla por el ambiente.', 3, 12),
+('Recubrimiento descascarado', 'El borde de la superficie de trabajo presenta descascarillado en el recubrimiento de formica, dejando la madera expuesta.', 3, 17);
 
 insert into fotos (url, reporte_id) values
 ('fotos_reportes/foto_reporte_3.jpg', 3), ('fotos_reportes/foto_reporte_4.jpg', 4);
+

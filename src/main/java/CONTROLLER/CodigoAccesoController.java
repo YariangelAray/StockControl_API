@@ -4,6 +4,7 @@ import service.CodigoAccesoService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import model.dto.HorasDTO;
 import providers.ResponseProvider;
 
 /**
@@ -31,7 +32,7 @@ public class CodigoAccesoController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response generarCodigo(@PathParam("inventarioId") int inventarioId, HorasDTO horas) {
         try {
-            return service.generarCodigo(inventarioId, horas.horas);            
+            return service.generarCodigo(inventarioId, horas);            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -62,8 +63,4 @@ public class CodigoAccesoController {
         }
     }
 
-}
-
-class HorasDTO {
-    public int horas;
 }

@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import java.time.Instant;
 import java.util.UUID;
 import model.dao.InventarioDAO;
+import model.dto.HorasDTO;
 import model.entity.Inventario;
 
 /**
@@ -29,7 +30,7 @@ public class CodigoAccesoService {
     /**
      * Genera un nuevo código de acceso para un inventario válido por cierto número de horas.
      */
-    public Response generarCodigo(int inventarioId, int horasValidez) {
+    public Response generarCodigo(int inventarioId, HorasDTO horasValidez) {
         // Validar si ya hay un código activo para este inventario
         CodigoAcceso codigoExistente = dao.getCodigoActivo(inventarioId);
         if (codigoExistente != null) {
@@ -37,7 +38,7 @@ public class CodigoAccesoService {
         }
         
         String codigoGenerado = UUID.randomUUID().toString().substring(0, 8).toUpperCase(); // Código simple         
-        Timestamp expiracion = Timestamp.from(Instant.now().plusSeconds(horasValidez * 3600));
+        Timestamp expiracion = Timestamp.from(Instant.now().plusSeconds(horasValidez.getHoras() * 3600 + horasValidez.getMinutos() * 60));
 
         CodigoAcceso codigo = new CodigoAcceso(codigoGenerado, inventarioId, expiracion);                
         

@@ -80,7 +80,8 @@ direccion varchar(50)
 create table ambientes(  
 id int auto_increment primary key,  
 nombre varchar(50), 
-centro_id int, 
+centro_id int,
+mapa mediumtext,
 foreign key (centro_id) references centros(id)  
 );  
    

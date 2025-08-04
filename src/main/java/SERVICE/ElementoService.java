@@ -88,7 +88,7 @@ public class ElementoService {
      * @return Elemento encontrado o error.
      */
     public Response obtenerElementoPorPlaca(long placa) {
-        Elemento elemento = (dao.getByPlaca(placa)).getFirst(); // Busca por placa
+        Elemento elemento = (dao.getByPlaca(placa)).get(0); // Busca por placa
 
         if (elemento == null) {
             return ResponseProvider.error("Elemento no encontrado", 404); // Si no existe

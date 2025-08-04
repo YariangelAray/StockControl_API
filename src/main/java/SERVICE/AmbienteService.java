@@ -129,6 +129,7 @@ public class AmbienteService {
             // Retorna el ambiente actualizado si fue exitoso
             return ResponseProvider.success(ambienteActualizado, "Ambiente actualizado correctamente", 200);
         } else {
+            System.out.println("holaa");
             // Retorna un error si hubo un problema al actualizar el ambiente
             return ResponseProvider.error("Error al actualizar el ambiente", 404);
         }

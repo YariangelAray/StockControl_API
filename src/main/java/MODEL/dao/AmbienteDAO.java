@@ -162,7 +162,7 @@ public class AmbienteDAO {
             // Establece los valores de los parámetros en la consulta
             stmt.setString(1, ambiente.getNombre());
             stmt.setInt(2, ambiente.getCentro_id());
-            stmt.setString(2, ambiente.getMapa());
+            stmt.setString(3, ambiente.getMapa());
             stmt.setInt(4, id); // Establece el ID del ambiente a actualizar
 
             // Ejecuta la consulta y obtiene el número de filas afectadas
