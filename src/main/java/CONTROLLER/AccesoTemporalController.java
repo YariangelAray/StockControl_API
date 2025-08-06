@@ -134,13 +134,21 @@ public class AccesoTemporalController {
             if (encontrado == null) {
                 return ResponseProvider.error("Código inválido o expirado", 404);
             }
+            
+
                         
             // Paso 2: Verificar que el usuario no tenga ya acceso a este código
             List<CodigoAcceso> accesos = dao.getCodigosAccesoActivosPorUsuario(acceso.getUsuario_id());
+            
+            boolean conAcceso = accesos.stream().anyMatch(a -> a.getId() == encontrado.getId());
+
             // Si el usuario ya tiene acceso a este código, retorna error 409 (conflicto)
-            if (accesos.contains(encontrado)) {
+            if (conAcceso) {
                 return ResponseProvider.error("Este usuario ya cuenta con acceso al inventario", 409);
             }
+//            if (accesos.contains(encontrado)) {
+//                return ResponseProvider.error("Este usuario ya cuenta con acceso al inventario", 409);
+//            }
 
             // Paso 3: Registrar el nuevo acceso temporal
             // Establece el ID del código de acceso en el objeto acceso

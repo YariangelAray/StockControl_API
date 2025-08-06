@@ -177,5 +177,5 @@ create table accesos_temporales (
   usuario_id int,
   codigo_acceso_id int,
   foreign key (usuario_id) references usuarios(id),
-  foreign key (codigo_acceso_id) references codigoss_acceso(id)
+  foreign key (codigo_acceso_id) references codigos_acceso(id)
 );
