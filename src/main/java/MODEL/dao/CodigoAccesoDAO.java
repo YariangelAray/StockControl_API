@@ -1,7 +1,7 @@
 package model.dao;
 
 import model.CodigoAcceso;
-import utils.DBConnection;
+import database.DBConnection;
 
 import java.sql.*;
 

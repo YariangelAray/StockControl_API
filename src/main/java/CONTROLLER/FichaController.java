@@ -1,6 +1,5 @@
 package controller;
 
-import utils.ResponseProvider;
 import model.dao.FichaDAO;
 import model.dao.UsuarioDAO;
 import model.Ficha;

@@ -1,6 +1,5 @@
 package controller;
 
-import utils.ResponseProvider;
 import model.dao.CentroDAO;
 import model.dao.AmbienteDAO;
 import model.Centro;

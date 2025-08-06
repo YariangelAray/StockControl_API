@@ -8,7 +8,6 @@ import model.dao.AccesoTemporalDAO;
 import model.dao.CodigoAccesoDAO;
 import model.dao.ElementoDAO;
 import model.dao.InventarioDAO;
-import utils.ResponseProvider;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

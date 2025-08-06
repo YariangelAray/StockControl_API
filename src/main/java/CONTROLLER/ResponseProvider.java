@@ -1,4 +1,4 @@
-package utils;
+package controller;
 
 import java.util.List;
 import javax.ws.rs.core.Response;

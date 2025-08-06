@@ -1,6 +1,5 @@
 package controller;
 
-import utils.ResponseProvider;
 import model.dao.TipoDocumentoDAO;
 import model.dao.UsuarioDAO;
 import model.TipoDocumento;

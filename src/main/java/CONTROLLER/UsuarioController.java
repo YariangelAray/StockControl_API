@@ -1,6 +1,5 @@
 package controller;
 
-import utils.ResponseProvider;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.*;

@@ -1,7 +1,7 @@
 package model.dao;
 
 import model.Estado;
-import utils.DBConnection;
+import database.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;

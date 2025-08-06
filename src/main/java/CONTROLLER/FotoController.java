@@ -1,6 +1,5 @@
 package controller;
 
-import utils.ResponseProvider;
 import java.io.IOException;
 import model.dao.FotoDAO;
 import model.Foto;

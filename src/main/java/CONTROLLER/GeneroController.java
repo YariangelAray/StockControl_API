@@ -1,7 +1,6 @@
 package controller;
 
 // Importaciones necesarias para validación, manejo de datos y respuestas
-import utils.ResponseProvider;
 import model.Genero;
 import model.Usuario;
 import model.dao.GeneroDAO;

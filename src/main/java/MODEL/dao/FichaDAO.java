@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Ficha;
-import utils.DBConnection;
+import database.DBConnection;
 
 /**
  * Clase DAO (Data Access Object) que permite realizar operaciones CRUD

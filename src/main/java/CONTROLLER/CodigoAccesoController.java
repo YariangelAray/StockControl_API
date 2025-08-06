@@ -7,7 +7,6 @@ import model.dao.CodigoAccesoDAO;
 import model.dao.AccesoTemporalDAO;
 import model.dao.InventarioDAO;
 import model.dto.HorasDTO;
-import utils.ResponseProvider;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

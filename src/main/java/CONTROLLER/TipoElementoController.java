@@ -1,6 +1,5 @@
 package controller;
 
-import utils.ResponseProvider;
 import model.dao.ElementoDAO;
 import model.dao.TipoElementoDAO;
 import model.Elemento;
