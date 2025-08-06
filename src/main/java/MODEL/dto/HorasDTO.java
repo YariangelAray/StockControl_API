@@ -1,7 +1,9 @@
 package model.dto;
 
 /**
- *
+ * DTO que nos sirve para traer del frontend la cantidad de horas y minutos la cual estará disponible un inventario
+ * cuando se le crea una llave de acceso
+ * 
  * @author YariangelAray
  */
 public class HorasDTO {

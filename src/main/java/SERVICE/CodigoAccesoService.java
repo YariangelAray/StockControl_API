@@ -2,15 +2,18 @@ package service;
 
 import java.sql.Timestamp;
 import model.dao.CodigoAccesoDAO;
-import model.entity.CodigoAcceso;
-import providers.ResponseProvider;
+import model.CodigoAcceso;
+import utils.ResponseProvider;
 
 import javax.ws.rs.core.Response;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import model.dao.AccesoTemporalDAO;
 import model.dao.InventarioDAO;
 import model.dto.HorasDTO;
-import model.entity.Inventario;
+import model.AccesoTemporal;
+import model.Inventario;
 
 /**
  * Servicio que gestiona la lógica de negocio para los códigos de acceso a inventarios.
@@ -21,10 +24,12 @@ public class CodigoAccesoService {
 
     CodigoAccesoDAO dao;
     InventarioDAO daoInventario;
+    AccesoTemporalDAO daoAcceso;
 
     public CodigoAccesoService() {
         dao = new CodigoAccesoDAO();
         daoInventario = new InventarioDAO();
+        daoAcceso = new AccesoTemporalDAO();
     }
 
     /**
@@ -40,7 +45,10 @@ public class CodigoAccesoService {
         String codigoGenerado = UUID.randomUUID().toString().substring(0, 8).toUpperCase(); // Código simple         
         Timestamp expiracion = Timestamp.from(Instant.now().plusSeconds(horasValidez.getHoras() * 3600 + horasValidez.getMinutos() * 60));
 
-        CodigoAcceso codigo = new CodigoAcceso(codigoGenerado, inventarioId, expiracion);                
+        CodigoAcceso codigo = new CodigoAcceso();                
+        codigo.setCodigo(codigoGenerado);
+        codigo.setInventario_id(inventarioId);
+        codigo.setFecha_expiracion(expiracion);
         
         if (dao.create(codigo)) {
             return ResponseProvider.success(codigo, "Código generado exitosamente", 201);
@@ -55,10 +63,9 @@ public class CodigoAccesoService {
     public Response validarCodigo(String codigo) {
         CodigoAcceso encontrado = dao.searchValid(codigo);
         
-
-        if (encontrado != null) {
+        if (encontrado != null) {            
             Inventario inventario = daoInventario.getById(encontrado.getInventario_id());
-            encontrado.setInventario_nombre(inventario.getNombre());
+            encontrado.setNombre_inventario(inventario.getNombre());
             return ResponseProvider.success(encontrado, "Código válido", 200);
         }              
 
@@ -73,4 +80,24 @@ public class CodigoAccesoService {
         return ResponseProvider.success(codigo, "Código activo del inventario", 201);
     }
 
+    public Response eliminarAccesosPorInventario(int inventarioId) {
+        CodigoAcceso codigo = dao.getByIdInventario(inventarioId);
+        if (codigo == null) {
+            return ResponseProvider.success(null, "No hay código activo para este inventario", 204);
+        }
+        List<AccesoTemporal> accesos = daoAcceso.getAccesosPorCodigo(inventarioId);
+        if (accesos.isEmpty()) {
+            return ResponseProvider.success(null, "No hay usuarios con acceso para eliminar", 204);
+        }
+        
+        boolean eliminadoAccesos = daoAcceso.deleteAccesosPorCodigo(codigo.getId());
+        if (eliminadoAccesos) {
+            boolean eliminado = dao.deleteCodigoPorInventario(inventarioId);
+            if (eliminado) {
+                return ResponseProvider.success(null, "Accesos del inventario eliminados correctamente", 200);                
+            }
+            return ResponseProvider.error("Error al eliminar el código de acceso", 500);                
+        }
+        return ResponseProvider.error("Error al eliminar los accesos del inventario", 500);
+    }
 }

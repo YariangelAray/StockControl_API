@@ -1,70 +1,88 @@
 package controller;
 
-import middleware.ValidarCampos;
-import service.EstadoService;
-import model.entity.Estado;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
+import model.dao.EstadoDAO;
+import model.dao.ElementoDAO;
+import model.Estado;
+import model.Elemento;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Controlador REST para gestionar operaciones relacionadas con los estados.
- * Define rutas HTTP que permiten consultar, crear, actualizar y eliminar estados.
  *
  * Rutas disponibles:
  * - GET /estados: Listar todos los estados.
  * - GET /estados/{id}: Buscar estado por ID.
  * - POST /estados: Crear nuevo estado.
  * - PUT /estados/{id}: Actualizar estado existente.
- * - DELETE /estados/{id}: Eliminar estado.
- * 
- * Usa la validación con @ValidarCampos para asegurar que los datos sean válidos.
- * 
- * @autor Yariangel Aray
+ * - DELETE /estados/{id}: Eliminar estado si no está en uso por elementos.
+ *
+ * Utiliza @ValidarCampos para validación automática.
+ *
+ * Autor: Yariangel Aray
  */
-@Path("/estados") // Define la ruta base para este controlador
+@Path("/estados")
 public class EstadoController {
 
-    EstadoService service; // Instancia del servicio que maneja la lógica de negocio
+    private final EstadoDAO dao;           // DAO para acceder a la tabla estados
+    private final ElementoDAO elementoDao; // DAO para verificar si hay elementos con este estado
 
     public EstadoController() {
-        // Instancia el servicio encargado de la lógica de negocio
-        service = new EstadoService();
+        // Inicializa los DAOs necesarios para la lógica
+        dao = new EstadoDAO();
+        elementoDao = new ElementoDAO();
     }
 
     /**
-     * Obtiene todos los estados registrados en el sistema.
+     * Obtiene todos los estados registrados.
      *
-     * @return Lista de estados o mensaje de error si ocurre una excepción.
+     * @return Lista de estados o error 404 si no hay resultados.
      */
-    @GET // Método HTTP GET
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerTodos() {
         try {
-            // Llama al servicio para obtener todos los estados
-            return service.obtenerTodos();
+            // Consulta todos los estados en la base de datos
+            List<Estado> estados = dao.getAll();
+
+            // Verifica si la lista está vacía
+            if (estados.isEmpty()) {
+                return ResponseProvider.error("No se encontraron estados", 404);
+            }
+
+            // Retorna la lista con mensaje de éxito
+            return ResponseProvider.success(estados, "Estados obtenidos correctamente", 200);
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el error en la consola
-            // Retorna un error 500 si ocurre una excepción
+            e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Busca un estado por su ID único.
+     * Obtiene un estado específico por su ID.
      *
-     * @param id Identificador del estado.
-     * @return Estado encontrado o mensaje de error si no existe o ocurre una excepción.
+     * @param id ID del estado a buscar.
+     * @return Estado encontrado o error si no existe.
      */
     @GET
-    @Path("/{id}") // Ruta que incluye el ID del estado
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerEstado(@PathParam("id") int id) {
         try {
-            // Llama al servicio para obtener el estado por ID
-            return service.obtenerEstado(id);
+            // Busca el estado por ID
+            Estado estado = dao.getById(id);
+
+            // Verifica si se encontró
+            if (estado == null) {
+                return ResponseProvider.error("Estado no encontrado", 404);
+            }
+
+            // Retorna el estado
+            return ResponseProvider.success(estado, "Estado obtenido correctamente", 200);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -72,20 +90,26 @@ public class EstadoController {
     }
 
     /**
-     * Registra un nuevo estado en el sistema.
-     * Se valida el contenido con una clase Middleware (@ValidarCampos).
+     * Crea un nuevo estado.
      *
-     * @param estado Objeto Estado recibido en el cuerpo de la petición.
-     * @return Respuesta con estado y mensaje.
+     * @param estado Datos del nuevo estado.
+     * @return Estado creado o error si falla el proceso.
      */
-    @POST // Método HTTP POST
-    @ValidarCampos(entidad = "estado") // Anotación que activa la validación de campos
-    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @POST
+    @ValidarCampos(entidad = "estado")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response crearEstado(Estado estado) {
         try {
-            // Llama al servicio para crear un nuevo estado
-            return service.crearEstado(estado);
+            // Intenta crear el estado
+            Estado nuevo = dao.create(estado);
+
+            // Verifica si fue exitoso
+            if (nuevo != null) {
+                return ResponseProvider.success(nuevo, "Estado creado correctamente", 201);
+            }
+
+            return ResponseProvider.error("Error al crear el estado", 400);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -93,22 +117,32 @@ public class EstadoController {
     }
 
     /**
-     * Actualiza la información de un estado existente.
-     * Se validan los nuevos campos antes de aplicar los cambios.
+     * Actualiza un estado existente.
      *
      * @param id ID del estado a actualizar.
-     * @param estado Datos nuevos del estado.
-     * @return Respuesta con mensaje de éxito o error.
+     * @param estado Datos nuevos para actualizar.
+     * @return Estado actualizado o mensaje de error.
      */
-    @PUT // Método HTTP PUT
-    @Path("/{id}") // Ruta que incluye el ID del estado
-    @ValidarCampos(entidad = "estado") // Anotación que activa la validación de campos
+    @PUT
+    @Path("/{id}")
+    @ValidarCampos(entidad = "estado")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarEstado(@PathParam("id") int id, Estado estado) {
         try {
-            // Llama al servicio para actualizar el estado
-            return service.actualizarEstado(id, estado);
+            // Verifica existencia
+            Estado actual = dao.getById(id);
+            if (actual == null) {
+                return ResponseProvider.error("Estado no encontrado", 404);
+            }
+
+            // Intenta actualizar el estado
+            Estado actualizado = dao.update(id, estado);
+            if (actualizado != null) {
+                return ResponseProvider.success(actualizado, "Estado actualizado correctamente", 200);
+            }
+
+            return ResponseProvider.error("Error al actualizar el estado", 404);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -116,18 +150,36 @@ public class EstadoController {
     }
 
     /**
-     * Elimina un estado del sistema mediante su ID.
+     * Elimina un estado del sistema.
+     * Solo es posible si no existen elementos asociados a dicho estado.
      *
      * @param id ID del estado a eliminar.
-     * @return Respuesta indicando si la eliminación fue exitosa o no.
+     * @return Mensaje de éxito o error si tiene elementos relacionados.
      */
-    @DELETE // Método HTTP DELETE
-    @Path("/{id}") // Ruta que incluye el ID del estado
+    @DELETE
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarEstado(@PathParam("id") int id) {
         try {
-            // Llama al servicio para eliminar el estado
-            return service.eliminarEstado(id);
+            // Verifica existencia del estado
+            Estado actual = dao.getById(id);
+            if (actual == null) {
+                return ResponseProvider.error("Estado no encontrado", 404);
+            }
+
+            // Consulta si existen elementos asociados a este estado
+            List<Elemento> elementos = elementoDao.getByIdTipoEstado(id);
+            if (elementos != null && !elementos.isEmpty()) {
+                return ResponseProvider.error("No se puede eliminar el estado porque tiene elementos asociados", 409);
+            }
+
+            // Intenta eliminar el estado
+            boolean eliminado = dao.delete(id);
+            if (eliminado) {
+                return ResponseProvider.success(null, "Estado eliminado correctamente", 200);
+            }
+
+            return ResponseProvider.error("Error al eliminar el estado", 500);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

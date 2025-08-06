@@ -1,70 +1,92 @@
 package controller;
 
-// Importaciones necesarias para el funcionamiento del controlador
-import middleware.ValidarCampos;
-import model.entity.Ficha;
-import service.FichaService;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
+import model.dao.FichaDAO;
+import model.dao.UsuarioDAO;
+import model.Ficha;
+import model.Usuario;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import model.ProgramaFormacion;
+import model.dao.ProgramaFormacionDAO;
 
 /**
- * Controlador REST para gestionar operaciones relacionadas con las fichas.
- * Define rutas HTTP que permiten consultar, crear, actualizar y eliminar fichas.
+ * Controlador REST que también contiene la lógica de negocio para gestionar fichas.
+ * Permite consultar, crear, actualizar y eliminar fichas, asegurando las reglas de negocio.
  *
  * Rutas disponibles:
- * - GET /fichas: Listar todas las fichas.
- * - GET /fichas/{id}: Buscar ficha por ID.
- * - POST /fichas: Crear nueva ficha.
- * - PUT /fichas/{id}: Actualizar ficha existente.
- * - DELETE /fichas/{id}: Eliminar ficha si no tiene usuarios asociados.
- * 
+ * - GET /fichas
+ * - GET /fichas/{id}
+ * - POST /fichas
+ * - PUT /fichas/{id}
+ * - DELETE /fichas/{id}
+ *
+ * Antes de eliminar una ficha, se valida que no existan usuarios asociados.
+ *
  * @author Yariangel Aray
  */
-@Path("/fichas") // Ruta base para este controlador
+@Path("/fichas")
 public class FichaController {
 
-    // Instancia del servicio que contiene la lógica de negocio de las fichas
-    private FichaService service;
+    // DAO que maneja operaciones de base de datos para fichas
+    private final FichaDAO fichaDao;
+    private final ProgramaFormacionDAO programaDao;
 
-    // Constructor que instancia el servicio al crear el controlador
+    // Constructor que instancia el DAO
     public FichaController() {
-        service = new FichaService();
+        this.fichaDao = new FichaDAO();
+        this.programaDao = new ProgramaFormacionDAO();
     }
 
     /**
      * Obtiene todas las fichas registradas en el sistema.
      *
-     * @return Lista de fichas o mensaje de error si ocurre una excepción.
+     * @return Lista de fichas o mensaje de error si no hay resultados.
      */
-    @GET // Método HTTP GET
-    @Produces(MediaType.APPLICATION_JSON) // La respuesta será en formato JSON
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerTodas() {
         try {
-            // Llama al servicio para obtener todas las fichas
-            return service.obtenerTodas();
+            // Se obtiene la lista completa de fichas
+            List<Ficha> fichas = fichaDao.getAll();
+
+            // Si no hay fichas, se retorna error 404
+            if (fichas.isEmpty()) {
+                return ResponseProvider.error("No se encontraron fichas registradas", 404);
+            }
+
+            // Retorna lista de fichas con éxito
+            return ResponseProvider.success(fichas, "Fichas obtenidas correctamente", 200);
         } catch (Exception e) {
-            e.printStackTrace(); // Muestra el error en la consola para debug
-            // Retorna error 500 si algo falla
+            e.printStackTrace(); // Imprime error en consola
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Obtiene una ficha específica por su ID.
+     * Obtiene una ficha por su ID único.
      *
      * @param id ID de la ficha a buscar.
-     * @return Ficha encontrada o mensaje de error si no existe.
+     * @return Ficha encontrada o error si no existe.
      */
     @GET
-    @Path("/{id}") // Ruta dinámica que incluye el ID de la ficha
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerFicha(@PathParam("id") int id) {
         try {
-            // Llama al servicio para buscar una ficha por ID
-            return service.obtenerFicha(id);
+            // Busca la ficha por ID
+            Ficha ficha = fichaDao.getById(id);
+
+            // Si no existe, retorna error
+            if (ficha == null) {
+                return ResponseProvider.error("Ficha no encontrada", 404);
+            }
+
+            // Retorna ficha encontrada
+            return ResponseProvider.success(ficha, "Ficha obtenida correctamente", 200);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -72,20 +94,33 @@ public class FichaController {
     }
 
     /**
-     * Crea una nueva ficha en el sistema.
-     * Se valida el contenido con una clase Middleware (@ValidarCampos).
+     * Registra una nueva ficha en el sistema.
      *
-     * @param ficha Objeto ficha recibido en la petición.
-     * @return Respuesta con el resultado del registro.
+     * @param ficha Objeto ficha recibido desde el cuerpo JSON.
+     * @return Respuesta con estado 201 si se creó correctamente.
      */
-    @POST // Método HTTP POST
-    @ValidarCampos(entidad = "ficha") // Activación del middleware de validación
-    @Consumes(MediaType.APPLICATION_JSON) // El cuerpo de la petición debe ser JSON
+    @POST
+    @ValidarCampos(entidad = "ficha")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response crearFicha(Ficha ficha) {
         try {
-            // Llama al servicio para crear la ficha
-            return service.crearFicha(ficha);
+            // Verificamos que el programa de formación exista
+            ProgramaFormacion programaExistente = programaDao.getById(ficha.getPrograma_id());
+            if (programaExistente == null){
+                return ResponseProvider.error("El programa de formación especificado no existe.", 404);
+            }
+            
+            // Intenta crear la ficha
+            Ficha nuevaFicha = fichaDao.create(ficha);
+
+            // Verifica si fue creada correctamente
+            if (nuevaFicha != null) {
+                return ResponseProvider.success(nuevaFicha, "Ficha creada correctamente", 201);
+            }
+
+            // Si no se pudo crear, retorna error
+            return ResponseProvider.error("Error al crear la ficha", 400);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -93,22 +128,41 @@ public class FichaController {
     }
 
     /**
-     * Actualiza una ficha existente.
-     * Se validan los nuevos campos antes de aplicar los cambios.
+     * Actualiza los datos de una ficha existente.
      *
      * @param id ID de la ficha a actualizar.
-     * @param ficha Datos nuevos de la ficha.
-     * @return Resultado de la operación.
+     * @param ficha Nuevos datos de la ficha.
+     * @return Respuesta con ficha actualizada o error si no existe.
      */
-    @PUT // Método HTTP PUT
-    @Path("/{id}") // Ruta con ID dinámico
-    @ValidarCampos(entidad = "ficha") // Activación del middleware de validación
+    @PUT
+    @Path("/{id}")
+    @ValidarCampos(entidad = "ficha")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarFicha(@PathParam("id") int id, Ficha ficha) {
-        try {
-            // Llama al servicio para actualizar la ficha
-            return service.actualizarFicha(id, ficha);
+        try {                        
+            // Verifica si la ficha existe antes de actualizar
+            Ficha fichaExistente = fichaDao.getById(id);
+            if (fichaExistente == null) {
+                return ResponseProvider.error("Ficha no encontrada", 404);
+            }
+            
+            // Verificamos que el programa de formación exista
+            ProgramaFormacion programaExistente = programaDao.getById(ficha.getPrograma_id());
+            if (programaExistente == null){
+                return ResponseProvider.error("El programa de formación especificado no existe.", 404);
+            }
+
+            // Realiza la actualización
+            Ficha fichaActualizada = fichaDao.update(id, ficha);
+
+            // Verifica si se actualizó correctamente
+            if (fichaActualizada != null) {
+                return ResponseProvider.success(fichaActualizada, "Ficha actualizada correctamente", 200);
+            }
+
+            // Si falló la actualización
+            return ResponseProvider.error("Error al actualizar la ficha", 400);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -116,18 +170,38 @@ public class FichaController {
     }
 
     /**
-     * Elimina una ficha específica si no tiene usuarios asociados.
+     * Elimina una ficha si no tiene usuarios asociados.
      *
      * @param id ID de la ficha a eliminar.
-     * @return Respuesta indicando el resultado.
+     * @return Resultado indicando si fue eliminada o no.
      */
-    @DELETE // Método HTTP DELETE
-    @Path("/{id}") // Ruta dinámica con ID
+    @DELETE
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarFicha(@PathParam("id") int id) {
         try {
-            // Llama al servicio para eliminar la ficha
-            return service.eliminarFicha(id);
+            // Verifica que la ficha exista
+            Ficha fichaExistente = fichaDao.getById(id);
+            if (fichaExistente == null) {
+                return ResponseProvider.error("Ficha no encontrada", 404);
+            }
+
+            // Verifica si tiene usuarios asociados antes de eliminar
+            UsuarioDAO usuarioDao = new UsuarioDAO();
+            List<Usuario> usuarios = usuarioDao.getAllByIdFicha(id);
+
+            // Si tiene usuarios, no se permite la eliminación
+            if (usuarios != null && !usuarios.isEmpty()) {
+                return ResponseProvider.error("No se puede eliminar la ficha porque tiene usuarios asociados", 409);
+            }
+
+            // Si no tiene usuarios, intenta eliminar
+            boolean eliminada = fichaDao.delete(id);
+            if (eliminada) {
+                return ResponseProvider.success(null, "Ficha eliminada correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al eliminar la ficha", 500);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

@@ -1,9 +1,9 @@
 package service;
 
 import java.util.ArrayList;
-import model.entity.Usuario;
+import model.Usuario;
 import model.dao.UsuarioDAO;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;

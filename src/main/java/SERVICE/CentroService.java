@@ -1,10 +1,10 @@
 package service;
 
-import model.entity.Centro;
+import model.Centro;
 import model.dao.CentroDAO;
 import model.dao.AmbienteDAO;
-import model.entity.Ambiente;
-import providers.ResponseProvider;
+import model.Ambiente;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;

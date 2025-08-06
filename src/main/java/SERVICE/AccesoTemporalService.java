@@ -2,15 +2,17 @@ package service;
 
 import java.util.ArrayList;
 import model.dao.AccesoTemporalDAO;
-import model.entity.AccesoTemporal;
-import model.entity.Elemento;
-import model.entity.Inventario;
-import providers.ResponseProvider;
+import model.AccesoTemporal;
+import model.Elemento;
+import model.Inventario;
+import utils.ResponseProvider;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
+import model.dao.CodigoAccesoDAO;
 import model.dao.ElementoDAO;
 import model.dao.InventarioDAO;
+import model.CodigoAcceso;
 
 /**
  *
@@ -20,14 +22,20 @@ public class AccesoTemporalService {
 
     AccesoTemporalDAO dao;
     InventarioDAO daoInventario;
+    CodigoAccesoDAO daoCodigo;
 
     public AccesoTemporalService() {
         dao = new AccesoTemporalDAO();
         daoInventario = new InventarioDAO();
+        daoCodigo = new CodigoAccesoDAO();
     }
     
     public Response obtenerUsuariosConAcceso(int inventarioId) {        
-        List<AccesoTemporal> accesos = dao.getAccesosPorInventario(inventarioId);
+        CodigoAcceso codigo = daoCodigo.getCodigoActivo(inventarioId);  
+        if (codigo == null) {
+            return ResponseProvider.error("No hay código activo para este inventario", 404);
+        }
+        List<AccesoTemporal> accesos = dao.getAccesosPorCodigo(codigo.getId());
         if (accesos.isEmpty()) {
             return ResponseProvider.error("No hay usuarios con acceso temporal actualmente", 204);
         }
@@ -35,19 +43,34 @@ public class AccesoTemporalService {
     }
 
     
-    public Response registrarAcceso(AccesoTemporal acceso) {
-        List<Integer> accesosUsuario = dao.getInventariosAccesoUsuario(acceso.getUsuario_id());
-        
-        if (accesosUsuario.contains(acceso.getInventario_id())){
-            return ResponseProvider.error("Este usuario ya cuenta con acceso al inventario", 409);            
+    public Response registrarAcceso(String codigo, AccesoTemporal acceso) {
+        // Paso 1: Buscar código válido
+        CodigoAcceso encontrado = daoCodigo.searchValid(codigo);
+
+        if (encontrado == null) {
+            return ResponseProvider.error("Código inválido o expirado", 404);
         }
-        
+
+        // Paso 2: Validar que no exista ya el acceso
+        List<Integer> accesos = dao.getInventariosAccesoUsuario(acceso.getUsuario_id());
+        if (accesos.contains(encontrado.getId())) {
+            return ResponseProvider.error("Este usuario ya cuenta con acceso al inventario", 409);
+        }
+
+        // Paso 3: Registrar acceso
+        acceso.setCodigo_acceso_id(encontrado.getId());
         boolean creado = dao.createAcceso(acceso);
+
         if (creado) {
-            return ResponseProvider.success(null, "Acceso éxitoso", 201);
+            // Adjuntar info extra del inventario (como lo hacía validarCodigo)
+            Inventario inventario = daoInventario.getById(encontrado.getInventario_id());
+            encontrado.setNombre_inventario(inventario.getNombre());
+            return ResponseProvider.success(encontrado, "Acceso exitoso", 201);
         }
-        return ResponseProvider.error("Error al acceder al inventario", 400);
+
+        return ResponseProvider.error("Error al registrar el acceso", 400);
     }
+
 
     public Response obtenerInventariosConAccesPorUsuario(int usuarioId) {
         List<Integer> inventarios_id = dao.getInventariosAccesoUsuario(usuarioId);
@@ -76,18 +99,5 @@ public class AccesoTemporalService {
         }
         
         return ResponseProvider.success(inventarios, "Inventarios con acceso obtenidos correctamente", 200);
-    }
-
-    public Response eliminarAccesosPorInventario(int inventarioId) {
-        List<AccesoTemporal> accesos = dao.getAccesosPorInventario(inventarioId);
-        if (accesos.isEmpty()) {
-            return ResponseProvider.success(null, "No hay usuarios con acceso para eliminar", 204);
-        }
-
-        boolean eliminado = dao.deleteAccesosInventario(inventarioId);
-        if (eliminado) {
-            return ResponseProvider.success(null, "Accesos del inventario eliminados correctamente", 200);
-        }
-        return ResponseProvider.error("Error al eliminar los accesos del inventario", 500);
-    }
+    }    
 }

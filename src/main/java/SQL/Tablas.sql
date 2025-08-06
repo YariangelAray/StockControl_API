@@ -19,7 +19,7 @@ nombre varchar(100));
 
 create table fichas(
 id int auto_increment primary key,
-ficha varchar(20),
+ficha varchar(20) unique,
 programa_id int,
 foreign key (programa_id) references programas_formacion(id));
 
@@ -174,8 +174,8 @@ create table codigos_acceso (
 
 create table accesos_temporales (
   id int primary key auto_increment,
-  usuario_id int not null,
-  inventario_id int not null,  
+  usuario_id int,
+  codigo_acceso_id int,
   foreign key (usuario_id) references usuarios(id),
-  foreign key (inventario_id) references inventarios(id)
+  foreign key (codigo_acceso_id) references codigoss_acceso(id)
 );

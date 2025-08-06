@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.Foto;
+import model.Foto;
 import utils.DBConnection;
 
 import java.sql.*;

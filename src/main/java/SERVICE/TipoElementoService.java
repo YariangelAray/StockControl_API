@@ -1,10 +1,10 @@
 package service;
 
-import model.entity.TipoElemento;
+import model.TipoElemento;
 import model.dao.TipoElementoDAO;
 import model.dao.ElementoDAO;
-import model.entity.Elemento;
-import providers.ResponseProvider;
+import model.Elemento;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;

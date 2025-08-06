@@ -1,13 +1,13 @@
 package service;
 
-import model.entity.Rol;
+import model.Rol;
 import model.dao.RolDAO;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
 import model.dao.UsuarioDAO;
-import model.entity.Usuario;
+import model.Usuario;
 
 /**
  * Servicio que maneja la lógica de negocio relacionada con roles.

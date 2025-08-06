@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.ProgramaFormacion;
+import model.ProgramaFormacion;
 import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;

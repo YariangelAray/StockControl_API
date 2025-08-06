@@ -1,68 +1,92 @@
 package controller;
 
-import middleware.ValidarCampos;
-import service.RolService;
-import model.entity.Rol;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
+import model.dao.RolDAO;
+import model.dao.UsuarioDAO;
+import model.Rol;
+import model.Usuario;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
- * Controlador REST para gestionar operaciones relacionadas con los roles.
- * Define rutas HTTP que permiten consultar, crear, actualizar y eliminar roles.
+ * Controlador REST para gestionar operaciones relacionadas con los roles del sistema.
  *
  * Rutas disponibles:
- * - GET /roles: Listar todos los roles.
- * - GET /roles/{id}: Buscar rol por ID.
- * - POST /roles: Crear nuevo rol.
- * - PUT /roles/{id}: Actualizar rol existente.
- * - DELETE /roles/{id}: Eliminar rol.
+ * - GET /roles             → Listar todos los roles.
+ * - GET /roles/{id}        → Consultar rol por ID.
+ * - POST /roles            → Crear nuevo rol.
+ * - PUT /roles/{id}        → Actualizar rol existente.
+ * - DELETE /roles/{id}     → Eliminar rol (solo si no está asociado a ningún usuario). 
  *
  * @author Yariangel Aray
  */
-@Path("/roles") // Define la ruta base para este controlador
+@Path("/roles") // Ruta base para las peticiones relacionadas con roles
 public class RolController {
 
-    RolService service; // Instancia del servicio que maneja la lógica de negocio
+    // DAO para acceder a la tabla de roles
+    private final RolDAO rolDAO;
 
+    // DAO para verificar si hay usuarios asociados a un rol antes de eliminarlo
+    private final UsuarioDAO usuarioDAO;
+
+    /**
+     * Constructor del controlador.
+     * Instancia los DAOs necesarios.
+     */
     public RolController() {
-        // Instancia el servicio encargado de la lógica de negocio
-        service = new RolService();
+        rolDAO = new RolDAO();
+        usuarioDAO = new UsuarioDAO();
     }
 
     /**
      * Obtiene todos los roles registrados en el sistema.
      *
-     * @return Lista de roles o mensaje de error si ocurre una excepción.
+     * @return Respuesta con lista de roles (200) o mensaje de error si no hay datos (404).
      */
-    @GET // Método HTTP GET
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerTodos() {
         try {
-            // Llama al servicio para obtener todos los roles
-            return service.obtenerTodos();
+            // Consultar todos los roles desde la base de datos
+            List<Rol> roles = rolDAO.getAll();
+
+            // Verificar si la lista está vacía
+            if (roles.isEmpty()) {
+                return ResponseProvider.error("No se encontraron roles", 404);
+            }
+
+            // Retornar los roles encontrados con código 200
+            return ResponseProvider.success(roles, "Roles obtenidos correctamente", 200);
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el error en la consola
-            // Retorna un error 500 si ocurre una excepción
+            e.printStackTrace(); // Imprime el error en consola
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Busca un rol por su ID único.
+     * Obtiene un rol específico por su ID.
      *
-     * @param id Identificador del rol.
-     * @return Rol encontrado o mensaje de error si no existe o ocurre una excepción.
+     * @param id ID del rol a buscar.
+     * @return Respuesta con el rol (200) o mensaje de error si no se encuentra (404).
      */
     @GET
-    @Path("/{id}") // Ruta que incluye el ID del rol
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerRol(@PathParam("id") int id) {
         try {
-            // Llama al servicio para obtener el rol por ID
-            return service.obtenerRol(id);
+            // Buscar el rol en base de datos usando su ID
+            Rol rol = rolDAO.getById(id);
+
+            // Verificar si el rol fue encontrado
+            if (rol == null) {
+                return ResponseProvider.error("Rol no encontrado", 404);
+            }
+
+            // Retornar el rol encontrado
+            return ResponseProvider.success(rol, "Rol obtenido correctamente", 200);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -70,20 +94,26 @@ public class RolController {
     }
 
     /**
-     * Registra un nuevo rol en el sistema.
-     * Se valida el contenido con una clase Middleware (@ValidarCampos).
+     * Crea un nuevo rol en el sistema.
      *
-     * @param rol Objeto Rol recibido en el cuerpo de la petición.
-     * @return Respuesta con estado y mensaje.
+     * @param rol Objeto con los datos del rol a crear.
+     * @return Respuesta con el rol creado (201) o mensaje de error (400 o 500).
      */
-    @POST // Método HTTP POST
-    @ValidarCampos(entidad = "rol") // Anotación que activa la validación de campos
-    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @POST
+    @ValidarCampos(entidad = "rol")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response crearRol(Rol rol) {
         try {
-            // Llama al servicio para crear un nuevo rol
-            return service.crearRol(rol);
+            // Intentar crear el rol en la base de datos
+            Rol nuevoRol = rolDAO.create(rol);
+
+            // Verificar si el rol fue creado correctamente
+            if (nuevoRol != null) {
+                return ResponseProvider.success(nuevoRol, "Rol creado correctamente", 201);
+            } else {
+                return ResponseProvider.error("Error al crear el rol", 400);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -91,22 +121,32 @@ public class RolController {
     }
 
     /**
-     * Actualiza la información de un rol existente.
-     * Se validan los nuevos campos antes de aplicar los cambios.
+     * Actualiza los datos de un rol existente.
      *
-     * @param id ID del rol a actualizar.
-     * @param rol Datos nuevos del rol.
-     * @return Respuesta con mensaje de éxito o error.
+     * @param id  ID del rol a actualizar.
+     * @param rol Objeto con los nuevos datos del rol.
+     * @return Respuesta con el rol actualizado (200) o mensaje de error (404 o 500).
      */
-    @PUT // Método HTTP PUT
-    @Path("/{id}") // Ruta que incluye el ID del rol
-    @ValidarCampos(entidad = "rol") // Anotación que activa la validación de campos
+    @PUT
+    @Path("/{id}")
+    @ValidarCampos(entidad = "rol")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarRol(@PathParam("id") int id, Rol rol) {
         try {
-            // Llama al servicio para actualizar el rol
-            return service.actualizarRol(id, rol);
+            // Validar que el rol exista en la base de datos
+            Rol rolExistente = rolDAO.getById(id);
+            if (rolExistente == null) {
+                return ResponseProvider.error("Rol no encontrado", 404);
+            }
+
+            // Intentar actualizar el rol
+            Rol rolActualizado = rolDAO.update(id, rol);
+            if (rolActualizado != null) {
+                return ResponseProvider.success(rolActualizado, "Rol actualizado correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al actualizar el rol", 400);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -114,18 +154,37 @@ public class RolController {
     }
 
     /**
-     * Elimina un rol del sistema mediante su ID.
+     * Elimina un rol del sistema, solo si no tiene usuarios asociados.
      *
      * @param id ID del rol a eliminar.
-     * @return Respuesta indicando si la eliminación fue exitosa o no.
+     * @return Respuesta con éxito (200), conflicto (409) o error (404 o 500).
      */
-    @DELETE // Método HTTP DELETE
-    @Path("/{id}") // Ruta que incluye el ID del rol
+    @DELETE
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarRol(@PathParam("id") int id) {
         try {
-            // Llama al servicio para eliminar el rol
-            return service.eliminarRol(id);
+            // Verificar si el rol existe
+            Rol rolExistente = rolDAO.getById(id);
+            if (rolExistente == null) {
+                return ResponseProvider.error("Rol no encontrado", 404);
+            }
+
+            // Obtener usuarios que usan ese rol
+            List<Usuario> usuariosConRol = usuarioDAO.getAllByIdRol(id);
+
+            // Verificar si hay usuarios asociados
+            if (usuariosConRol != null && !usuariosConRol.isEmpty()) {
+                return ResponseProvider.error("No se puede eliminar el rol porque tiene usuarios asociados", 409);
+            }
+
+            // Intentar eliminar el rol
+            boolean eliminado = rolDAO.delete(id);
+            if (eliminado) {
+                return ResponseProvider.success(null, "Rol eliminado correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al eliminar el rol", 500);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

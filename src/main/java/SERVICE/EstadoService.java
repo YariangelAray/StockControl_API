@@ -2,9 +2,9 @@ package service;
 
 import model.dao.EstadoDAO;
 import model.dao.ElementoDAO;
-import model.entity.Estado;
-import model.entity.Elemento;
-import providers.ResponseProvider;
+import model.Estado;
+import model.Elemento;
+import utils.ResponseProvider;
 
 import javax.ws.rs.core.Response;
 import java.util.List;

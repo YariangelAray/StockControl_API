@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.CodigoAcceso;
+import model.CodigoAcceso;
 import utils.DBConnection;
 
 import java.sql.*;
@@ -12,6 +12,31 @@ import java.sql.*;
  */
 public class CodigoAccesoDAO {
 
+    public CodigoAcceso getByIdInventario(int inventarioId){
+        String SQL = "SELECT * FROM codigos_acceso WHERE inventario_id = ? ORDER BY fecha_expiracion DESC LIMIT 1";
+
+       try (Connection conn = DBConnection.conectar();
+            PreparedStatement stmt = conn.prepareStatement(SQL)) {
+
+           stmt.setInt(1, inventarioId);
+           ResultSet rs = stmt.executeQuery();
+
+           if (rs.next()) {
+               return new CodigoAcceso(                 
+                   rs.getInt("id"),
+                   rs.getString("codigo"),
+                   rs.getInt("inventario_id"),
+                   rs.getTimestamp("fecha_expiracion")
+               );
+           }
+
+       } catch (SQLException e) {
+           e.printStackTrace();
+       }
+
+       return null;
+    }
+    
     /**
      * Inserta un nuevo código de acceso para un inventario.
      */
@@ -47,6 +72,7 @@ public class CodigoAccesoDAO {
 
             if (rs.next()) {
                 return new CodigoAcceso(
+                    rs.getInt("id"),
                     rs.getString("codigo"),
                     rs.getInt("inventario_id"),                    
                     rs.getTimestamp("fecha_expiracion")
@@ -73,7 +99,8 @@ public class CodigoAccesoDAO {
            ResultSet rs = stmt.executeQuery();
 
            if (rs.next()) {
-               return new CodigoAcceso(                   
+               return new CodigoAcceso(                 
+                   rs.getInt("id"),
                    rs.getString("codigo"),
                    rs.getInt("inventario_id"),
                    rs.getTimestamp("fecha_expiracion")
@@ -86,5 +113,16 @@ public class CodigoAccesoDAO {
 
        return null;
    }
-
+   
+   public boolean deleteCodigoPorInventario(int inventarioId) {
+        String SQL = "DELETE FROM codigos_acceso WHERE inventario_id = ?";
+        try (Connection conn = DBConnection.conectar();
+             PreparedStatement stmt = conn.prepareStatement(SQL)) {
+            stmt.setInt(1, inventarioId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

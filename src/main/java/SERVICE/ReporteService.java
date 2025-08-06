@@ -1,13 +1,13 @@
 package service;
 
-import model.entity.Reporte;
+import model.Reporte;
 import model.dao.ReporteDAO;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
 import model.dao.FotoDAO;
-import model.entity.Foto;
+import model.Foto;
 
 /**
  * Servicio que maneja la lógica de negocio relacionada con reportes.

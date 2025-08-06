@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.Estado;
+import model.Estado;
 import utils.DBConnection;
 
 import java.sql.*;

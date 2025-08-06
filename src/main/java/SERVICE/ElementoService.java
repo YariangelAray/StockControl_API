@@ -3,9 +3,9 @@ package service;
 import java.util.ArrayList;
 import model.dao.ElementoDAO;
 import model.dao.ReporteDAO;
-import model.entity.Elemento;
-import model.entity.Reporte;
-import providers.ResponseProvider;
+import model.Elemento;
+import model.Reporte;
+import utils.ResponseProvider;
 
 import javax.ws.rs.core.Response;
 import java.util.List;

@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.TipoDocumento;
+import model.TipoDocumento;
 import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;

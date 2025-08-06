@@ -1,13 +1,13 @@
 package service;
 
-import model.entity.Genero;
+import model.Genero;
 import model.dao.GeneroDAO;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
 import model.dao.UsuarioDAO;
-import model.entity.Usuario;
+import model.Usuario;
 
 /**
  * Servicio que maneja la lógica de negocio relacionada con géneros.

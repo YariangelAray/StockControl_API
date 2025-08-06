@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.Centro;
+import model.Centro;
 import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;

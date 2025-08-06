@@ -1,13 +1,13 @@
 package service;
 
-import model.entity.Ambiente;
+import model.Ambiente;
 import model.dao.AmbienteDAO;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
 import model.dao.ElementoDAO;
-import model.entity.Elemento;
+import model.Elemento;
 
 /**
  * Servicio que maneja la lógica de negocio relacionada con ambientes.

@@ -1,13 +1,15 @@
 package controller;
 
-import middleware.ValidarCampos;
-import service.CentroService;
-import model.entity.Centro;
-import providers.ResponseProvider;
+import utils.ResponseProvider;
+import model.dao.CentroDAO;
+import model.dao.AmbienteDAO;
+import model.Centro;
+import model.Ambiente;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Controlador REST para gestionar operaciones relacionadas con los centros.
@@ -22,47 +24,67 @@ import javax.ws.rs.core.Response;
  * 
  * @author Yariangel Aray
  */
-@Path("/centros") // Define la ruta base para este controlador
+@Path("/centros")
 public class CentroController {
 
-    CentroService service; // Instancia del servicio que maneja la lógica de negocio
+    private final CentroDAO dao;           // Acceso a datos de centros
+    private final AmbienteDAO ambienteDao; // Acceso a datos de ambientes relacionados
 
     public CentroController() {
-        // Instancia el servicio encargado de la lógica de negocio
-        service = new CentroService();
+        // Inicializa los DAOs
+        dao = new CentroDAO();
+        ambienteDao = new AmbienteDAO();
     }
 
     /**
      * Obtiene todos los centros registrados en el sistema.
      *
-     * @return Lista de centros o mensaje de error si ocurre una excepción.
+     * @return Lista de centros o error si no se encuentran resultados.
      */
-    @GET // Método HTTP GET
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerTodos() {
         try {
-            // Llama al servicio para obtener todos los centros
-            return service.obtenerTodos();
+            // Consulta todos los centros desde la base de datos
+            List<Centro> centros = dao.getAll();
+
+            // Verifica si la lista está vacía
+            if (centros.isEmpty()) {
+                return ResponseProvider.error("No se encontraron centros", 404);
+            }
+
+            // Retorna la lista si hay resultados
+            return ResponseProvider.success(centros, "Centros obtenidos correctamente", 200);
+
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el error en la consola
-            // Retorna un error 500 si ocurre una excepción
+            // Si ocurre una excepción, la imprime y retorna error 500
+            e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Busca un centro por su ID único.
+     * Obtiene un centro por su identificador único.
      *
-     * @param id Identificador del centro.
-     * @return Centro encontrado o mensaje de error si no existe o ocurre una excepción.
+     * @param id ID del centro a consultar.
+     * @return Centro encontrado o mensaje de error si no existe.
      */
     @GET
-    @Path("/{id}") // Ruta que incluye el ID del centro
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerCentro(@PathParam("id") int id) {
         try {
-            // Llama al servicio para obtener el centro por ID
-            return service.obtenerCentro(id);
+            // Consulta el centro por ID
+            Centro centro = dao.getById(id);
+
+            // Si no existe, retorna mensaje de no encontrado
+            if (centro == null) {
+                return ResponseProvider.error("Centro no encontrado", 404);
+            }
+
+            // Retorna el centro si fue encontrado
+            return ResponseProvider.success(centro, "Centro obtenido correctamente", 200);
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -70,20 +92,28 @@ public class CentroController {
     }
 
     /**
-     * Registra un nuevo centro en el sistema.
-     * Se valida el contenido con una clase Middleware (@ValidarCampos).
+     * Crea un nuevo centro en el sistema.
+     * Requiere validación de campos.
      *
-     * @param centro Objeto Centro recibido en el cuerpo de la petición.
-     * @return Respuesta con estado y mensaje.
+     * @param centro Objeto JSON con los datos del centro.
+     * @return Centro creado o mensaje de error si falla.
      */
-    @POST // Método HTTP POST
-    @ValidarCampos(entidad = "centro") // Anotación que activa la validación de campos
-    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @POST
+    @ValidarCampos(entidad = "centro")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response crearCentro(Centro centro) {
         try {
-            // Llama al servicio para crear un nuevo centro
-            return service.crearCentro(centro);
+            // Intenta registrar el nuevo centro
+            Centro nuevoCentro = dao.create(centro);
+
+            // Verifica si se creó correctamente
+            if (nuevoCentro != null) {
+                return ResponseProvider.success(nuevoCentro, "Centro creado correctamente", 201);
+            } else {
+                return ResponseProvider.error("Error al crear el centro", 400);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -91,22 +121,36 @@ public class CentroController {
     }
 
     /**
-     * Actualiza la información de un centro existente.
-     * Se validan los nuevos campos antes de aplicar los cambios.
+     * Actualiza un centro existente con nuevos datos.
+     * Valida que el centro exista previamente.
      *
-     * @param id ID del centro a actualizar.
-     * @param centro Datos nuevos del centro.
-     * @return Respuesta con mensaje de éxito o error.
+     * @param id     ID del centro a actualizar.
+     * @param centro Nuevos datos para el centro.
+     * @return Centro actualizado o error si no existe.
      */
-    @PUT // Método HTTP PUT
-    @Path("/{id}") // Ruta que incluye el ID del centro
-    @ValidarCampos(entidad = "centro") // Anotación que activa la validación de campos
+    @PUT
+    @Path("/{id}")
+    @ValidarCampos(entidad = "centro")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarCentro(@PathParam("id") int id, Centro centro) {
         try {
-            // Llama al servicio para actualizar el centro
-            return service.actualizarCentro(id, centro);
+            // Verifica que el centro exista
+            Centro centroExistente = dao.getById(id);
+            if (centroExistente == null) {
+                return ResponseProvider.error("Centro no encontrado", 404);
+            }
+
+            // Intenta actualizar el centro
+            Centro centroActualizado = dao.update(id, centro);
+
+            // Si se actualizó correctamente, se retorna
+            if (centroActualizado != null) {
+                return ResponseProvider.success(centroActualizado, "Centro actualizado correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al actualizar el centro", 404);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -114,18 +158,40 @@ public class CentroController {
     }
 
     /**
-     * Elimina un centro del sistema mediante su ID.
+     * Elimina un centro del sistema, solo si no tiene ambientes asociados.
      *
      * @param id ID del centro a eliminar.
-     * @return Respuesta indicando si la eliminación fue exitosa o no.
+     * @return Respuesta de éxito o error si hay ambientes relacionados o no existe.
      */
-    @DELETE // Método HTTP DELETE
-    @Path("/{id}") // Ruta que incluye el ID del centro
+    @DELETE
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarCentro(@PathParam("id") int id) {
         try {
-            // Llama al servicio para eliminar el centro
-            return service.eliminarCentro(id);
+            // Verifica que el centro exista
+            Centro centroExistente = dao.getById(id);
+            if (centroExistente == null) {
+                return ResponseProvider.error("Centro no encontrado", 404);
+            }
+
+            // Consulta los ambientes que dependen del centro
+            List<Ambiente> ambientes = ambienteDao.getAllByCentroId(id);
+
+            // Si tiene ambientes asociados, no se puede eliminar
+            if (ambientes != null && !ambientes.isEmpty()) {
+                return ResponseProvider.error("No se puede eliminar el centro porque tiene ambientes asociados", 409);
+            }
+
+            // Intenta eliminar el centro
+            boolean eliminado = dao.delete(id);
+
+            // Verifica resultado de la eliminación
+            if (eliminado) {
+                return ResponseProvider.success(null, "Centro eliminado correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al eliminar el centro", 500);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

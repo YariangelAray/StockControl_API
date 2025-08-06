@@ -1,13 +1,16 @@
 package controller;
 
-import middleware.ValidarCampos;
-import service.GeneroService;
-import model.entity.Genero;
-import providers.ResponseProvider;
+// Importaciones necesarias para validación, manejo de datos y respuestas
+import utils.ResponseProvider;
+import model.Genero;
+import model.Usuario;
+import model.dao.GeneroDAO;
+import model.dao.UsuarioDAO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Controlador REST para gestionar operaciones relacionadas con los géneros.
@@ -18,51 +21,59 @@ import javax.ws.rs.core.Response;
  * - GET /generos/{id}: Buscar género por ID.
  * - POST /generos: Crear nuevo género.
  * - PUT /generos/{id}: Actualizar género existente.
- * - DELETE /generos/{id}: Eliminar género.
+ * - DELETE /generos/{id}: Eliminar género si no tiene usuarios asociados.
  * 
- * @author Yariangel Aray
+ * Autor: Yariangel Aray
  */
-@Path("/generos") // Define la ruta base para este controlador
+@Path("/generos") // Ruta base del recurso
 public class GeneroController {
 
-    GeneroService service; // Instancia del servicio que maneja la lógica de negocio
+    // DAO para interactuar con la base de datos
+    private final GeneroDAO dao;
+    private final UsuarioDAO usuarioDao;
 
+    // Constructor que inicializa el DAO
     public GeneroController() {
-        // Instancia el servicio encargado de la lógica de negocio
-        service = new GeneroService();
+        dao = new GeneroDAO();
+        usuarioDao = new UsuarioDAO();
     }
 
     /**
-     * Obtiene todos los géneros registrados en el sistema.
+     * Obtiene todos los géneros registrados en la base de datos.
      *
-     * @return Lista de géneros o mensaje de error si ocurre una excepción.
+     * @return Lista de géneros o mensaje de error si no hay ninguno.
      */
-    @GET // Método HTTP GET
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerTodos() {
         try {
-            // Llama al servicio para obtener todos los géneros
-            return service.obtenerTodos();
+            List<Genero> generos = dao.getAll();
+            if (generos.isEmpty()) {
+                return ResponseProvider.error("No se encontraron géneros", 404);
+            }
+            return ResponseProvider.success(generos, "Géneros obtenidos correctamente", 200);
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime el error en la consola
-            // Retorna un error 500 si ocurre una excepción
+            e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
         }
     }
 
     /**
-     * Busca un género por su ID único.
+     * Obtiene un género por su ID único.
      *
-     * @param id Identificador del género.
-     * @return Género encontrado o mensaje de error si no existe o ocurre una excepción.
+     * @param id ID del género a buscar.
+     * @return Género encontrado o mensaje de error si no existe.
      */
     @GET
-    @Path("/{id}") // Ruta que incluye el ID del género
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerGenero(@PathParam("id") int id) {
         try {
-            // Llama al servicio para obtener el género por ID
-            return service.obtenerGenero(id);
+            Genero genero = dao.getById(id);
+            if (genero == null) {
+                return ResponseProvider.error("Género no encontrado", 404);
+            }
+            return ResponseProvider.success(genero, "Género obtenido correctamente", 200);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -70,20 +81,23 @@ public class GeneroController {
     }
 
     /**
-     * Registra un nuevo género en el sistema.
-     * Se valida el contenido con una clase Middleware (@ValidarCampos).
+     * Registra un nuevo género en la base de datos.
      *
-     * @param genero Objeto Genero recibido en el cuerpo de la petición.
-     * @return Respuesta con estado y mensaje.
+     * @param genero Objeto con los datos del nuevo género.
+     * @return Género creado o mensaje de error si ocurre un fallo.
      */
-    @POST // Método HTTP POST
-    @ValidarCampos(entidad = "genero") // Anotación que activa la validación de campos
-    @Consumes(MediaType.APPLICATION_JSON) // Indica que el cuerpo de la petición es JSON
-    @Produces(MediaType.APPLICATION_JSON) // Indica que la respuesta será en formato JSON
+    @POST
+    @ValidarCampos(entidad = "genero")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response crearGenero(Genero genero) {
         try {
-            // Llama al servicio para crear un nuevo género
-            return service.crearGenero(genero);
+            Genero nuevoGenero = dao.create(genero);
+            if (nuevoGenero != null) {
+                return ResponseProvider.success(nuevoGenero, "Género creado correctamente", 201);
+            } else {
+                return ResponseProvider.error("Error al crear el género", 400);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -91,22 +105,30 @@ public class GeneroController {
     }
 
     /**
-     * Actualiza la información de un género existente.
-     * Se validan los nuevos campos antes de aplicar los cambios.
+     * Actualiza un género existente.
      *
      * @param id ID del género a actualizar.
-     * @param genero Datos nuevos del género.
-     * @return Respuesta con mensaje de éxito o error.
+     * @param genero Nuevos datos del género.
+     * @return Género actualizado o mensaje de error si falla.
      */
-    @PUT // Método HTTP PUT
-    @Path("/{id}") // Ruta que incluye el ID del género
-    @ValidarCampos(entidad = "genero") // Anotación que activa la validación de campos
+    @PUT
+    @Path("/{id}")
+    @ValidarCampos(entidad = "genero")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response actualizarGenero(@PathParam("id") int id, Genero genero) {
         try {
-            // Llama al servicio para actualizar el género
-            return service.actualizarGenero(id, genero);
+            Genero existente = dao.getById(id);
+            if (existente == null) {
+                return ResponseProvider.error("Género no encontrado", 404);
+            }
+
+            Genero actualizado = dao.update(id, genero);
+            if (actualizado != null) {
+                return ResponseProvider.success(actualizado, "Género actualizado correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al actualizar el género", 400);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);
@@ -114,18 +136,35 @@ public class GeneroController {
     }
 
     /**
-     * Elimina un género del sistema mediante su ID.
+     * Elimina un género por su ID, solo si no tiene usuarios asociados.
      *
      * @param id ID del género a eliminar.
-     * @return Respuesta indicando si la eliminación fue exitosa o no.
+     * @return Mensaje de éxito o error si falla.
      */
-    @DELETE // Método HTTP DELETE
-    @Path("/{id}") // Ruta que incluye el ID del género
+    @DELETE
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarGenero(@PathParam("id") int id) {
         try {
-            // Llama al servicio para eliminar el género
-            return service.eliminarGenero(id);
+            // Verifica que el género exista
+            Genero generoExistente = dao.getById(id);
+            if (generoExistente == null) {
+                return ResponseProvider.error("Género no encontrado", 404);
+            }
+
+            // Verifica si hay usuarios asociados a ese género           
+            List<Usuario> usuarios = usuarioDao.getAllByIdGenero(id);
+            if (usuarios != null && !usuarios.isEmpty()) {
+                return ResponseProvider.error("No se puede eliminar el género porque tiene usuarios asociados", 409);
+            }
+
+            // Intenta eliminar el género
+            boolean eliminado = dao.delete(id);
+            if (eliminado) {
+                return ResponseProvider.success(null, "Género eliminado correctamente", 200);
+            } else {
+                return ResponseProvider.error("Error al eliminar el género", 500);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseProvider.error("Error interno en el servidor", 500);

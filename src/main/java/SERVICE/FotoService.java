@@ -1,8 +1,8 @@
 package service;
 
 import model.dao.FotoDAO;
-import model.entity.Foto;
-import providers.ResponseProvider;
+import model.Foto;
+import utils.ResponseProvider;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Response;

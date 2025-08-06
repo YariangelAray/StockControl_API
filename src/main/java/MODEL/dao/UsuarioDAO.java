@@ -1,6 +1,6 @@
 package model.dao;
 
-import model.entity.Usuario;
+import model.Usuario;
 import utils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;

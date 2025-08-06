@@ -2,9 +2,9 @@ package service;
 
 import model.dao.FichaDAO;
 import model.dao.ProgramaFormacionDAO;
-import model.entity.Ficha;
-import model.entity.ProgramaFormacion;
-import providers.ResponseProvider;
+import model.Ficha;
+import model.ProgramaFormacion;
+import utils.ResponseProvider;
 
 import javax.ws.rs.core.Response;
 import java.util.List;

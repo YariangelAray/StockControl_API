@@ -2,9 +2,9 @@ package service;
 
 import model.dao.FichaDAO;
 import model.dao.UsuarioDAO;
-import model.entity.Ficha;
-import model.entity.Usuario;
-import providers.ResponseProvider;
+import model.Ficha;
+import model.Usuario;
+import utils.ResponseProvider;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
