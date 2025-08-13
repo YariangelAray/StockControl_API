@@ -32,20 +32,25 @@ public class TipoElementoDAO {
      * @return Lista de objetos TipoElemento con todos los tipos registrados.
      */
     public List<TipoElemento> getAll() {
-        List<TipoElemento> tipos = new ArrayList<>();
-        String SQL = "SELECT * FROM tipos_elementos ORDER BY id DESC";
+        List<TipoElemento> tipos = new ArrayList<>(); // Lista para almacenar los resultados
+        String SQL = "SELECT * FROM tipos_elementos ORDER BY id DESC"; // Consulta SQL
 
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL);
-             ResultSet rs = stmt.executeQuery()) {
-
+        // Bloque para ejecutar la consulta y recorrer los resultados
+        try (
+            Connection conexion = DBConnection.conectar(); // Establece conexión
+            PreparedStatement stmt = conexion.prepareStatement(SQL); // Prepara la consulta
+            ResultSet rs = stmt.executeQuery() // Ejecuta la consulta y obtiene resultados
+        ) {
+            // Iteración sobre cada fila del resultado para mapearla a un objeto
             while (rs.next()) {
-                TipoElemento tipo = mapearTipoElemento(rs);
-                tipos.add(tipo);
+                TipoElemento tipo = mapearTipoElemento(rs); // Mapea la fila a un objeto TipoElemento
+                tipos.add(tipo); // Agrega el objeto a la lista
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Imprime el error en consola
         }
+
+        // Retorna la lista de tipos obtenidos
         return tipos;
     }
 
@@ -56,22 +61,27 @@ public class TipoElementoDAO {
      * @return El objeto TipoElemento si se encuentra, o null si no existe.
      */
     public TipoElemento getById(int id) {
-        TipoElemento tipo = null;
-        String SQL = "SELECT * FROM tipos_elementos WHERE id = ?";
+        TipoElemento tipo = null; // Inicializa el resultado
+        String SQL = "SELECT * FROM tipos_elementos WHERE id = ?"; // Consulta con parámetro
 
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
+        // Bloque para ejecutar la consulta con parámetro ID
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
+            stmt.setInt(1, id); // Asigna el valor del parámetro
+            ResultSet rs = stmt.executeQuery(); // Ejecuta la consulta
 
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-
+            // Verifica si se obtuvo un resultado
             if (rs.next()) {
-                tipo = mapearTipoElemento(rs);
+                tipo = mapearTipoElemento(rs); // Mapea el resultado
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Retorna el tipo encontrado o null
         return tipo;
     }
 
@@ -85,12 +95,15 @@ public class TipoElementoDAO {
         TipoElemento tipo = null;
         String SQL = "SELECT * FROM tipos_elementos WHERE consecutivo = ?";
 
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
-
+        // Bloque para ejecutar la consulta con parámetro consecutivo
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
             stmt.setInt(1, consecutivo);
             ResultSet rs = stmt.executeQuery();
 
+            // Verifica si se obtuvo un resultado
             if (rs.next()) {
                 tipo = mapearTipoElemento(rs);
             }
@@ -98,6 +111,8 @@ public class TipoElementoDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Retorna el tipo encontrado o null
         return tipo;
     }
 
@@ -110,9 +125,12 @@ public class TipoElementoDAO {
     public TipoElemento create(TipoElemento tipo) {
         String SQL = "INSERT INTO tipos_elementos (nombre, consecutivo, descripcion, marca, modelo, atributos) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
-
+        // Bloque para ejecutar la inserción y recuperar el ID generado
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)
+        ) {
+            // Asignación de parámetros al statement
             stmt.setString(1, tipo.getNombre());
             stmt.setInt(2, tipo.getConsecutivo());
             stmt.setString(3, tipo.getDescripcion());
@@ -120,18 +138,22 @@ public class TipoElementoDAO {
             stmt.setString(5, tipo.getModelo());
             stmt.setString(6, tipo.getAtributos());
 
-            int filasAfectadas = stmt.executeUpdate();
+            int filasAfectadas = stmt.executeUpdate(); // Ejecuta la inserción
+
+            // Verifica si se insertó correctamente
             if (filasAfectadas > 0) {
-                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                ResultSet generatedKeys = stmt.getGeneratedKeys(); // Obtiene el ID generado
                 if (generatedKeys.next()) {
-                    tipo.setId(generatedKeys.getInt(1));
-                    return tipo;
+                    tipo.setId(generatedKeys.getInt(1)); // Asigna el ID al objeto
+                    return tipo; // Retorna el objeto creado
                 }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Retorna null si hubo error
         return null;
     }
 
@@ -145,9 +167,12 @@ public class TipoElementoDAO {
     public TipoElemento update(int id, TipoElemento tipo) {
         String SQL = "UPDATE tipos_elementos SET nombre = ?, consecutivo = ?, descripcion = ?, marca = ?, modelo = ?, atributos = ? WHERE id = ?";
 
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
-
+        // Bloque para ejecutar la actualización
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
+            // Asignación de nuevos valores
             stmt.setString(1, tipo.getNombre());
             stmt.setInt(2, tipo.getConsecutivo());
             stmt.setString(3, tipo.getDescripcion());
@@ -156,15 +181,19 @@ public class TipoElementoDAO {
             stmt.setString(6, tipo.getAtributos());
             stmt.setInt(7, id);
 
-            int filasAfectadas = stmt.executeUpdate();
+            int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
+
+            // Verifica si se actualizó correctamente
             if (filasAfectadas > 0) {
-                tipo.setId(id);
-                return tipo;
+                tipo.setId(id); // Actualiza el ID en el objeto
+                return tipo; // Retorna el objeto actualizado
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Retorna null si hubo error
         return null;
     }
 
@@ -177,19 +206,29 @@ public class TipoElementoDAO {
     public boolean delete(int id) {
         String SQL = "DELETE FROM tipos_elementos WHERE id = ?";
 
-        try (Connection conexion = DBConnection.conectar();
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) {
-
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+        // Bloque para ejecutar la eliminación
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
+            stmt.setInt(1, id); // Asigna el ID al parámetro
+            return stmt.executeUpdate() > 0; // Retorna true si se eliminó
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return false; // Retorna false si hubo error
         }
     }
-    
-    private TipoElemento mapearTipoElemento (ResultSet rs) throws SQLException {
+
+    /**
+     * Mapea un ResultSet a un objeto TipoElemento.
+     *
+     * @param rs ResultSet con los datos de una fila.
+     * @return Objeto TipoElemento con los datos mapeados.
+     * @throws SQLException Si ocurre un error al acceder a los datos.
+     */
+    private TipoElemento mapearTipoElemento(ResultSet rs) throws SQLException {
+        // Bloque que convierte una fila del ResultSet en un objeto TipoElemento
         return new TipoElemento(
             rs.getInt("id"),
             rs.getString("nombre"),

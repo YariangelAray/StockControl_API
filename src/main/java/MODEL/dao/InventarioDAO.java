@@ -15,10 +15,12 @@ import model.dto.AmbienteDTO;
  * 
  * Métodos disponibles:
  * - getAll(): Obtiene todos los inventarios.
+ * - getAllByIdUserAdmin(int idUsuarioAdmin): Obtiene todos los inventarios que tiene un administrador.
+ * - getAllAmbientesByInventario(int inventarioId): Obtiene todos los ambientes cubiertos por un inventario.
  * - getById(int id): Busca un inventario por su ID.
  * - create(Inventario inventario): Crea un nuevo inventario y retorna el objeto creado.
  * - update(int id, Inventario inventario): Actualiza un inventario por su ID y retorna el objeto actualizado.
- * - delete(int id): Elimina un inventario por su ID.
+ * - delete(int id): Elimina un inventario por su ID
  * 
  * Esta clase no contiene lógica de negocio, solo acceso a datos.
  * 
@@ -59,20 +61,20 @@ public class InventarioDAO {
     }
     
     /**
-     * Obtiene todos los inventarios que tiene un administrador
+     * Obtiene todos los inventarios que tiene un administrador.
      *
-     * @param idUsuarioAdmin ID del usuario
-     * @return Lista de inventarios o vacío si no hay coincidencias.
+     * @param idUsuarioAdmin ID del usuario administrador.
+     * @return Lista de inventarios o vacía si no hay coincidencias.
      */
     public List<Inventario> getAllByIdUserAdmin(int idUsuarioAdmin) {
-        return getAllByCampo("usuario_admin_id", idUsuarioAdmin); // Consulta por tipo de documento
+        return getAllByCampo("usuario_admin_id", idUsuarioAdmin); // Consulta por ID de usuario administrador
     }
     
     /**
-     * Obtiene todos los ambientes que esten cubiertos por un inventario
+     * Obtiene todos los ambientes que están cubiertos por un inventario.
      *
-     * @param inventarioId ID del inventario
-     * @return Lista de ambientes o vacío si no hay coincidencias.
+     * @param inventarioId ID del inventario.
+     * @return Lista de ambientes o vacía si no hay coincidencias.
      */
     public List<AmbienteDTO> getAllAmbientesByInventario(int inventarioId) {
         List<AmbienteDTO> ambientes = new ArrayList<>();
@@ -84,23 +86,28 @@ public class InventarioDAO {
         try (Connection conexion = DBConnection.conectar();
              PreparedStatement stmt = conexion.prepareStatement(SQL)) {
 
-            stmt.setInt(1, inventarioId);
-            ResultSet rs = stmt.executeQuery();
+            stmt.setInt(1, inventarioId); // Establece el ID del inventario en la consulta
+            ResultSet rs = stmt.executeQuery(); // Ejecuta la consulta
 
+            // Itera sobre los resultados obtenidos
             while (rs.next()) {
+                // Crea un nuevo objeto AmbienteDTO a partir de los datos de la fila actual
                 AmbienteDTO ambiente = new AmbienteDTO(
                     rs.getInt("ambiente_id"),
                     rs.getString("ambiente_nombre"),
                     rs.getString("ambiente_mapa"),
                     rs.getInt("cantidad_elementos")
                 );
+                // Agrega el ambiente a la lista
                 ambientes.add(ambiente);
             }
 
         } catch (SQLException e) {
+            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
 
+        // Retorna la lista de ambientes
         return ambientes;
     }
 
@@ -247,56 +254,63 @@ public class InventarioDAO {
     }
     
     /**
-    * Método auxiliar que realiza una consulta genérica por campo y valor para la tabla de inventarios.
-    *
-    * Este método es útil para obtener inventarios filtrados por campos específicos como `usuario_admin_id`.
-    *
-    * @param campo Nombre del campo por el cual se desea filtrar (por ejemplo, "usuario_admin_id").
-    * @param value Valor que debe tener el campo especificado.
-    * @return Lista de objetos Inventario que cumplen con el criterio, o una lista vacía si no hay coincidencias.
-    */
-   private List<Inventario> getAllByCampo(String campo, int value) {
-       // Inicializa una lista para almacenar los resultados encontrados
-       List<Inventario> inventarios = new ArrayList<>();
+     * Método auxiliar que realiza una consulta genérica por campo y valor para la tabla de inventarios.
+     *
+     * Este método es útil para obtener inventarios filtrados por campos específicos como `usuario_admin_id`.
+     *
+     * @param campo Nombre del campo por el cual se desea filtrar (por ejemplo, "usuario_admin_id").
+     * @param value Valor que debe tener el campo especificado.
+     * @return Lista de objetos Inventario que cumplen con el criterio, o una lista vacía si no hay coincidencias.
+     */
+    private List<Inventario> getAllByCampo(String campo, int value) {
+        // Inicializa una lista para almacenar los resultados encontrados
+        List<Inventario> inventarios = new ArrayList<>();
 
-       // Arma dinámicamente la consulta SQL con el campo recibido
-       String SQL = "SELECT * FROM inventarios WHERE " + campo + " = ? ORDER BY id DESC";
+        // Arma dinámicamente la consulta SQL con el campo recibido
+        String SQL = "SELECT * FROM inventarios WHERE " + campo + " = ? ORDER BY id DESC";
 
-       // Intenta establecer una conexión y ejecutar la consulta
-       try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-            PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta con parámetros
+        // Intenta establecer una conexión y ejecutar la consulta
+        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta con parámetros
 
-           // Asigna el valor recibido como parámetro para la condición WHERE
-           stmt.setInt(1, value);
+            // Asigna el valor recibido como parámetro para la condición WHERE
+            stmt.setInt(1, value);
 
-           // Ejecuta la consulta y guarda el resultado en un ResultSet
-           ResultSet rs = stmt.executeQuery();
+            // Ejecuta la consulta y guarda el resultado en un ResultSet
+            ResultSet rs = stmt.executeQuery();
 
-           // Itera sobre los resultados obtenidos
-           while (rs.next()) {
-               // Crea un nuevo objeto Inventario con los datos de la fila actual
-               Inventario inventario = mapearInventario(rs);
+            // Itera sobre los resultados obtenidos
+            while (rs.next()) {
+                // Crea un nuevo objeto Inventario con los datos de la fila actual
+                Inventario inventario = mapearInventario(rs);
 
-               // Agrega el inventario a la lista de resultados
-               inventarios.add(inventario);
-           }
+                // Agrega el inventario a la lista de resultados
+                inventarios.add(inventario);
+            }
 
-       } catch (SQLException e) {
-           // Imprime el error en caso de fallo en la consulta
-           e.printStackTrace();
-       }
+        } catch (SQLException e) {
+            // Imprime el error en caso de fallo en la consulta
+            e.printStackTrace();
+        }
 
-       // Retorna la lista de inventarios encontrados (puede estar vacía)
-       return inventarios;
-   }
+        // Retorna la lista de inventarios encontrados (puede estar vacía)
+        return inventarios;
+    }
    
-   private Inventario mapearInventario (ResultSet rs) throws SQLException {
-       return new Inventario(
+    /**
+     * Mapea un ResultSet a un objeto Inventario.
+     *
+     * @param rs ResultSet que contiene los datos del inventario.
+     * @return Objeto Inventario con los datos mapeados.
+     * @throws SQLException Si ocurre un error al acceder a los datos del ResultSet.
+     */
+    private Inventario mapearInventario(ResultSet rs) throws SQLException {
+        return new Inventario(
             rs.getInt("id"), // Obtiene el ID del inventario
             rs.getString("nombre"), // Obtiene el nombre del inventario
             rs.getDate("fecha_creacion"), // Obtiene la fecha de creación del inventario
             rs.getDate("ultima_actualizacion"), // Obtiene la fecha de actualización del inventario
             rs.getInt("usuario_admin_id") // Obtiene el ID del usuario administrador
         );
-   }
+    }
 }

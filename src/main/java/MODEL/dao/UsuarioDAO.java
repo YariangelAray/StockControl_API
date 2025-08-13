@@ -16,7 +16,7 @@ import java.util.List;
  * - getAll(): Obtiene todos los usuarios.
  * - getAllByIdRol(int idRol): Obtiene todos los usuarios que pertenecen a un rol específico.
  * - getAllByIdTipoDocumento(int idTipoDocumento): Obtiene todos los usuarios que tienen un tipo de documento específico.
- * - getAllByIdFicha(int idFicha): Obtiene todos los usuarios que pertenecen a un número de ficha especifico
+ * - getAllByIdFicha(int idFicha): Obtiene todos los usuarios que pertenecen a un número de ficha específico.
  * - getById(int id): Busca un usuario por su ID.
  * - getByDocumento(String documento): Busca un usuario por su número de documento.
  * - getByCorreo(String correo): Busca un usuario por su correo electrónico.
@@ -38,7 +38,7 @@ public class UsuarioDAO {
     public List<Usuario> getAll() {
         // Inicializa una lista para almacenar los usuarios
         List<Usuario> usuarios = new ArrayList<>();
-        // Consulta SQL para seleccionar todos los usuarios
+        // Consulta SQL para seleccionar todos los usuarios, excluyendo el rol con ID 1
         String SQL = "SELECT * FROM usuarios WHERE rol_id != 1 ORDER BY id DESC";
 
         // Intenta establecer una conexión y ejecutar la consulta
@@ -73,33 +73,33 @@ public class UsuarioDAO {
     }
     
     /**
-     * Obtiene todos los usuarios que tienen un tipo de documento especifico.
+     * Obtiene todos los usuarios que tienen un tipo de documento específico.
      *
      * @param idTipoDocumento ID del tipo de documento.
-     * @return Lista de usuarios o vacío si no hay coincidencias.
+     * @return Lista de usuarios o vacía si no hay coincidencias.
      */
     public List<Usuario> getAllByIdTipoDocumento(int idTipoDocumento) {
         return getAllByCampo("tipo_documento_id", idTipoDocumento); // Consulta por tipo de documento
     }
     
     /**
-    * Obtiene una lista de usuarios que tienen asignada una ficha específica.
-    *
-    * @param idFicha ID de la ficha a buscar.
-    * @return Lista de usuarios asociados a la ficha, o lista vacía si no hay ninguno.
-    */
+     * Obtiene una lista de usuarios que tienen asignada una ficha específica.
+     *
+     * @param idFicha ID de la ficha a buscar.
+     * @return Lista de usuarios asociados a la ficha, o lista vacía si no hay ninguno.
+     */
     public List<Usuario> getAllByIdFicha(int idFicha) {
         return getAllByCampo("ficha_id", idFicha); // Consulta por ficha
     }
 
     /**
-    * Obtiene todos los usuarios que tienen asignado un género específico.
-    *
-    * @param idGenero ID del género a buscar.
-    * @return Lista de usuarios que pertenecen a ese género.
-    */
+     * Obtiene todos los usuarios que tienen asignado un género específico.
+     *
+     * @param idGenero ID del género a buscar.
+     * @return Lista de usuarios que pertenecen a ese género.
+     */
     public List<Usuario> getAllByIdGenero(int idGenero) {
-        return getAllByCampo("genero_id", idGenero); // Consulta por genero
+        return getAllByCampo("genero_id", idGenero); // Consulta por género
     }
 
     /**
@@ -329,41 +329,54 @@ public class UsuarioDAO {
         }
     }
 
-   public boolean updateState(int id, boolean estado) {
-       // Consulta SQL para desactivar el usuario en lugar de eliminarlo
-       String SQL = "UPDATE usuarios SET activo = ? WHERE id = ?";
+    /**
+     * Actualiza el estado de un usuario (activo/inactivo) por su ID.
+     *
+     * @param id ID del usuario a actualizar.
+     * @param estado Nuevo estado del usuario (true para activo, false para inactivo).
+     * @return true si la actualización fue exitosa, false si falló.
+     */
+    public boolean updateState(int id, boolean estado) {
+        // Consulta SQL para actualizar el estado del usuario
+        String SQL = "UPDATE usuarios SET activo = ? WHERE id = ?";
 
-       try (Connection conexion = DBConnection.conectar();              // Conexión a la base de datos
-           PreparedStatement stmt = conexion.prepareStatement(SQL)) {  // Prepara la sentencia SQL
+        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la sentencia SQL
        
-           stmt.setBoolean(1, estado);                                 // Asigna el estado al parámetro
-           stmt.setInt(2, id);                                         // Asigna el ID al parámetro
-           int filasAfectadas = stmt.executeUpdate();                  // Ejecuta la actualización
-           return filasAfectadas > 0;                                  // Devuelve true si se modificó al menos una fila
-       } catch (SQLException e) {
-           e.printStackTrace();                                        // Imprime el error si ocurre
-           return false;                                               // Retorna false en caso de fallo
-       }
-   }
+            stmt.setBoolean(1, estado); // Asigna el estado al parámetro
+            stmt.setInt(2, id); // Asigna el ID al parámetro
+            int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
+            return filasAfectadas > 0; // Devuelve true si se modificó al menos una fila
+        } catch (SQLException e) {
+            e.printStackTrace(); // Imprime el error si ocurre
+            return false; // Retorna false en caso de fallo
+        }
+    }
    
-   public boolean updatePassword(int id, String nuevaContrasena) {
-       // Consulta SQL para desactivar el usuario en lugar de eliminarlo
-       String SQL = "UPDATE usuarios SET contrasena = ? WHERE id = ?";
+    /**
+     * Actualiza la contraseña de un usuario por su ID.
+     *
+     * @param id ID del usuario cuya contraseña se actualizará.
+     * @param nuevaContrasena Nueva contraseña del usuario.
+     * @return true si la actualización fue exitosa, false si falló.
+     */
+    public boolean updatePassword(int id, String nuevaContrasena) {
+        // Consulta SQL para actualizar la contraseña del usuario
+        String SQL = "UPDATE usuarios SET contrasena = ? WHERE id = ?";
 
-       try (Connection conexion = DBConnection.conectar();              // Conexión a la base de datos
-           PreparedStatement stmt = conexion.prepareStatement(SQL)) {  // Prepara la sentencia SQL
+        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
+             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la sentencia SQL
        
-           stmt.setString(1, nuevaContrasena);
-           stmt.setInt(2, id);                                         // Asigna el ID al parámetro
-           int filasAfectadas = stmt.executeUpdate();                  // Ejecuta la actualización
-           return filasAfectadas > 0;                                  // Devuelve true si se modificó al menos una fila
-       } catch (SQLException e) {
-           e.printStackTrace();                                        // Imprime el error si ocurre
-           return false;                                               // Retorna false en caso de fallo
-       }
-   }
+            stmt.setString(1, nuevaContrasena); // Asigna la nueva contraseña al parámetro
+            stmt.setInt(2, id); // Asigna el ID al parámetro
+            int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
+            return filasAfectadas > 0; // Devuelve true si se modificó al menos una fila
+        } catch (SQLException e) {
+            e.printStackTrace(); // Imprime el error si ocurre
+            return false; // Retorna false en caso de fallo
+        }
+    }
 
-    
     /**
      * Método auxiliar que realiza una consulta genérica por campo y valor.
      *
@@ -373,7 +386,7 @@ public class UsuarioDAO {
      */
     private List<Usuario> getAllByCampo(String campo, int value) {
         List<Usuario> usuarios = new ArrayList<>(); // Lista para resultados
-        String SQL = "SELECT * FROM elementos WHERE " + campo + " = ? ORDER BY id DESC"; // Consulta dinámica
+        String SQL = "SELECT * FROM usuarios WHERE " + campo + " = ? ORDER BY id DESC"; // Consulta dinámica
 
         try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
              PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
@@ -394,6 +407,13 @@ public class UsuarioDAO {
         return usuarios; // Retorna la lista
     }
     
+    /**
+     * Mapea un ResultSet a un objeto Usuario.
+     *
+     * @param rs ResultSet que contiene los datos del usuario.
+     * @return Objeto Usuario con los datos mapeados.
+     * @throws SQLException Si ocurre un error al acceder a los datos del ResultSet.
+     */
     private Usuario mapearUsuario(ResultSet rs) throws SQLException {
         return new Usuario(
             rs.getInt("id"), // Obtiene el ID del usuario
@@ -407,9 +427,7 @@ public class UsuarioDAO {
             rs.getInt("ficha_id"), // Obtiene el ID de la ficha
             rs.getString("contrasena"), // Obtiene la contraseña
             rs.getBoolean("activo"), // Obtiene el estado
-            rs.getInt("rol_id") // Obtiene el ID del rol
+            rs.getInt("rol_id") // Obtiene el ID
         );
     }
 }
-
-

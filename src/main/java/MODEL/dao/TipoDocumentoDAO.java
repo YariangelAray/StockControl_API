@@ -7,19 +7,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Clase DAO (Data Access Object) para realizar operaciones CRUD 
- * sobre la tabla 'tipos_documento' en la base de datos.
+ * Clase DAO para realizar operaciones CRUD sobre la tabla 'tipos_documento'.
  * 
- * Esta clase utiliza la clase utilitaria DBConnection para establecer conexión con la base de datos.
+ * Esta clase se encarga exclusivamente del acceso a datos, sin incluir lógica de negocio.
+ * Utiliza la clase DBConnection para conectarse a la base de datos.
  * 
  * Métodos disponibles:
  * - getAll(): Obtiene todos los tipos de documento.
  * - getById(int id): Busca un tipo de documento por su ID.
- * - create(TipoDocumento tipoDocumento): Crea un nuevo tipo de documento y retorna el objeto creado.
- * - update(int id, TipoDocumento tipoDocumento): Actualiza un tipo de documento por su ID y retorna el objeto actualizado.
- * - delete(int id): Elimina un tipo de documento por su ID.
- * 
- * Esta clase no contiene lógica de negocio, solo acceso a datos.
+ * - create(TipoDocumento tipoDocumento): Inserta un nuevo tipo de documento.
+ * - update(int id, TipoDocumento tipoDocumento): Actualiza un tipo existente.
+ * - delete(int id): Elimina un tipo por su ID.
  * 
  * @author Yariangel Aray
  */
@@ -31,33 +29,26 @@ public class TipoDocumentoDAO {
      * @return Lista de objetos TipoDocumento con todos los tipos registrados.
      */
     public List<TipoDocumento> getAll() {
-        // Inicializa una lista para almacenar los tipos de documento
-        List<TipoDocumento> tipos = new ArrayList<>();
-        // Consulta SQL para seleccionar todos los tipos de documento
-        String SQL = "SELECT * FROM tipos_documento";
+        List<TipoDocumento> tipos = new ArrayList<>(); // Lista para almacenar resultados
+        String SQL = "SELECT * FROM tipos_documento"; // Consulta SQL
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL); // Prepara la consulta
-             ResultSet rs = stmt.executeQuery()) { // Ejecuta la consulta y obtiene los resultados
-
-            // Itera sobre los resultados obtenidos
-            while (rs.next()) {
-                // Crea un nuevo objeto TipoDocumento a partir de los datos de la fila actual
+        try (
+            Connection conexion = DBConnection.conectar(); // Establece conexión
+            PreparedStatement stmt = conexion.prepareStatement(SQL); // Prepara la consulta
+            ResultSet rs = stmt.executeQuery() // Ejecuta y obtiene resultados
+        ) {
+            while (rs.next()) { // Itera sobre cada fila
                 TipoDocumento tipo = new TipoDocumento(
-                    rs.getInt("id"), // Obtiene el ID del tipo de documento
-                    rs.getString("nombre") // Obtiene el nombre del tipo de documento
+                    rs.getInt("id"), // ID del tipo
+                    rs.getString("nombre") // Nombre del tipo
                 );
-                // Agrega el tipo de documento a la lista
-                tipos.add(tipo);
+                tipos.add(tipo); // Agrega a la lista
             }
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
-            e.printStackTrace();
+            e.printStackTrace(); // Imprime error si ocurre
         }
 
-        // Retorna la lista de tipos de documento
-        return tipos;
+        return tipos; // Retorna la lista
     }
 
     /**
@@ -67,36 +58,28 @@ public class TipoDocumentoDAO {
      * @return El objeto TipoDocumento si se encuentra, o null si no existe.
      */
     public TipoDocumento getById(int id) {
-        // Inicializa el objeto TipoDocumento como null
-        TipoDocumento tipo = null;
-        // Consulta SQL para seleccionar un tipo de documento por ID
-        String SQL = "SELECT * FROM tipos_documento WHERE id = ?";
+        TipoDocumento tipo = null; // Inicializa el resultado
+        String SQL = "SELECT * FROM tipos_documento WHERE id = ?"; // Consulta con parámetro
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
+            stmt.setInt(1, id); // Asigna el ID
+            ResultSet rs = stmt.executeQuery(); // Ejecuta la consulta
 
-            // Establece el valor del parámetro id en la consulta
-            stmt.setInt(1, id);
-            // Ejecuta la consulta y obtiene los resultados
-            ResultSet rs = stmt.executeQuery();
-
-            // Verifica si hay resultados
-            if (rs.next()) {
-                // Crea un nuevo objeto TipoDocumento a partir de los datos de la fila actual
+            if (rs.next()) { // Si hay resultado
                 tipo = new TipoDocumento(
-                    rs.getInt("id"), // Obtiene el ID del tipo de documento
-                    rs.getString("nombre") // Obtiene el nombre del tipo de documento
+                    rs.getInt("id"),
+                    rs.getString("nombre")
                 );
             }
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
 
-        // Retorna el tipo de documento encontrado o null si no existe
-        return tipo;
+        return tipo; // Retorna el tipo o null
     }
 
     /**
@@ -106,35 +89,28 @@ public class TipoDocumentoDAO {
      * @return TipoDocumento creado con el ID generado, o null si hubo error.
      */
     public TipoDocumento create(TipoDocumento tipo) {
-        // Consulta SQL para insertar un nuevo tipo de documento
-        String SQL = "INSERT INTO tipos_documento (nombre) VALUES (?)";
+        String SQL = "INSERT INTO tipos_documento (nombre) VALUES (?)"; // Consulta de inserción
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)) { // Prepara la consulta y permite obtener el ID generado
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL, PreparedStatement.RETURN_GENERATED_KEYS)
+        ) {
+            stmt.setString(1, tipo.getNombre()); // Asigna el nombre
 
-            // Establece los valores de los parámetros en la consulta
-            stmt.setString(1, tipo.getNombre());
-
-            // Ejecuta la consulta y obtiene el número de filas afectadas
-            int filasAfectadas = stmt.executeUpdate();
-            // Verifica si se insertó al menos un registro
+            int filasAfectadas = stmt.executeUpdate(); // Ejecuta la inserción
             if (filasAfectadas > 0) {
-                // Obtiene las claves generadas (ID del nuevo tipo de documento)
-                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                ResultSet generatedKeys = stmt.getGeneratedKeys(); // Obtiene el ID generado
                 if (generatedKeys.next()) {
-                    // Establece el ID en el objeto tipo y lo retorna
-                    tipo.setId(generatedKeys.getInt(1));
+                    tipo.setId(generatedKeys.getInt(1)); // Asigna el ID al objeto
                     return tipo;
                 }
             }
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-        // Retorna null si hubo un error al crear el tipo de documento
-        return null;
+
+        return null; // Retorna null si hubo error
     }
 
     /**
@@ -145,31 +121,25 @@ public class TipoDocumentoDAO {
      * @return TipoDocumento actualizado si fue exitoso, o null si falló.
      */
     public TipoDocumento update(int id, TipoDocumento tipo) {
-        // Consulta SQL para actualizar un tipo de documento existente
-        String SQL = "UPDATE tipos_documento SET nombre = ? WHERE id = ?";
+        String SQL = "UPDATE tipos_documento SET nombre = ? WHERE id = ?"; // Consulta de actualización
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
+            stmt.setString(1, tipo.getNombre()); // Nuevo nombre
+            stmt.setInt(2, id); // ID del registro a actualizar
 
-            // Establece los valores de los parámetros en la consulta
-            stmt.setString(1, tipo.getNombre());
-            stmt.setInt(2, id); // Establece el ID del tipo de documento a actualizar
-
-            // Ejecuta la consulta y obtiene el número de filas afectadas
-            int filasAfectadas = stmt.executeUpdate();
-            // Verifica si se actualizó al menos un registro
+            int filasAfectadas = stmt.executeUpdate(); // Ejecuta la actualización
             if (filasAfectadas > 0) {
-                // Establece el ID en el objeto tipo y lo retorna
-                tipo.setId(id);
+                tipo.setId(id); // Actualiza el ID en el objeto
                 return tipo;
             }
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
         }
-        // Retorna null si hubo un error al actualizar el tipo de documento
+
         return null;
     }
 
@@ -180,24 +150,19 @@ public class TipoDocumentoDAO {
      * @return true si la eliminación fue exitosa, false si falló.
      */
     public boolean delete(int id) {
-        // Consulta SQL para eliminar un tipo de documento por ID
-        String SQL = "DELETE FROM tipos_documento WHERE id = ?";
+        String SQL = "DELETE FROM tipos_documento WHERE id = ?"; // Consulta de eliminación
 
-        // Intenta establecer una conexión y ejecutar la consulta
-        try (Connection conexion = DBConnection.conectar(); // Conexión a la base de datos
-             PreparedStatement stmt = conexion.prepareStatement(SQL)) { // Prepara la consulta
-
-            // Establece el valor del parámetro id en la consulta
-            stmt.setInt(1, id);
-            // Ejecuta la consulta y obtiene el número de filas afectadas
-            int filasAfectadas = stmt.executeUpdate();
-            // Retorna true si se eliminó al menos un registro
-            return filasAfectadas > 0;
+        try (
+            Connection conexion = DBConnection.conectar();
+            PreparedStatement stmt = conexion.prepareStatement(SQL)
+        ) {
+            stmt.setInt(1, id); // Asigna el ID
+            return stmt.executeUpdate() > 0; // Retorna true si se eliminó
 
         } catch (SQLException e) {
-            // Imprime el error en caso de que ocurra una excepción SQL
             e.printStackTrace();
-            return false; // Retorna false si hubo un error
+            return false; // Retorna false si hubo error
         }
     }
 }
+
